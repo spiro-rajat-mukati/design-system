@@ -17,6 +17,7 @@ import {
   ProgressBar,
   NumericInput,
   SegmentedControl,
+  Tabs,
   Field,
   TextInput,
   Textarea,
@@ -232,6 +233,32 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
             ]}
             defaultValue="week"
             size="sm"
+          />
+        </Section>
+
+        {/* ── Tabs ─────────────────────────────────────────────────────── */}
+        <Section title="Tabs — underline">
+          <Tabs
+            items={[
+              { value: "overview", label: "Overview" },
+              { value: "activity", label: "Activity" },
+              { value: "settings", label: "Settings" },
+              { value: "archive", label: "Archive", disabled: true },
+            ]}
+            defaultValue="overview"
+            variant="underline"
+          />
+        </Section>
+
+        <Section title="Tabs — pill">
+          <Tabs
+            items={[
+              { value: "day", label: "Day" },
+              { value: "week", label: "Week" },
+              { value: "month", label: "Month" },
+            ]}
+            defaultValue="week"
+            variant="pill"
           />
         </Section>
 
