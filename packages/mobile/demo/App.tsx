@@ -18,6 +18,8 @@ import {
   NumericInput,
   SegmentedControl,
   Tabs,
+  ToastProvider,
+  useToast,
   Field,
   TextInput,
   Textarea,
@@ -61,6 +63,26 @@ function Row({ children }: { children: React.ReactNode }) {
 }
 
 // ─── Showcase screen ────────────────────────────────────────────────────────
+
+function ToastTriggerSection() {
+  const { show } = useToast();
+  return (
+    <Section title="Toast">
+      <Row>
+        {(["neutral", "info", "success", "warning", "danger"] as const).map((tone) => (
+          <Button
+            key={tone}
+            size="sm"
+            variant="secondary"
+            onPress={() => show({ tone, message: `${tone} toast`, title: tone.charAt(0).toUpperCase() + tone.slice(1) })}
+          >
+            {tone}
+          </Button>
+        ))}
+      </Row>
+    </Section>
+  );
+}
 
 function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
   const { theme, themeName } = useTheme();
@@ -262,6 +284,9 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
           />
         </Section>
 
+        {/* ── Toast ────────────────────────────────────────────────────── */}
+        <ToastTriggerSection />
+
         {/* ── Field + TextInput ─────────────────────────────────────────── */}
         <Section title="TextInput">
           <Field label="Email" helperText="We'll never share your email.">
@@ -381,7 +406,9 @@ export default function App() {
   const [theme, setTheme] = useState<ThemeName>("light");
   return (
     <ThemeProvider forcedTheme={theme}>
-      <Showcase onToggleTheme={() => setTheme(t => t === "light" ? "dark" : "light")} />
+      <ToastProvider>
+        <Showcase onToggleTheme={() => setTheme(t => t === "light" ? "dark" : "light")} />
+      </ToastProvider>
     </ThemeProvider>
   );
 }
