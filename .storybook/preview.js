@@ -1,22 +1,19 @@
 import React, { useEffect } from "react";
 import "../src/index.css";
 
-/* ---- Theme + density decorator ----
- * Toggles [data-theme] and [data-density] on <html> based on global toolbars.
- * Storybook UI gets a Theme (Light/Dark) and Density (Compact/Comfortable)
- * picker; Chromatic snapshots the four-corner matrix via parameters.chromatic.modes.
+/* ---- Theme decorator ----
+ * Toggles [data-theme] on <html> based on the global Theme toolbar.
+ * Storybook UI gets a Theme (Light/Dark) picker; Chromatic snapshots
+ * both via parameters.chromatic.modes.
  */
 const withGlobals = (Story, context) => {
   const theme = context.globals.theme || "light";
-  const density = context.globals.density || "compact";
 
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "dark") root.setAttribute("data-theme", "dark");
     else root.removeAttribute("data-theme");
-    if (density === "comfortable") root.setAttribute("data-density", "comfortable");
-    else root.removeAttribute("data-density");
-  }, [theme, density]);
+  }, [theme]);
 
   return React.createElement(
     "div",
@@ -29,7 +26,6 @@ const withGlobals = (Story, context) => {
         fontFamily: "var(--font-family-sans)",
       },
       "data-story-theme": theme,
-      "data-story-density": density,
     },
     React.createElement(Story, null)
   );
@@ -53,19 +49,6 @@ const preview = {
         dynamicTitle: true,
       },
     },
-    density: {
-      name: "Density",
-      description: "Touch-target density",
-      defaultValue: "compact",
-      toolbar: {
-        icon: "graphline",
-        items: [
-          { value: "compact",     title: "Compact" },
-          { value: "comfortable", title: "Comfortable" },
-        ],
-        dynamicTitle: true,
-      },
-    },
   },
 
   parameters: {
@@ -78,17 +61,15 @@ const preview = {
     },
     backgrounds: { disable: true },
 
-    /* Chromatic four-corner matrix.
-     * `modes` requires the @chromatic-com/storybook addon to capture all
-     * four snapshots per story. Without that addon, snapshots default to
-     * whatever the toolbars are set to.
+    /* Chromatic light/dark matrix.
+     * `modes` requires the @chromatic-com/storybook addon to capture both
+     * snapshots per story. Without that addon, snapshots default to
+     * whatever the toolbar is set to.
      */
     chromatic: {
       modes: {
-        "light-compact":     { theme: "light", density: "compact" },
-        "dark-compact":      { theme: "dark",  density: "compact" },
-        "light-comfortable": { theme: "light", density: "comfortable" },
-        "dark-comfortable":  { theme: "dark",  density: "comfortable" },
+        light: { theme: "light" },
+        dark:  { theme: "dark" },
       },
       diffThreshold: 0.2,
       pauseAnimationAtEnd: true,

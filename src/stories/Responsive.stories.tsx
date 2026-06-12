@@ -16,7 +16,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          "Real form rendered at three viewports. Use the Density toolbar to flip between compact (desktop) and comfortable (touch) and see touch targets bump to ≥ 44px.",
+          "Real form rendered at three viewports (mobile, tablet, desktop).",
       },
     },
   },
@@ -112,20 +112,20 @@ export const Desktop: Story = {
   parameters: { viewport: { defaultViewport: "desktop" } },
 };
 
-/** Quick visual reference for all token-driven heights at the active density. */
+/** Quick visual reference for all token-driven heights. */
 export const TouchTargets: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", maxWidth: 360, marginInline: "auto" }}>
-      <Field label="Small input"><TextInput size="sm" placeholder="32 / 36 px" /></Field>
-      <Field label="Medium input"><TextInput size="md" placeholder="40 / 44 px" /></Field>
-      <Field label="Large input"><TextInput size="lg" placeholder="48 / 52 px" /></Field>
+      <Field label="Small input"><TextInput size="sm" placeholder="32px" /></Field>
+      <Field label="Medium input"><TextInput size="md" placeholder="40px" /></Field>
+      <Field label="Large input"><TextInput size="lg" placeholder="48px" /></Field>
       <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
         <Button size="sm">sm</Button>
         <Button size="md">md</Button>
         <Button size="lg">lg</Button>
       </div>
       <p style={{ color: "var(--color-text-tertiary)", fontSize: "var(--font-size-100)", margin: 0 }}>
-        Heights swap when the Density toolbar flips to <code>comfortable</code> (≥ 44px).
+        Token-driven heights: sm 32px · md 40px · lg 48px.
       </p>
     </div>
   ),
