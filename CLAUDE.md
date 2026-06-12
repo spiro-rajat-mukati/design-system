@@ -23,6 +23,18 @@ _Numbered list, ~8 items. Each one line. Examples to flesh out later:_
 7. TypeScript types are not optional. Props named consistently with the existing API surface.
 8. Accessibility is a build error, not a follow-up ticket.
 
+## Agent operating mode (autonomous / solo)
+
+This repo is currently run **solo by the owner, with Claude Code driving execution.** Unless told otherwise:
+
+- **Work in chunks, not single steps.** Given a multi-step goal (e.g. "build the core component set"), proceed through the steps autonomously — don't stop after each one to ask "what next?".
+- **Per unit of work, run the full loop yourself:** build + test + lint → commit → push → open a PR → squash-merge it → delete the branch → sync `main`. One focused PR per component/unit.
+- **Keep the gates green:** every change must pass the web build and `npm run tokens:check`; never hand-edit generated token files.
+- **Only stop to ask the owner for** a genuine product/design decision or ambiguity, or a failure you can't resolve. Surface those clearly; never guess on direction.
+- Current plan + locked decisions live in `docs/ai/mobile-library-plan.md`.
+
+_Solo-mode note: this intentionally lets the agent merge its own PRs. The lead-review expectation in §7 applies once the team grows._
+
 ## 3. How to start a task (the 60-second orientation)
 
 _Three bullet decision tree:_
