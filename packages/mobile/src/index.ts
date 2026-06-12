@@ -68,3 +68,6 @@ export type { ToastItem, ToastTone, ToastContextValue } from "./components/Toast
 
 export { Select } from "./components/Select";
 export type { SelectProps, SelectOption, SelectSize } from "./components/Select";
+
+export { ActionSheet } from "./components/ActionSheet";
+export type { ActionSheetProps, ActionSheetItem } from "./components/ActionSheet";
