@@ -13,6 +13,7 @@ import {
   useTheme,
   Button,
   Badge,
+  Tag,
   Field,
   TextInput,
   Textarea,
@@ -144,6 +145,28 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
             <Badge count={5} tone="brand" variant="solid" />
             <Badge count={150} tone="danger" variant="solid" />
             <Badge withDot tone="success">Live</Badge>
+          </Row>
+        </Section>
+
+        {/* ── Tag ──────────────────────────────────────────────────────── */}
+        <Section title="Tag — tones">
+          <Row>
+            {(["neutral","brand","success","warning","danger","info"] as const).map(t => (
+              <Tag key={t} label={t} tone={t} />
+            ))}
+          </Row>
+        </Section>
+
+        <Section title="Tag — variants & actions">
+          <Row>
+            <Tag label="soft" tone="brand" variant="soft" />
+            <Tag label="outline" tone="brand" variant="outline" />
+            <Tag label="solid" tone="brand" variant="solid" />
+          </Row>
+          <Row>
+            <Tag label="removable" tone="success" removable onRemove={() => {}} />
+            <Tag label="pressable" tone="info" onPress={() => {}} />
+            <Tag label="disabled" tone="danger" removable disabled />
           </Row>
         </Section>
 
