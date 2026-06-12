@@ -85,3 +85,6 @@ export type {
   SafeAreaEdge,
   SafeAreaSurface,
 } from "./components/SafeAreaWrapper";
+
+export { ListItem } from "./components/ListItem";
+export type { ListItemProps, ListItemVariant } from "./components/ListItem";

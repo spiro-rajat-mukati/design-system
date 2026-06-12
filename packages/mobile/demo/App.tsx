@@ -23,6 +23,7 @@ import {
   MultiSelect,
   ActionSheet,
   SafeAreaWrapper,
+  ListItem,
   Field,
   TextInput,
   Textarea,
@@ -467,6 +468,36 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
           <Text style={{ color: theme.color.text.muted, fontSize: 12, marginTop: 8 }}>
             Selected: {radio}
           </Text>
+        </Section>
+
+        {/* ── ListItem ─────────────────────────────────────────────────── */}
+        <Section title="ListItem">
+          <ListItem
+            title="Press me"
+            description="This item has a description and a chevron"
+            trailingContent={<Text style={{ color: theme.color.text.tertiary, fontSize: 18 }}>›</Text>}
+            showDivider
+            onPress={() => {}}
+          />
+          <ListItem
+            title="With leading icon"
+            leadingContent={<View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: theme.color.brand["100"], alignItems: "center", justifyContent: "center" }}><Text style={{ color: theme.color.brand["700"] }}>★</Text></View>}
+            trailingContent={<Badge tone="success" variant="soft" size="xs">New</Badge>}
+            showDivider
+            variant="inset"
+            onPress={() => {}}
+          />
+          <ListItem
+            title="Static row (no press)"
+            description="No onPress, renders as View"
+            showDivider
+          />
+          <ListItem
+            title="Disabled row"
+            description="Cannot be pressed"
+            onPress={() => {}}
+            disabled
+          />
         </Section>
 
         {/* ── SafeAreaWrapper ──────────────────────────────────────────── */}
