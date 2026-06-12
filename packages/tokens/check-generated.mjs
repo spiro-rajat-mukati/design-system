@@ -21,6 +21,7 @@ const FILES = [
   "semantics.css",
   "component-tokens.css",
   "tokens.ts",
+  "tokens.native.ts",
   "tokens.figma-variables.json",
 ];
 

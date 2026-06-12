@@ -1,7 +1,7 @@
 /* Token layer — load order matters: primitives → semantics → components */
-@import "./tokens/primitives.css";
-@import "./tokens/semantics.css";
-@import "./tokens/component-tokens.css";
+@import "@kijani/tokens/primitives.css";
+@import "@kijani/tokens/semantics.css";
+@import "@kijani/tokens/component-tokens.css";
 
 html {
   color-scheme: light dark;

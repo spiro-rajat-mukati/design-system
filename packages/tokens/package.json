@@ -2,5 +2,17 @@
   "name": "@kijani/tokens",
   "version": "0.1.0",
   "private": true,
-  "description": "Kijani shared design tokens — single source of truth for web and mobile. Populated in Phase 0 step 2."
+  "description": "Kijani shared design tokens — single source of truth for web and mobile.",
+  "main": "tokens.native.ts",
+  "types": "tokens.native.ts",
+  "files": [
+    "*.css",
+    "*.ts",
+    "*.json",
+    "source"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node check-generated.mjs"
+  }
 }
