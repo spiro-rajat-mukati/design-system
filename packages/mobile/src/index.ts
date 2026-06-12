@@ -88,3 +88,6 @@ export type {
 
 export { ListItem } from "./components/ListItem";
 export type { ListItemProps, ListItemVariant } from "./components/ListItem";
+
+export { BottomSheet } from "./components/BottomSheet";
+export type { BottomSheetProps } from "./components/BottomSheet";

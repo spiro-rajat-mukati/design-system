@@ -24,6 +24,7 @@ import {
   ActionSheet,
   SafeAreaWrapper,
   ListItem,
+  BottomSheet,
   Field,
   TextInput,
   Textarea,
@@ -84,6 +85,50 @@ function ToastTriggerSection() {
           </Button>
         ))}
       </Row>
+    </Section>
+  );
+}
+
+function BottomSheetDemo() {
+  const { theme } = useTheme();
+  const [sheet1, setSheet1] = useState(false);
+  const [sheet2, setSheet2] = useState(false);
+  return (
+    <Section title="BottomSheet">
+      <Row>
+        <Button size="sm" onPress={() => setSheet1(true)}>Two snap points</Button>
+        <Button size="sm" variant="secondary" onPress={() => setSheet2(true)}>No handle</Button>
+      </Row>
+
+      <BottomSheet
+        visible={sheet1}
+        onClose={() => setSheet1(false)}
+        snapPoints={["40%", "80%"]}
+        title="Snap points"
+        testID="demo-bs-1"
+      >
+        <View style={{ padding: 16 }}>
+          <Text style={{ color: theme.color.text.primary, marginBottom: 8 }}>
+            Drag the handle up to expand to 80%, or down to snap back to 40%. Drag below 40% to close.
+          </Text>
+          <Button onPress={() => setSheet1(false)}>Close</Button>
+        </View>
+      </BottomSheet>
+
+      <BottomSheet
+        visible={sheet2}
+        onClose={() => setSheet2(false)}
+        showHandle={false}
+        snapPoints={["60%"]}
+        title="No handle — tap backdrop to close"
+        testID="demo-bs-2"
+      >
+        <View style={{ padding: 16 }}>
+          <Text style={{ color: theme.color.text.secondary, fontSize: 13 }}>
+            closeOnBackdrop=true (default). Tap outside to dismiss.
+          </Text>
+        </View>
+      </BottomSheet>
     </Section>
   );
 }
@@ -499,6 +544,9 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
             disabled
           />
         </Section>
+
+        {/* ── BottomSheet ──────────────────────────────────────────────── */}
+        <BottomSheetDemo />
 
         {/* ── SafeAreaWrapper ──────────────────────────────────────────── */}
         <Section title="SafeAreaWrapper — surfaces">
