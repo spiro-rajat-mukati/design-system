@@ -4,7 +4,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   Pressable,
   StatusBar,
 } from "react-native";
@@ -23,6 +22,7 @@ import {
   Select,
   MultiSelect,
   ActionSheet,
+  SafeAreaWrapper,
   Field,
   TextInput,
   Textarea,
@@ -99,7 +99,7 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
   const [sheetVisible, setSheetVisible] = useState(false);
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: bg }]}>
+    <SafeAreaWrapper surface="default" style={styles.safe}>
       <StatusBar barStyle={themeName === "dark" ? "light-content" : "dark-content"} />
 
       {/* Theme toggle bar */}
@@ -469,9 +469,25 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
           </Text>
         </Section>
 
+        {/* ── SafeAreaWrapper ──────────────────────────────────────────── */}
+        <Section title="SafeAreaWrapper — surfaces">
+          <Text style={{ color: theme.color.text.secondary, fontSize: 13, marginBottom: 10 }}>
+            The whole screen is already wrapped in a SafeAreaWrapper (surface=&quot;default&quot;). Below are the available surface tokens:
+          </Text>
+          <Row>
+            {(["default","raised","sunken","brand","inverse"] as const).map(s => (
+              <SafeAreaWrapper key={s} surface={s} edges={[]} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, flex: undefined }}>
+                <Text style={{ fontSize: 11, fontWeight: "500", color: s === "inverse" || s === "brand" ? theme.color.text.inverse : theme.color.text.secondary }}>
+                  {s}
+                </Text>
+              </SafeAreaWrapper>
+            ))}
+          </Row>
+        </Section>
+
         <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaWrapper>
   );
 }
 
