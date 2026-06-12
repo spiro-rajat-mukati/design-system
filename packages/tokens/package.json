@@ -1,0 +1,6 @@
+{
+  "name": "@kijani/tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kijani shared design tokens — single source of truth for web and mobile. Populated in Phase 0 step 2."
+}

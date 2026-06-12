@@ -1,0 +1,6 @@
+{
+  "name": "@kijani/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kijani React Native (Expo) component library, built on the shared @kijani/tokens foundation. Scaffolded in Phase 0 step 3."
+}

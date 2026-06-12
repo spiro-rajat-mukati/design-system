@@ -36,6 +36,8 @@ jobs:
       - name: Publish to Chromatic
         uses: chromaui/action@latest
         with:
+          # The web library (Storybook + chromatic.config.json) lives in packages/web.
+          workingDir: packages/web
           projectToken: chpt_ea703ee05d00cea
           # Don't fail the build on visual changes — they're for review, not gating.
           exitZeroOnChanges: true
