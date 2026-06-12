@@ -15,6 +15,7 @@ import {
   Badge,
   Tag,
   ProgressBar,
+  NumericInput,
   Field,
   TextInput,
   Textarea,
@@ -193,6 +194,21 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
           </Row>
           <View style={{ height: 10 }} />
           <ProgressBar label="Loading…" indeterminate />
+        </Section>
+
+        {/* ── NumericInput ─────────────────────────────────────────────── */}
+        <Section title="NumericInput">
+          <Field label="Quantity" helperText="Min 1, max 99">
+            <NumericInput defaultValue={1} min={1} max={99} />
+          </Field>
+          <View style={{ height: 12 }} />
+          <Field label="Step 5">
+            <NumericInput defaultValue={0} step={5} min={0} max={50} />
+          </Field>
+          <View style={{ height: 12 }} />
+          <Field label="Disabled">
+            <NumericInput defaultValue={10} disabled />
+          </Field>
         </Section>
 
         {/* ── Field + TextInput ─────────────────────────────────────────── */}

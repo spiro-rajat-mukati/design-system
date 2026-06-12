@@ -47,3 +47,9 @@ export type {
   ProgressBarTone,
   ProgressBarSize,
 } from "./components/ProgressBar";
+
+export { NumericInput } from "./components/NumericInput";
+export type {
+  NumericInputProps,
+  NumericInputSize,
+} from "./components/NumericInput";
