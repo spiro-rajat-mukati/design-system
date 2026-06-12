@@ -4,3 +4,11 @@ export type { ThemeContextValue } from "./ThemeContext";
 
 export { Button } from "./components/Button";
 export type { ButtonProps, ButtonVariant, ButtonSize } from "./components/Button";
+
+export { Badge } from "./components/Badge";
+export type {
+  BadgeProps,
+  BadgeVariant,
+  BadgeTone,
+  BadgeSize,
+} from "./components/Badge";
