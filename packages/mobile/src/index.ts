@@ -5,6 +5,9 @@ export type { ThemeContextValue } from "./ThemeContext";
 export { Button } from "./components/Button";
 export type { ButtonProps, ButtonVariant, ButtonSize } from "./components/Button";
 
+export { TextInput } from "./components/TextInput";
+export type { TextInputProps, TextInputSize } from "./components/TextInput";
+
 export { Field } from "./components/Field";
 export { useFieldContext } from "./components/Field";
 export type {
