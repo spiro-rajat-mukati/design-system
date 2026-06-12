@@ -21,6 +21,7 @@ import {
   ToastProvider,
   useToast,
   Select,
+  ActionSheet,
   Field,
   TextInput,
   Textarea,
@@ -94,6 +95,7 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
   const [textareaValue, setTextareaValue] = useState("");
   const [checks, setChecks] = useState<string[]>(["b"]);
   const [radio, setRadio] = useState("b");
+  const [sheetVisible, setSheetVisible] = useState(false);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: bg }]}>
@@ -309,6 +311,26 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
               disabled
             />
           </Field>
+        </Section>
+
+        {/* ── ActionSheet ──────────────────────────────────────────────── */}
+        <Section title="ActionSheet">
+          <Button variant="secondary" onPress={() => setSheetVisible(true)}>
+            Open action sheet
+          </Button>
+          <ActionSheet
+            visible={sheetVisible}
+            onClose={() => setSheetVisible(false)}
+            title="File options"
+            message="Choose an action for this file"
+            items={[
+              { label: "Rename", onPress: () => {} },
+              { label: "Move to folder", onPress: () => {} },
+              { label: "Share", onPress: () => {} },
+              { label: "Delete", onPress: () => {}, destructive: true },
+              { label: "Archived (disabled)", onPress: () => {}, disabled: true },
+            ]}
+          />
         </Section>
 
         {/* ── Field + TextInput ─────────────────────────────────────────── */}
