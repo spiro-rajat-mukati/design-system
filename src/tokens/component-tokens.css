@@ -283,23 +283,3 @@
   --progress-circular-track: var(--color-neutral-800);
 }
 
-[data-density="comfortable"] {
-  /* button */
-  --button-height-sm: 36px;
-  --button-height-md: 44px;
-  --button-height-lg: 52px;
-  /* input */
-  --input-height-sm: 36px;
-  --input-height-md: 44px;
-  --input-height-lg: 52px;
-  --input-padding-inline-md: var(--space-4);
-  --input-padding-inline-lg: var(--space-5);
-  /* radio */
-  --radio-size: 20px;
-  /* checkbox */
-  --checkbox-size: 20px;
-  /* tabs */
-  --tabs-trigger-padding-md: var(--space-3) var(--space-5);
-  --tabs-trigger-padding-lg: var(--space-4) var(--space-6);
-}
-
