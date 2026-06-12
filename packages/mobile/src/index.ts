@@ -62,3 +62,6 @@ export type {
 
 export { Tabs } from "./components/Tabs";
 export type { TabsProps, TabItem, TabsVariant, TabsSize } from "./components/Tabs";
+
+export { ToastProvider, useToast } from "./components/Toast";
+export type { ToastItem, ToastTone, ToastContextValue } from "./components/Toast";
