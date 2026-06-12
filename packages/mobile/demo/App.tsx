@@ -21,6 +21,7 @@ import {
   ToastProvider,
   useToast,
   Select,
+  MultiSelect,
   ActionSheet,
   Field,
   TextInput,
@@ -309,6 +310,34 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
               options={[{ value: "x", label: "Option" }]}
               defaultValue="x"
               disabled
+            />
+          </Field>
+        </Section>
+
+        {/* ── MultiSelect ──────────────────────────────────────────────── */}
+        <Section title="MultiSelect">
+          <Field label="Skills">
+            <MultiSelect
+              options={[
+                { value: "ts", label: "TypeScript" },
+                { value: "rn", label: "React Native" },
+                { value: "gql", label: "GraphQL" },
+                { value: "rust", label: "Rust", disabled: true },
+              ]}
+              placeholder="Pick skills…"
+            />
+          </Field>
+          <View style={{ height: 12 }} />
+          <Field label="Max 2 tags">
+            <MultiSelect
+              options={[
+                { value: "a", label: "Alpha" },
+                { value: "b", label: "Beta" },
+                { value: "c", label: "Gamma" },
+              ]}
+              defaultValue={["a"]}
+              maxSelections={2}
+              placeholder="Pick up to 2…"
             />
           </Field>
         </Section>
