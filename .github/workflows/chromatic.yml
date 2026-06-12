@@ -25,10 +25,10 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        # `npm install` instead of `npm ci` so transitive version drift
-        # (e.g. yaml@^2.x bumping to a new minor) doesn't fail the build.
-        # We're not chasing byte-reproducibility on this pipeline.
-        run: npm install --no-audit --no-fund
+        # --legacy-peer-deps: @kijani/mobile uses React 18 (RN) while @kijani/web
+        # uses React 19; the peer-dep chain from @testing-library/react-native
+        # causes a conflict that --legacy-peer-deps resolves.
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Build tokens
         run: npm run tokens:build
