@@ -7,8 +7,8 @@
     "packages/*"
   ],
   "scripts": {
-    "tokens:build": "npm run tokens:build -w @kijani/web",
-    "tokens:check": "npm run tokens:check -w @kijani/web",
+    "tokens:build": "node packages/tokens/build.mjs",
+    "tokens:check": "node packages/tokens/check-generated.mjs",
     "start": "npm run start -w @kijani/web",
     "build": "npm run build -w @kijani/web",
     "test": "npm run test -w @kijani/web",

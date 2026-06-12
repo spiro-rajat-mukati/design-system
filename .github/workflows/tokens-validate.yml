@@ -8,17 +8,18 @@ name: Validate tokens
 on:
   pull_request:
     paths:
-      - "packages/web/src/tokens/source/**"
-      - "packages/web/src/tokens/build.mjs"
-      - "packages/web/src/tokens/check-generated.mjs"
-      - "packages/web/src/tokens/primitives.css"
-      - "packages/web/src/tokens/semantics.css"
-      - "packages/web/src/tokens/component-tokens.css"
-      - "packages/web/src/tokens/tokens.ts"
+      - "packages/tokens/source/**"
+      - "packages/tokens/build.mjs"
+      - "packages/tokens/check-generated.mjs"
+      - "packages/tokens/primitives.css"
+      - "packages/tokens/semantics.css"
+      - "packages/tokens/component-tokens.css"
+      - "packages/tokens/tokens.ts"
+      - "packages/tokens/tokens.native.ts"
   push:
     branches: [main]
     paths:
-      - "packages/web/src/tokens/**"
+      - "packages/tokens/**"
 
 jobs:
   check:
@@ -33,11 +34,11 @@ jobs:
 
       # The build script is zero-dep, so no `npm ci` needed.
       - name: Re-run build and verify generated files match source
-        run: node packages/web/src/tokens/check-generated.mjs
+        run: node packages/tokens/check-generated.mjs
 
       - name: Validate JSON sources parse cleanly
         run: |
-          for f in packages/web/src/tokens/source/*.json; do
+          for f in packages/tokens/source/*.json; do
             node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" \
               || (echo "::error file=$f::Invalid JSON" && exit 1)
           done

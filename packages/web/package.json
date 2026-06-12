@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@kijani/tokens": "*",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -13,9 +14,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "tokens:build": "node src/tokens/build.mjs",
-    "tokens:watch": "node --watch-path=src/tokens/source src/tokens/build.mjs",
-    "tokens:check": "node src/tokens/check-generated.mjs",
+    "tokens:build": "node ../tokens/build.mjs",
+    "tokens:watch": "node --watch-path=../tokens/source ../tokens/build.mjs",
+    "tokens:check": "node ../tokens/check-generated.mjs",
     "prestart": "npm run tokens:build",
     "prebuild": "npm run tokens:build",
     "prestorybook": "npm run tokens:build",
