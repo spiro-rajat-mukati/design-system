@@ -20,6 +20,7 @@ import {
   Tabs,
   ToastProvider,
   useToast,
+  Select,
   Field,
   TextInput,
   Textarea,
@@ -286,6 +287,29 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
 
         {/* ── Toast ────────────────────────────────────────────────────── */}
         <ToastTriggerSection />
+
+        {/* ── Select ───────────────────────────────────────────────────── */}
+        <Section title="Select">
+          <Field label="Fruit">
+            <Select
+              options={[
+                { value: "apple", label: "Apple" },
+                { value: "banana", label: "Banana" },
+                { value: "cherry", label: "Cherry" },
+                { value: "durian", label: "Durian (unavailable)", disabled: true },
+              ]}
+              placeholder="Choose a fruit…"
+            />
+          </Field>
+          <View style={{ height: 12 }} />
+          <Field label="Disabled select">
+            <Select
+              options={[{ value: "x", label: "Option" }]}
+              defaultValue="x"
+              disabled
+            />
+          </Field>
+        </Section>
 
         {/* ── Field + TextInput ─────────────────────────────────────────── */}
         <Section title="TextInput">

@@ -65,3 +65,6 @@ export type { TabsProps, TabItem, TabsVariant, TabsSize } from "./components/Tab
 
 export { ToastProvider, useToast } from "./components/Toast";
 export type { ToastItem, ToastTone, ToastContextValue } from "./components/Toast";
+
+export { Select } from "./components/Select";
+export type { SelectProps, SelectOption, SelectSize } from "./components/Select";
