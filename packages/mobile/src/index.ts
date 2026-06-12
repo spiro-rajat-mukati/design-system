@@ -37,3 +37,6 @@ export type {
   BadgeTone,
   BadgeSize,
 } from "./components/Badge";
+
+export { Tag } from "./components/Tag";
+export type { TagProps, TagTone, TagVariant, TagSize } from "./components/Tag";
