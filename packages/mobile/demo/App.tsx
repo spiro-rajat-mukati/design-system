@@ -16,6 +16,7 @@ import {
   Tag,
   ProgressBar,
   NumericInput,
+  SegmentedControl,
   Field,
   TextInput,
   Textarea,
@@ -209,6 +210,29 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
           <Field label="Disabled">
             <NumericInput defaultValue={10} disabled />
           </Field>
+        </Section>
+
+        {/* ── SegmentedControl ─────────────────────────────────────────── */}
+        <Section title="SegmentedControl">
+          <SegmentedControl
+            options={[
+              { value: "all", label: "All" },
+              { value: "active", label: "Active" },
+              { value: "done", label: "Done" },
+            ]}
+            defaultValue="all"
+          />
+          <View style={{ height: 10 }} />
+          <SegmentedControl
+            options={[
+              { value: "day", label: "Day" },
+              { value: "week", label: "Week" },
+              { value: "month", label: "Month" },
+              { value: "year", label: "Year", disabled: true },
+            ]}
+            defaultValue="week"
+            size="sm"
+          />
         </Section>
 
         {/* ── Field + TextInput ─────────────────────────────────────────── */}
