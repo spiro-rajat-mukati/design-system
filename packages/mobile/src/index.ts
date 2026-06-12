@@ -71,3 +71,10 @@ export type { SelectProps, SelectOption, SelectSize } from "./components/Select"
 
 export { ActionSheet } from "./components/ActionSheet";
 export type { ActionSheetProps, ActionSheetItem } from "./components/ActionSheet";
+
+export { MultiSelect } from "./components/MultiSelect";
+export type {
+  MultiSelectProps,
+  MultiSelectOption,
+  MultiSelectSize,
+} from "./components/MultiSelect";
