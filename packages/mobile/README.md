@@ -109,6 +109,13 @@ dismissAll();    // clear all
 | `SegmentedControl` | Pill-track group selector; controlled + uncontrolled; per-option disabled; 3 sizes |
 | `Tabs` | `variant="underline"\|"pill"`, 3 sizes, scrollable, per-tab disabled |
 
+### Navigation & layout (mobile-only)
+| Component | Props highlights |
+|---|---|
+| `SafeAreaWrapper` | Token-driven background via `surface` prop; configurable `edges`; thin wrapper over `SafeAreaView` |
+| `ListItem` | `title`, `description`, `leadingContent`, `trailingContent`, `showDivider`, `variant="default"\|"inset"`, 56px min touch target |
+| `BottomSheet` | `snapPoints`, `initialSnapIndex`, `title`, `showHandle`, `closeOnBackdrop`, `closeOnSwipeDown`; PanResponder drag + spring snap |
+
 ### Overlays & system
 | Component | Props highlights |
 |---|---|
@@ -174,7 +181,7 @@ Tests live alongside each component in `__tests__/` directories.
 
 ```sh
 cd packages/mobile
-npx jest                             # all 175 tests
+npx jest                             # all 209 tests
 npx jest --watch                     # watch mode
 npx jest src/components/Button       # single component
 ```
@@ -201,14 +208,35 @@ Use the `px()` utility from `src/utils/tokens.ts` to strip the "px" unit when as
 
 ---
 
-## What's not in v1
+## BottomSheet usage
+
+```tsx
+import { BottomSheet } from "@kijani/mobile";
+
+const [open, setOpen] = useState(false);
+
+<Button onPress={() => setOpen(true)}>Open sheet</Button>
+
+<BottomSheet
+  visible={open}
+  onClose={() => setOpen(false)}
+  snapPoints={["40%", "80%"]}
+  title="Actions"
+>
+  {/* sheet content */}
+</BottomSheet>
+```
+
+`snapPoints` accepts numbers (px) or percent strings (`"50%"`). The sheet opens at `snapPoints[initialSnapIndex]` (default 0). Drag up to expand; drag down to snap to smaller point or close.
+
+---
+
+## What's not in this library
 
 | Item | Notes |
 |---|---|
 | `Popover` | No natural mobile equivalent; use `ActionSheet` or `Modal` instead |
-| `BottomSheet` | Draggable/snap sheet — candidate for v1.1 |
-| `SafeAreaWrapper` | Use `expo-safe-area-context` directly for now |
-| `ListItem` | Row component for lists — candidate for v1.1 |
-| Visual regression | Detox/Maestro or Chromatic RN — candidate for v1.1 |
+| Visual regression | Detox/Maestro or Chromatic RN — candidate for next phase |
 | Figma mobile modes | iOS/Android component frames — deferred per locked decision |
 | npm publishing | Monorepo-only for now |
+| `expo-safe-area-context` | `SafeAreaWrapper` uses RN built-in `SafeAreaView`; upgrade path: swap the import in `SafeAreaWrapper.tsx` |

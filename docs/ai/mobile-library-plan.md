@@ -27,13 +27,18 @@ A **separate** mobile component library (`@kijani/mobile`) that shares the **sam
 | Distribution | **Consume from the monorepo** for now; no npm publishing yet |
 | Touch targets | ≥ 44px on mobile (handle via mobile tokens; web baseline is smaller) |
 
-## v1 status: COMPLETE (2026-06-13)
+## Status: v1 + mobile-only extras — COMPLETE (2026-06-13)
 
-All Phase 0 steps and the full component set are merged to `main`. 175 tests, 17 test suites. Expo showcase in `packages/mobile/demo/`.
+All Phase 0 steps, the full v1 component set, and the three mobile-only extras are merged to `main`. 209 tests, 20 test suites. Expo showcase in `packages/mobile/demo/`.
 
-**Built (PRs #10–#23):** ThemeProvider/useTheme, Button, Badge, Field, TextInput, Textarea, Checkbox/CheckboxGroup, Radio/RadioGroup, Tag, ProgressBar, NumericInput, SegmentedControl, Tabs, Toast/ToastProvider/useToast, Select, ActionSheet, MultiSelect.
+**Built (PRs #10–#26):** ThemeProvider/useTheme, Button, Badge, Field, TextInput, Textarea, Checkbox/CheckboxGroup, Radio/RadioGroup, Tag, ProgressBar, NumericInput, SegmentedControl, Tabs, Toast/ToastProvider/useToast, Select, ActionSheet, MultiSelect, SafeAreaWrapper (PR #24), ListItem (PR #25), BottomSheet (PR #26).
 
-**Intentionally deferred:** BottomSheet, SafeAreaWrapper, ListItem, Popover (no mobile equivalent), visual regression, Figma mobile modes, npm publishing.
+**Mobile-only extras detail:**
+- **SafeAreaWrapper** — thin wrapper over RN built-in `SafeAreaView`; configurable edges + surface token; upgrade path to `expo-safe-area-context` documented.
+- **ListItem** — row component with leading/trailing slots, inset divider variant, 56px min touch target, pressable + static variants.
+- **BottomSheet** — draggable with snap points (px or %), PanResponder gesture + spring animations, animated backdrop overlay, configurable handle + backdrop-close behavior.
+
+**Intentionally deferred:** Popover (no direct mobile equivalent), visual regression, Figma mobile modes, npm publishing.
 
 ## Conventions / guardrails
 
