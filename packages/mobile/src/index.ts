@@ -78,3 +78,10 @@ export type {
   MultiSelectOption,
   MultiSelectSize,
 } from "./components/MultiSelect";
+
+export { SafeAreaWrapper } from "./components/SafeAreaWrapper";
+export type {
+  SafeAreaWrapperProps,
+  SafeAreaEdge,
+  SafeAreaSurface,
+} from "./components/SafeAreaWrapper";
