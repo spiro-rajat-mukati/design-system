@@ -59,3 +59,6 @@ export type {
   SegmentedControlProps,
   SegmentedOption,
 } from "./components/SegmentedControl";
+
+export { Tabs } from "./components/Tabs";
+export type { TabsProps, TabItem, TabsVariant, TabsSize } from "./components/Tabs";
