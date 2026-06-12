@@ -40,3 +40,10 @@ export type {
 
 export { Tag } from "./components/Tag";
 export type { TagProps, TagTone, TagVariant, TagSize } from "./components/Tag";
+
+export { ProgressBar } from "./components/ProgressBar";
+export type {
+  ProgressBarProps,
+  ProgressBarTone,
+  ProgressBarSize,
+} from "./components/ProgressBar";

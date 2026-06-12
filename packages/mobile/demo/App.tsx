@@ -14,6 +14,7 @@ import {
   Button,
   Badge,
   Tag,
+  ProgressBar,
   Field,
   TextInput,
   Textarea,
@@ -168,6 +169,30 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
             <Tag label="pressable" tone="info" onPress={() => {}} />
             <Tag label="disabled" tone="danger" removable disabled />
           </Row>
+        </Section>
+
+        {/* ── ProgressBar ──────────────────────────────────────────────── */}
+        <Section title="ProgressBar — tones">
+          <ProgressBar label="Brand" tone="brand" value={60} showValue />
+          <View style={{ height: 10 }} />
+          <ProgressBar label="Success" tone="success" value={80} showValue />
+          <View style={{ height: 10 }} />
+          <ProgressBar label="Warning" tone="warning" value={40} showValue />
+          <View style={{ height: 10 }} />
+          <ProgressBar label="Danger" tone="danger" value={25} showValue />
+        </Section>
+
+        <Section title="ProgressBar — sizes & indeterminate">
+          <Row>
+            {(["xs","sm","md","lg"] as const).map(s => (
+              <View key={s} style={{ flex: 1 }}>
+                <Text style={{ color: theme.color.text.muted, fontSize: 11, marginBottom: 4 }}>{s}</Text>
+                <ProgressBar size={s} value={65} />
+              </View>
+            ))}
+          </Row>
+          <View style={{ height: 10 }} />
+          <ProgressBar label="Loading…" indeterminate />
         </Section>
 
         {/* ── Field + TextInput ─────────────────────────────────────────── */}
