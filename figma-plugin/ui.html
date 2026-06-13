@@ -55,6 +55,8 @@
     color: var(--fg-muted);
   }
   .config strong { color: var(--fg); font-weight: 500; }
+  .config .pat-ok  { color: var(--success); }
+  .config .pat-err { color: var(--error); }
   .actions {
     display: flex;
     flex-direction: column;
@@ -82,16 +84,21 @@
     border: 1px solid var(--border);
   }
   button.secondary:hover:not(:disabled) { background: var(--bg-sunken); }
+  button.small {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
   .log {
     background: var(--bg-sunken);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 8px 10px;
-    height: 180px;
+    height: 160px;
     overflow-y: auto;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 11px;
     line-height: 1.5;
+    margin-bottom: 12px;
   }
   .log .line { white-space: pre-wrap; }
   .log .info { color: var(--fg); }
@@ -100,6 +107,53 @@
   .log .err { color: var(--error); }
   .log .warn { color: var(--warning); }
   .log .empty { color: var(--fg-muted); font-style: italic; }
+  /* Settings accordion */
+  details {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  summary {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--fg-muted);
+    background: var(--bg-sunken);
+    list-style: none;
+    user-select: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▶  "; font-size: 9px; }
+  details[open] summary::before { content: "▼  "; }
+  .settings-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .settings-body p {
+    margin: 0;
+    color: var(--fg-muted);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .pat-row {
+    display: flex;
+    gap: 6px;
+  }
+  .pat-row input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    outline: none;
+  }
+  .pat-row input:focus { border-color: var(--action-bg); }
 </style>
 </head>
 <body>
@@ -109,6 +163,7 @@
   <div class="config">
     <div><strong>Repo:</strong> spiro-rajat-mukati/design-system</div>
     <div><strong>Branch:</strong> main</div>
+    <div id="pat-status"><strong>PAT:</strong> <span class="muted">loading…</span></div>
   </div>
 
   <div class="actions">
@@ -122,54 +177,102 @@
     <div class="line empty">Logs appear here.</div>
   </div>
 
+  <details id="pat-settings">
+    <summary>PAT Settings</summary>
+    <div class="settings-body">
+      <p>
+        Fine-grained PAT with <strong>Contents: Read</strong> on
+        <code>spiro-rajat-mukati/design-system</code>.
+        Stored in Figma clientStorage — never committed to the repo.
+      </p>
+      <div class="pat-row">
+        <input type="password" id="pat-input" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
+        <button class="secondary small" id="save-pat">Save</button>
+      </div>
+    </div>
+  </details>
+
 <script>
-  const REPO_RAW = 'https://raw.githubusercontent.com/spiro-rajat-mukati/design-system/main';
-  const TOKENS_URL = REPO_RAW + '/packages/tokens/tokens.figma-variables.json';
+  const REPO   = 'spiro-rajat-mukati/design-system';
+  const BRANCH = 'main';
   const SPECS = [
-    'Button',
-    'Badge',
-    'ButtonGroup',
-    'Field',
-    'TextInput',
-    'Textarea',
-    'NumericInput',
-    'Radio',
-    'Checkbox',
-    'Tag',
-    'Toast',
-    'Tabs',
-    'Select',
-    'MultiSelect',
-    'Menu',
-    'ProgressBar'
+    'Button', 'Badge', 'ButtonGroup', 'Field', 'TextInput', 'Textarea',
+    'NumericInput', 'Radio', 'Checkbox', 'Tag', 'Toast', 'Tabs',
+    'Select', 'MultiSelect', 'Menu', 'ProgressBar'
   ];
 
+  // PAT held in memory for the session; never written to DOM as plain text.
+  let activePat = null;
+
+  /* ---------- logging ---------- */
+
   const logEl = document.getElementById('log');
-  function log(msg, kind = 'info') {
-    // Remove the placeholder if present.
+  function log(msg, kind) {
     const empty = logEl.querySelector('.empty');
     if (empty) empty.remove();
     const line = document.createElement('div');
-    line.className = 'line ' + kind;
+    line.className = 'line ' + (kind || 'info');
     line.textContent = msg;
     logEl.appendChild(line);
     logEl.scrollTop = logEl.scrollHeight;
   }
 
-  function setBusy(busy) {
-    document.getElementById('sync-tokens').disabled = busy;
-    document.getElementById('sync-text-styles').disabled = busy;
-    document.getElementById('generate-foundations').disabled = busy;
-    document.getElementById('generate-components').disabled = busy;
+  /* ---------- PAT status indicator ---------- */
+
+  function updatePatStatus(hasPat) {
+    const el = document.getElementById('pat-status');
+    if (hasPat) {
+      el.innerHTML = '<strong>PAT:</strong> <span class="pat-ok">✓ stored</span>';
+    } else {
+      el.innerHTML = '<strong>PAT:</strong> <span class="pat-err">not set — open PAT Settings below</span>';
+      document.getElementById('pat-settings').open = true;
+    }
   }
+
+  /* ---------- GitHub Contents API ---------- */
+
+  /**
+   * Fetch a file from the private repo via the authenticated GitHub API.
+   * Accept: application/vnd.github.raw+json → returns the raw file bytes.
+   */
+  async function ghFetch(repoPath) {
+    if (!activePat) {
+      throw new Error('No PAT stored — enter your GitHub PAT in the settings below');
+    }
+    const url = 'https://api.github.com/repos/' + REPO + '/contents/' + repoPath
+              + '?ref=' + BRANCH;
+    const resp = await fetch(url, {
+      cache: 'no-store',
+      headers: {
+        'Authorization': 'Bearer ' + activePat,
+        'Accept': 'application/vnd.github.raw+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    });
+    if (!resp.ok) {
+      const body = await resp.text().catch(() => '');
+      throw new Error('GitHub API ' + resp.status + ' ' + resp.statusText
+        + (body ? ': ' + body.slice(0, 120) : ''));
+    }
+    return resp.json();
+  }
+
+  /* ---------- busy state ---------- */
+
+  function setBusy(busy) {
+    for (const id of ['sync-tokens','sync-text-styles','generate-foundations','generate-components','save-pat']) {
+      const el = document.getElementById(id);
+      if (el) el.disabled = busy;
+    }
+  }
+
+  /* ---------- action handlers ---------- */
 
   document.getElementById('sync-tokens').addEventListener('click', async () => {
     setBusy(true);
-    log('Fetching tokens from ' + TOKENS_URL, 'muted');
+    log('Fetching tokens via GitHub API…', 'muted');
     try {
-      const resp = await fetch(TOKENS_URL, { cache: 'no-store' });
-      if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ' + resp.statusText);
-      const data = await resp.json();
+      const data = await ghFetch('packages/tokens/tokens.figma-variables.json');
       log('Fetched ' + data.variables.length + ' variables across ' + data.modes.length + ' modes', 'info');
       parent.postMessage({ pluginMessage: { type: 'sync-tokens', data } }, '*');
     } catch (e) {
@@ -192,14 +295,12 @@
 
   document.getElementById('generate-components').addEventListener('click', async () => {
     setBusy(true);
-    log('Fetching ' + SPECS.length + ' component spec(s)…', 'muted');
+    log('Fetching ' + SPECS.length + ' component spec(s) via GitHub API…', 'muted');
     try {
       const specs = [];
       for (const name of SPECS) {
-        const url = REPO_RAW + '/packages/web/src/component-specs/' + name + '.json';
-        const resp = await fetch(url, { cache: 'no-store' });
-        if (!resp.ok) throw new Error(name + ': HTTP ' + resp.status);
-        specs.push(await resp.json());
+        const data = await ghFetch('packages/web/src/component-specs/' + name + '.json');
+        specs.push(data);
         log('  · ' + name + '.json', 'muted');
       }
       log('Fetched ' + specs.length + ' spec(s)', 'info');
@@ -210,16 +311,46 @@
     }
   });
 
-  // Receive log + status messages from the main thread.
+  document.getElementById('save-pat').addEventListener('click', () => {
+    const input = document.getElementById('pat-input');
+    const pat = input.value.trim();
+    if (!pat) { log('PAT is empty — nothing saved', 'warn'); return; }
+    parent.postMessage({ pluginMessage: { type: 'set-pat', pat } }, '*');
+    input.value = '';
+  });
+
+  /* ---------- messages from code.js ---------- */
+
   window.onmessage = (event) => {
     const msg = event.data.pluginMessage;
     if (!msg) return;
-    if (msg.type === 'log') log(msg.text, msg.kind || 'info');
-    if (msg.type === 'sync-done') setBusy(false);
-    if (msg.type === 'sync-text-styles-done') setBusy(false);
-    if (msg.type === 'foundations-done') setBusy(false);
-    if (msg.type === 'generate-done') setBusy(false);
+
+    switch (msg.type) {
+      case 'pat-loaded':
+        activePat = msg.pat || null;
+        updatePatStatus(!!activePat);
+        break;
+      case 'pat-saved':
+        activePat = msg.pat;
+        updatePatStatus(true);
+        log('PAT saved to clientStorage', 'ok');
+        document.getElementById('pat-settings').open = false;
+        break;
+      case 'log':
+        log(msg.text, msg.kind || 'info');
+        break;
+      case 'sync-done':
+      case 'sync-text-styles-done':
+      case 'foundations-done':
+      case 'generate-done':
+        setBusy(false);
+        break;
+    }
   };
+
+  /* ---------- init: load PAT from clientStorage ---------- */
+
+  parent.postMessage({ pluginMessage: { type: 'get-pat' } }, '*');
 </script>
 </body>
 </html>
