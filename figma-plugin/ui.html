@@ -15,342 +15,404 @@
     --success: #15803D;
     --error: #B91C1C;
     --warning: #B45309;
+    --changed-bg: #FEF3C7; --changed-fg: #92400E;
+    --added-bg: #D1FAE5;   --added-fg: #065F46;
+    --removed-bg: #FEE2E2; --removed-fg: #991B1B;
+    --conflict-bg: #FFF7ED; --conflict-fg: #9A3412;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #1A1F23;
-      --fg: #F0F2F4;
-      --fg-muted: #889096;
-      --border: #2C3338;
-      --bg-sunken: #11181C;
+      --bg: #1A1F23; --fg: #F0F2F4; --fg-muted: #889096;
+      --border: #2C3338; --bg-sunken: #11181C;
+      --changed-bg: #451A03; --changed-fg: #FDE68A;
+      --added-bg: #052E16;   --added-fg: #6EE7B7;
+      --removed-bg: #450A0A; --removed-fg: #FCA5A5;
+      --conflict-bg: #431407; --conflict-fg: #FDBA74;
     }
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    padding: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
-    font-size: 12px;
-    line-height: 1.4;
-    color: var(--fg);
-    background: var(--bg);
-  }
-  h1 {
-    font-size: 13px;
-    font-weight: 600;
-    margin: 0 0 4px;
-  }
-  .subtitle {
-    color: var(--fg-muted);
-    margin: 0 0 16px;
-  }
-  .config {
-    background: var(--bg-sunken);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 12px;
-    margin-bottom: 16px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 11px;
-    color: var(--fg-muted);
-  }
-  .config strong { color: var(--fg); font-weight: 500; }
-  .config .pat-ok  { color: var(--success); }
-  .config .pat-err { color: var(--error); }
-  .actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  button {
-    appearance: none;
-    border: 0;
-    border-radius: 6px;
-    padding: 10px 14px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    background: var(--action-bg);
-    color: var(--action-fg);
-    transition: background-color 0.15s ease;
-  }
-  button:hover:not(:disabled) { background: var(--action-bg-hover); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  button.secondary {
-    background: transparent;
-    color: var(--fg);
-    border: 1px solid var(--border);
-  }
-  button.secondary:hover:not(:disabled) { background: var(--bg-sunken); }
-  button.small {
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-  .log {
-    background: var(--bg-sunken);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 10px;
-    height: 160px;
-    overflow-y: auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 11px;
-    line-height: 1.5;
-    margin-bottom: 12px;
-  }
-  .log .line { white-space: pre-wrap; }
-  .log .info { color: var(--fg); }
-  .log .muted { color: var(--fg-muted); }
-  .log .ok { color: var(--success); }
-  .log .err { color: var(--error); }
-  .log .warn { color: var(--warning); }
-  .log .empty { color: var(--fg-muted); font-style: italic; }
-  /* Settings accordion */
-  details {
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  summary {
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--fg-muted);
-    background: var(--bg-sunken);
-    list-style: none;
-    user-select: none;
-  }
-  summary::-webkit-details-marker { display: none; }
-  summary::before { content: "▶  "; font-size: 9px; }
-  details[open] summary::before { content: "▼  "; }
-  .settings-body {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .settings-body p {
-    margin: 0;
-    color: var(--fg-muted);
-    font-size: 11px;
-    line-height: 1.5;
-  }
-  .pat-row {
-    display: flex;
-    gap: 6px;
-  }
-  .pat-row input {
-    flex: 1;
-    padding: 6px 8px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 11px;
-    outline: none;
-  }
-  .pat-row input:focus { border-color: var(--action-bg); }
+  body { margin:0; padding:16px; font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif; font-size:12px; line-height:1.4; color:var(--fg); background:var(--bg); }
+  h1 { font-size:13px; font-weight:600; margin:0 0 4px; }
+  .subtitle { color:var(--fg-muted); margin:0 0 16px; }
+  .config { background:var(--bg-sunken); border:1px solid var(--border); border-radius:6px; padding:10px 12px; margin-bottom:16px; font-family:ui-monospace,monospace; font-size:11px; color:var(--fg-muted); }
+  .config strong { color:var(--fg); font-weight:500; }
+  .config .pat-ok  { color:var(--success); }
+  .config .pat-err { color:var(--error); }
+  .group-label { font-size:10px; font-weight:600; color:var(--fg-muted); text-transform:uppercase; letter-spacing:.05em; margin:12px 0 5px; }
+  .group-label:first-child { margin-top:0; }
+  .actions { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  button { appearance:none; border:0; border-radius:6px; padding:8px 14px; font-family:inherit; font-size:12px; font-weight:500; cursor:pointer; background:var(--action-bg); color:var(--action-fg); transition:background-color .15s ease; }
+  button:hover:not(:disabled) { background:var(--action-bg-hover); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  button.secondary { background:transparent; color:var(--fg); border:1px solid var(--border); }
+  button.secondary:hover:not(:disabled) { background:var(--bg-sunken); }
+  button.small { padding:6px 10px; font-size:11px; }
+  .log { background:var(--bg-sunken); border:1px solid var(--border); border-radius:6px; padding:8px 10px; height:130px; overflow-y:auto; font-family:ui-monospace,monospace; font-size:11px; line-height:1.5; margin-bottom:12px; }
+  .log .line { white-space:pre-wrap; }
+  .log .muted { color:var(--fg-muted); } .log .ok { color:var(--success); } .log .err { color:var(--error); } .log .warn { color:var(--warning); } .log .empty { color:var(--fg-muted); font-style:italic; }
+  details { border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+  summary { padding:8px 12px; cursor:pointer; font-size:11px; font-weight:500; color:var(--fg-muted); background:var(--bg-sunken); list-style:none; user-select:none; }
+  summary::-webkit-details-marker { display:none; }
+  summary::before { content:"▶  "; font-size:9px; }
+  details[open] summary::before { content:"▼  "; }
+  .settings-body { padding:12px; display:flex; flex-direction:column; gap:8px; }
+  .settings-body p { margin:0; color:var(--fg-muted); font-size:11px; line-height:1.5; }
+  .pat-row { display:flex; gap:6px; }
+  .pat-row input { flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--fg); font-family:ui-monospace,monospace; font-size:11px; outline:none; }
+  .pat-row input:focus { border-color:var(--action-bg); }
+
+  /* ── Overlay panels (Diff / Pull) ─────────────────────── */
+  .overlay { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; z-index:20; }
+  .overlay[hidden] { display:none; }
+  .ov-header { display:flex; align-items:center; gap:8px; padding:11px 12px 9px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .ov-title  { flex:1; font-size:12px; font-weight:600; }
+  .ov-close  { background:none; border:none; padding:2px 6px; cursor:pointer; color:var(--fg-muted); font-size:15px; line-height:1; }
+  .ov-close:hover { color:var(--fg); background:none; }
+  .ov-body   { flex:1; overflow-y:auto; padding:12px; }
+  .ov-footer { display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--border); flex-shrink:0; }
+  .ov-footer button { flex:1; }
+
+  /* Diff content */
+  .diff-summary { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+  .pill { padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:600; }
+  .pill.changed { background:var(--changed-bg); color:var(--changed-fg); }
+  .pill.added   { background:var(--added-bg);   color:var(--added-fg);   }
+  .pill.removed { background:var(--removed-bg); color:var(--removed-fg); }
+  .pill.ok      { background:var(--added-bg);   color:var(--added-fg);   }
+  .diff-modes { font-size:11px; color:var(--fg-muted); margin-bottom:10px; line-height:1.6; }
+  .diff-modes em { font-style:normal; background:var(--bg-sunken); padding:0 3px; border-radius:3px; }
+  .diff-stitle { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin:12px 0 4px; }
+  .diff-row { padding:6px 0; border-bottom:1px solid var(--border); }
+  .diff-row:last-child { border-bottom:none; }
+  .var-name { font-family:ui-monospace,monospace; font-size:10px; color:var(--fg); word-break:break-all; margin-bottom:2px; }
+  .var-name.changed::before { content:"~  "; color:var(--warning); }
+  .var-name.added::before   { content:"+  "; color:var(--success); }
+  .var-name.removed::before { content:"−  "; color:var(--error);   }
+  .mode-change { font-size:11px; color:var(--fg-muted); padding:1px 0 1px 12px; }
+  .mode-lbl { font-size:9px; font-weight:600; color:var(--fg-muted); display:inline-block; min-width:70px; }
+  .swatch { display:inline-block; width:11px; height:11px; border-radius:2px; border:1px solid rgba(128,128,128,.3); vertical-align:middle; margin-right:2px; flex-shrink:0; }
+  .val-old { opacity:.65; }
+  .val-arr  { margin:0 4px; color:var(--fg-muted); }
+  code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-sunken); padding:1px 4px; border-radius:3px; }
+  .diff-more { font-size:11px; color:var(--fg-muted); padding:4px 0; font-style:italic; }
+  .diff-collapse { border:none; margin-top:6px; }
+  .diff-collapse > summary { background:none; padding:4px 0; border-radius:0; }
+  .panel-error { color:var(--error); font-size:12px; padding:16px 0; }
 </style>
 </head>
 <body>
-  <h1>Design System Sync</h1>
-  <p class="subtitle">Syncs tokens and components from your GitHub repo into this Figma file.</p>
 
-  <div class="config">
-    <div><strong>Repo:</strong> spiro-rajat-mukati/design-system</div>
-    <div><strong>Branch:</strong> main</div>
-    <div id="pat-status"><strong>PAT:</strong> <span class="muted">loading…</span></div>
-  </div>
+<!-- ═══════════ MAIN PANEL ═══════════ -->
+<h1>Design System Sync</h1>
+<p class="subtitle">Syncs tokens and components from your GitHub repo into this Figma file.</p>
 
-  <div class="actions">
-    <button id="sync-tokens">Sync tokens from GitHub</button>
-    <button id="sync-text-styles" class="secondary">Sync Text Styles</button>
-    <button id="generate-foundations" class="secondary">Generate Foundations pages</button>
-    <button id="generate-components" class="secondary">Generate components</button>
-  </div>
+<div class="config">
+  <div><strong>Repo:</strong> spiro-rajat-mukati/design-system</div>
+  <div><strong>Branch:</strong> main</div>
+  <div id="pat-status"><strong>PAT:</strong> <span class="muted">loading…</span></div>
+</div>
 
-  <div class="log" id="log">
-    <div class="line empty">Logs appear here.</div>
-  </div>
+<div class="actions">
+  <div class="group-label">Tokens</div>
+  <button id="sync-tokens">Sync tokens from GitHub</button>
+  <button id="btn-diff" class="secondary">Diff tokens vs GitHub</button>
 
-  <details id="pat-settings">
-    <summary>PAT Settings</summary>
-    <div class="settings-body">
-      <p>
-        Fine-grained PAT with <strong>Contents: Read</strong> on
-        <code>spiro-rajat-mukati/design-system</code>.
-        Stored in Figma clientStorage — never committed to the repo.
-      </p>
-      <div class="pat-row">
-        <input type="password" id="pat-input" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
-        <button class="secondary small" id="save-pat">Save</button>
-      </div>
+  <div class="group-label">Styles &amp; components</div>
+  <button id="sync-text-styles" class="secondary">Sync Text Styles</button>
+  <button id="generate-foundations" class="secondary">Generate Foundations pages</button>
+  <button id="generate-components" class="secondary">Generate components</button>
+</div>
+
+<div class="log" id="log">
+  <div class="line empty">Logs appear here.</div>
+</div>
+
+<details id="pat-settings">
+  <summary>PAT Settings</summary>
+  <div class="settings-body">
+    <p>Fine-grained PAT with <strong>Contents: Read</strong> on <code>spiro-rajat-mukati/design-system</code>. Stored in Figma clientStorage — never committed.</p>
+    <div class="pat-row">
+      <input type="password" id="pat-input" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
+      <button class="secondary small" id="save-pat">Save</button>
     </div>
-  </details>
+  </div>
+</details>
+
+<!-- ═══════════ DIFF OVERLAY ═══════════ -->
+<div id="diff-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">Diff — Figma vs repo</span>
+    <button class="ov-close" id="close-diff" title="Close">✕</button>
+  </div>
+  <div class="ov-body" id="diff-body"><!-- populated by renderDiff() --></div>
+</div>
 
 <script>
-  const REPO   = 'spiro-rajat-mukati/design-system';
-  const BRANCH = 'main';
-  const SPECS = [
-    'Button', 'Badge', 'ButtonGroup', 'Field', 'TextInput', 'Textarea',
-    'NumericInput', 'Radio', 'Checkbox', 'Tag', 'Toast', 'Tabs',
-    'Select', 'MultiSelect', 'Menu', 'ProgressBar'
-  ];
+/* ── constants ── */
+const REPO   = 'spiro-rajat-mukati/design-system';
+const BRANCH = 'main';
+const SPECS = [
+  'Button','Badge','ButtonGroup','Field','TextInput','Textarea',
+  'NumericInput','Radio','Checkbox','Tag','Toast','Tabs',
+  'Select','MultiSelect','Menu','ProgressBar'
+];
 
-  // PAT held in memory for the session; never written to DOM as plain text.
-  let activePat = null;
+/* ── session state ── */
+let activePat = null;
 
-  /* ---------- logging ---------- */
+/* ── logging ── */
+const logEl = document.getElementById('log');
+function log(msg, kind) {
+  const empty = logEl.querySelector('.empty');
+  if (empty) empty.remove();
+  const line = document.createElement('div');
+  line.className = 'line ' + (kind || 'info');
+  line.textContent = msg;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
 
-  const logEl = document.getElementById('log');
-  function log(msg, kind) {
-    const empty = logEl.querySelector('.empty');
-    if (empty) empty.remove();
-    const line = document.createElement('div');
-    line.className = 'line ' + (kind || 'info');
-    line.textContent = msg;
-    logEl.appendChild(line);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
+/* ── PAT status ── */
+function updatePatStatus(hasPat) {
+  const el = document.getElementById('pat-status');
+  el.innerHTML = hasPat
+    ? '<strong>PAT:</strong> <span class="pat-ok">✓ stored</span>'
+    : '<strong>PAT:</strong> <span class="pat-err">not set — open PAT Settings below</span>';
+  if (!hasPat) document.getElementById('pat-settings').open = true;
+}
 
-  /* ---------- PAT status indicator ---------- */
+/* ── HTML escaping (variable names / values from repo JSON) ── */
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-  function updatePatStatus(hasPat) {
-    const el = document.getElementById('pat-status');
-    if (hasPat) {
-      el.innerHTML = '<strong>PAT:</strong> <span class="pat-ok">✓ stored</span>';
-    } else {
-      el.innerHTML = '<strong>PAT:</strong> <span class="pat-err">not set — open PAT Settings below</span>';
-      document.getElementById('pat-settings').open = true;
-    }
-  }
-
-  /* ---------- GitHub Contents API ---------- */
-
-  /**
-   * Fetch a file from the private repo via the authenticated GitHub API.
-   * Accept: application/vnd.github.raw+json → returns the raw file bytes.
-   */
-  async function ghFetch(repoPath) {
-    if (!activePat) {
-      throw new Error('No PAT stored — enter your GitHub PAT in the settings below');
-    }
-    const url = 'https://api.github.com/repos/' + REPO + '/contents/' + repoPath
-              + '?ref=' + BRANCH;
-    const resp = await fetch(url, {
-      cache: 'no-store',
-      headers: {
-        'Authorization': 'Bearer ' + activePat,
-        'Accept': 'application/vnd.github.raw+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-      },
-    });
-    if (!resp.ok) {
-      const body = await resp.text().catch(() => '');
-      throw new Error('GitHub API ' + resp.status + ' ' + resp.statusText
-        + (body ? ': ' + body.slice(0, 120) : ''));
-    }
-    return resp.json();
-  }
-
-  /* ---------- busy state ---------- */
-
-  function setBusy(busy) {
-    for (const id of ['sync-tokens','sync-text-styles','generate-foundations','generate-components','save-pat']) {
-      const el = document.getElementById(id);
-      if (el) el.disabled = busy;
-    }
-  }
-
-  /* ---------- action handlers ---------- */
-
-  document.getElementById('sync-tokens').addEventListener('click', async () => {
-    setBusy(true);
-    log('Fetching tokens via GitHub API…', 'muted');
-    try {
-      const data = await ghFetch('packages/tokens/tokens.figma-variables.json');
-      log('Fetched ' + data.variables.length + ' variables across ' + data.modes.length + ' modes', 'info');
-      parent.postMessage({ pluginMessage: { type: 'sync-tokens', data } }, '*');
-    } catch (e) {
-      log('Fetch failed: ' + e.message, 'err');
-      setBusy(false);
-    }
+/* ── GitHub Contents API ── */
+async function ghFetch(repoPath) {
+  if (!activePat) throw new Error('No PAT — enter it in PAT Settings');
+  const url = 'https://api.github.com/repos/' + REPO + '/contents/' + repoPath + '?ref=' + BRANCH;
+  const resp = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      'Authorization': 'Bearer ' + activePat,
+      'Accept': 'application/vnd.github.raw+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
   });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => '');
+    throw new Error('GitHub API ' + resp.status + ' for ' + repoPath + (body ? ': ' + body.slice(0,100) : ''));
+  }
+  return resp.json();
+}
 
-  document.getElementById('sync-text-styles').addEventListener('click', () => {
-    setBusy(true);
-    log('Syncing Text Styles…', 'muted');
-    parent.postMessage({ pluginMessage: { type: 'sync-text-styles' } }, '*');
-  });
+/* ── busy state (all interactive buttons) ── */
+const ALL_BTNS = ['sync-tokens','btn-diff','sync-text-styles','generate-foundations','generate-components','save-pat'];
+function setBusy(busy) {
+  for (const id of ALL_BTNS) { const el = document.getElementById(id); if (el) el.disabled = busy; }
+}
 
-  document.getElementById('generate-foundations').addEventListener('click', () => {
-    setBusy(true);
-    log('Generating Foundations pages…', 'muted');
-    parent.postMessage({ pluginMessage: { type: 'generate-foundations' } }, '*');
-  });
+/* ══════════════════════════════════════════════════════════
+   DIFF RENDERING
+   ══════════════════════════════════════════════════════════ */
 
-  document.getElementById('generate-components').addEventListener('click', async () => {
-    setBusy(true);
-    log('Fetching ' + SPECS.length + ' component spec(s) via GitHub API…', 'muted');
-    try {
-      const specs = [];
-      for (const name of SPECS) {
-        const data = await ghFetch('packages/web/src/component-specs/' + name + '.json');
-        specs.push(data);
-        log('  · ' + name + '.json', 'muted');
+function shortMode(name) {
+  // "Light · Web" → "Light·W", "Dark · iOS" → "Dark·iOS" etc.
+  return name.replace(' · ', '·').replace('Web','W').replace('Android','And');
+}
+
+function renderSwatch(hex) {
+  // hex is always #[0-9a-f]+ from our normalizer — safe for style attr
+  return '<span class="swatch" style="background:' + hex + '"></span>';
+}
+
+function renderModeChange(mc) {
+  let html = '<div class="mode-change">';
+  html += '<span class="mode-lbl">' + esc(shortMode(mc.modeName)) + '</span> ';
+  if (mc.isColor) {
+    html += '<span class="val-old">' + renderSwatch(mc.figmaStr) + esc(mc.figmaLabel) + '</span>';
+    html += '<span class="val-arr">→</span>';
+    html += renderSwatch(mc.repoStr) + esc(mc.repoLabel);
+  } else {
+    html += '<span class="val-old"><code>' + esc(mc.figmaLabel) + '</code></span>';
+    html += '<span class="val-arr">→</span>';
+    html += '<code>' + esc(mc.repoLabel) + '</code>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderDiff(result) {
+  if (result.error) return '<div class="panel-error">' + esc(result.error) + '</div>';
+
+  const { modeMap, unmatchedFigmaModes, added, changed, removed } = result;
+  const matched = modeMap.filter(m => m.matched).length;
+  let html = '';
+
+  // Summary pills
+  html += '<div class="diff-summary">';
+  if (!changed.length && !added.length && !removed.length) {
+    html += '<span class="pill ok">✓ Figma is in sync with the repo</span>';
+  } else {
+    if (changed.length) html += '<span class="pill changed">' + changed.length + ' changed</span>';
+    if (added.length)   html += '<span class="pill added">'   + added.length   + ' added</span>';
+    if (removed.length) html += '<span class="pill removed">' + removed.length + ' removed</span>';
+  }
+  html += '</div>';
+
+  // Mode matching summary
+  const unmatchedRepo = modeMap.filter(m => !m.matched).map(m => m.name);
+  html += '<div class="diff-modes">';
+  html += 'Modes matched: <strong>' + matched + ' / ' + modeMap.length + '</strong>';
+  if (unmatchedRepo.length)      html += ' · Repo-only: ' + unmatchedRepo.map(n => '<em>' + esc(n) + '</em>').join(', ');
+  if (unmatchedFigmaModes.length) html += ' · Figma-only: ' + unmatchedFigmaModes.map(n => '<em>' + esc(n) + '</em>').join(', ');
+  html += '</div>';
+
+  if (!changed.length && !added.length && !removed.length) return html;
+
+  // Changed
+  if (changed.length) {
+    html += '<div class="diff-stitle">Changed (' + changed.length + ')</div>';
+    const show = changed.slice(0, 60);
+    for (const item of show) {
+      html += '<div class="diff-row">';
+      html += '<div class="var-name changed">' + esc(item.name) + '</div>';
+      for (const mc of item.modeChanges.slice(0, 4)) html += renderModeChange(mc);
+      if (item.modeChanges.length > 4) html += '<div class="mode-change diff-more">+' + (item.modeChanges.length - 4) + ' more modes</div>';
+      html += '</div>';
+    }
+    if (changed.length > 60) html += '<div class="diff-more">… ' + (changed.length - 60) + ' more</div>';
+  }
+
+  // Added (collapsed)
+  if (added.length) {
+    html += '<details class="diff-collapse"><summary>Added in repo, not in Figma (' + added.length + ')</summary>';
+    for (const item of added.slice(0, 40)) {
+      html += '<div class="diff-row"><div class="var-name added">' + esc(item.name) + '</div>';
+      for (const [modeName, v] of Object.entries(item.preview).slice(0, 2)) {
+        html += '<div class="mode-change"><span class="mode-lbl">' + esc(shortMode(modeName)) + '</span> ';
+        if (v.isColor && v.hex) html += renderSwatch(v.hex);
+        html += esc(v.label) + '</div>';
       }
-      log('Fetched ' + specs.length + ' spec(s)', 'info');
-      parent.postMessage({ pluginMessage: { type: 'generate-components', specs } }, '*');
-    } catch (e) {
-      log('Fetch failed: ' + e.message, 'err');
+      html += '</div>';
+    }
+    if (added.length > 40) html += '<div class="diff-more">… ' + (added.length - 40) + ' more</div>';
+    html += '</details>';
+  }
+
+  // Removed (collapsed)
+  if (removed.length) {
+    html += '<details class="diff-collapse"><summary>In Figma, not in repo (' + removed.length + ') — Pull will not delete these</summary>';
+    for (const item of removed.slice(0, 40)) {
+      html += '<div class="diff-row"><div class="var-name removed">' + esc(item.name) + '</div></div>';
+    }
+    if (removed.length > 40) html += '<div class="diff-more">… ' + (removed.length - 40) + ' more</div>';
+    html += '</details>';
+  }
+
+  return html;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ACTION HANDLERS
+   ══════════════════════════════════════════════════════════ */
+
+document.getElementById('sync-tokens').addEventListener('click', async () => {
+  setBusy(true);
+  log('Fetching tokens via GitHub API…', 'muted');
+  try {
+    const data = await ghFetch('packages/tokens/tokens.figma-variables.json');
+    log('Fetched ' + data.variables.length + ' variables across ' + data.modes.length + ' modes', 'info');
+    parent.postMessage({ pluginMessage: { type: 'sync-tokens', data } }, '*');
+  } catch (e) { log('Fetch failed: ' + e.message, 'err'); setBusy(false); }
+});
+
+document.getElementById('btn-diff').addEventListener('click', async () => {
+  setBusy(true);
+  log('Fetching tokens for diff…', 'muted');
+  try {
+    const repoData = await ghFetch('packages/tokens/tokens.figma-variables.json');
+    log('Comparing ' + repoData.variables.length + ' variables × ' + repoData.modes.length + ' modes…', 'muted');
+    parent.postMessage({ pluginMessage: { type: 'compute-diff', repoData } }, '*');
+  } catch (e) { log('Fetch failed: ' + e.message, 'err'); setBusy(false); }
+});
+
+document.getElementById('sync-text-styles').addEventListener('click', () => {
+  setBusy(true); log('Syncing Text Styles…', 'muted');
+  parent.postMessage({ pluginMessage: { type: 'sync-text-styles' } }, '*');
+});
+
+document.getElementById('generate-foundations').addEventListener('click', () => {
+  setBusy(true); log('Generating Foundations pages…', 'muted');
+  parent.postMessage({ pluginMessage: { type: 'generate-foundations' } }, '*');
+});
+
+document.getElementById('generate-components').addEventListener('click', async () => {
+  setBusy(true);
+  log('Fetching ' + SPECS.length + ' component spec(s)…', 'muted');
+  try {
+    const specs = [];
+    for (const name of SPECS) {
+      const data = await ghFetch('packages/web/src/component-specs/' + name + '.json');
+      specs.push(data); log('  · ' + name + '.json', 'muted');
+    }
+    log('Fetched ' + specs.length + ' spec(s)', 'info');
+    parent.postMessage({ pluginMessage: { type: 'generate-components', specs } }, '*');
+  } catch (e) { log('Fetch failed: ' + e.message, 'err'); setBusy(false); }
+});
+
+document.getElementById('save-pat').addEventListener('click', () => {
+  const input = document.getElementById('pat-input');
+  const pat = input.value.trim();
+  if (!pat) { log('PAT is empty — nothing saved', 'warn'); return; }
+  parent.postMessage({ pluginMessage: { type: 'set-pat', pat } }, '*');
+  input.value = '';
+});
+
+document.getElementById('close-diff').addEventListener('click', () => {
+  document.getElementById('diff-panel').hidden = true;
+  setBusy(false);
+});
+
+/* ══════════════════════════════════════════════════════════
+   MESSAGE HANDLER
+   ══════════════════════════════════════════════════════════ */
+
+window.onmessage = (event) => {
+  const msg = event.data.pluginMessage;
+  if (!msg) return;
+  switch (msg.type) {
+    case 'pat-loaded':
+      activePat = msg.pat || null;
+      updatePatStatus(!!activePat);
+      break;
+    case 'pat-saved':
+      activePat = msg.pat;
+      updatePatStatus(true);
+      log('PAT saved to clientStorage', 'ok');
+      document.getElementById('pat-settings').open = false;
+      break;
+    case 'diff-result': {
+      const html = renderDiff(msg.result);
+      document.getElementById('diff-body').innerHTML = html;
+      document.getElementById('diff-panel').hidden = false;
+      const r = msg.result;
+      if (!r.error) {
+        log('Diff: ' + (r.changed||[]).length + ' changed · ' + (r.added||[]).length + ' added · ' + (r.removed||[]).length + ' removed', 'info');
+      }
       setBusy(false);
+      break;
     }
-  });
+    case 'log':  log(msg.text, msg.kind || 'info'); break;
+    case 'sync-done':
+    case 'sync-text-styles-done':
+    case 'foundations-done':
+    case 'generate-done':
+      setBusy(false); break;
+  }
+};
 
-  document.getElementById('save-pat').addEventListener('click', () => {
-    const input = document.getElementById('pat-input');
-    const pat = input.value.trim();
-    if (!pat) { log('PAT is empty — nothing saved', 'warn'); return; }
-    parent.postMessage({ pluginMessage: { type: 'set-pat', pat } }, '*');
-    input.value = '';
-  });
-
-  /* ---------- messages from code.js ---------- */
-
-  window.onmessage = (event) => {
-    const msg = event.data.pluginMessage;
-    if (!msg) return;
-
-    switch (msg.type) {
-      case 'pat-loaded':
-        activePat = msg.pat || null;
-        updatePatStatus(!!activePat);
-        break;
-      case 'pat-saved':
-        activePat = msg.pat;
-        updatePatStatus(true);
-        log('PAT saved to clientStorage', 'ok');
-        document.getElementById('pat-settings').open = false;
-        break;
-      case 'log':
-        log(msg.text, msg.kind || 'info');
-        break;
-      case 'sync-done':
-      case 'sync-text-styles-done':
-      case 'foundations-done':
-      case 'generate-done':
-        setBusy(false);
-        break;
-    }
-  };
-
-  /* ---------- init: load PAT from clientStorage ---------- */
-
-  parent.postMessage({ pluginMessage: { type: 'get-pat' } }, '*');
+/* ── init ── */
+parent.postMessage({ pluginMessage: { type: 'get-pat' } }, '*');
 </script>
 </body>
 </html>
