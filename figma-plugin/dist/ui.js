@@ -82,7 +82,26 @@ async function ghFetch(repoPath) {
   }
   return resp.json();
 }
-const ALL_BTNS = ["sync-tokens", "btn-diff", "btn-pull", "sync-text-styles", "generate-foundations", "generate-components", "save-pat"];
+async function ghFetchMeta(repoPath, ref) {
+  if (!activePat) throw new Error("No PAT \u2014 enter it in PAT Settings");
+  const url = "https://api.github.com/repos/" + REPO + "/contents/" + repoPath + (ref ? "?ref=" + ref : "");
+  const resp = await fetch(url, {
+    cache: "no-store",
+    headers: {
+      "Authorization": "Bearer " + activePat,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    }
+  });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => "");
+    if (resp.status === 403) throw new Error("PAT lacks required scope. Push needs Contents: Write + Pull Requests: Write. GitHub said: " + body.slice(0, 120));
+    if (resp.status === 404) return null;
+    throw new Error("GitHub " + resp.status + " for " + repoPath + (body ? ": " + body.slice(0, 100) : ""));
+  }
+  return resp.json();
+}
+const ALL_BTNS = ["sync-tokens", "btn-diff", "btn-pull", "btn-push", "sync-text-styles", "generate-foundations", "generate-components", "save-pat"];
 function setBusy(busy) {
   for (const id of ALL_BTNS) {
     const el = document.getElementById(id);
@@ -244,6 +263,265 @@ function collectResolutions() {
   });
   return resolutions;
 }
+const SOURCE_FILES = ["core", "color-light", "color-dark", "components", "components-dark", "platform-web", "platform-ios", "platform-android"];
+const SOURCE_BASE = "packages/tokens/source/";
+const MODE_SOURCE_PRIORITY = {
+  "Light \xB7 Web": ["platform-web", "components", "color-light", "core"],
+  "Dark \xB7 Web": ["platform-web", "components-dark", "components", "color-dark", "core"],
+  "Light \xB7 iOS": ["platform-ios", "components", "color-light", "core"],
+  "Dark \xB7 iOS": ["platform-ios", "components-dark", "components", "color-dark", "core"],
+  "Light \xB7 Android": ["platform-android", "components", "color-light", "core"],
+  "Dark \xB7 Android": ["platform-android", "components-dark", "components", "color-dark", "core"]
+};
+function flattenTokens(obj) {
+  const result = /* @__PURE__ */ new Map();
+  function walk(node, path) {
+    if (!node || typeof node !== "object") return;
+    if ("$value" in node || "value" in node) {
+      result.set(path, node);
+      return;
+    }
+    for (const [k, v] of Object.entries(node)) {
+      if (k.startsWith("$")) continue;
+      walk(v, path ? path + "/" + k : k);
+    }
+  }
+  walk(obj, "");
+  return result;
+}
+function srcVal(entry) {
+  return "$value" in entry ? entry["$value"] : entry["value"];
+}
+function normSrcVal(entry) {
+  return String(srcVal(entry)).trim().toLowerCase();
+}
+function figmaValToSrcEntry(figmaVal, existingEntry) {
+  const key = "$value" in existingEntry ? "$value" : "value";
+  const updated = Object.assign({}, existingEntry);
+  if (figmaVal.alias) {
+    updated[key] = "{" + figmaVal.alias.replace(/\//g, ".") + "}";
+  } else {
+    updated[key] = figmaVal.value;
+  }
+  return updated;
+}
+function figmaValMatchesSrc(figmaVal, existingEntry) {
+  const current = normSrcVal(existingEntry);
+  if (figmaVal.alias) {
+    const expected = "{" + figmaVal.alias.replace(/\//g, ".") + "}";
+    return current === expected.toLowerCase();
+  }
+  return current === String(figmaVal.value).trim().toLowerCase();
+}
+async function fetchSourceFilesWithMeta() {
+  const result = {};
+  await Promise.all(SOURCE_FILES.map(async (name) => {
+    const path = SOURCE_BASE + name + ".json";
+    const meta = await ghFetchMeta(path, BRANCH);
+    if (!meta) {
+      result[name] = null;
+      return;
+    }
+    const json = JSON.parse(atob(meta.content.replace(/\n/g, "")));
+    result[name] = { json, sha: meta.sha, path, flat: flattenTokens(json) };
+  }));
+  return result;
+}
+function computePushChanges(figmaCollection, sourceFiles) {
+  const changes = {};
+  for (const fv of figmaCollection.variables) {
+    for (const [modeName, figmaVal] of Object.entries(fv.values)) {
+      const priority = MODE_SOURCE_PRIORITY[modeName];
+      if (!priority) continue;
+      const srcFile = priority.find((f) => sourceFiles[f] && sourceFiles[f].flat && sourceFiles[f].flat.has(fv.name));
+      if (!srcFile) continue;
+      const existingEntry = sourceFiles[srcFile].flat.get(fv.name);
+      if (figmaValMatchesSrc(figmaVal, existingEntry)) continue;
+      const newEntry = figmaValToSrcEntry(figmaVal, existingEntry);
+      if (!changes[srcFile]) changes[srcFile] = /* @__PURE__ */ new Map();
+      const existing = changes[srcFile].get(fv.name);
+      if (existing) {
+        existing.modes.push(modeName);
+      } else {
+        changes[srcFile].set(fv.name, { old: existingEntry, new: newEntry, modes: [modeName] });
+      }
+    }
+  }
+  return changes;
+}
+function applyChangesToJson(originalJson, changesMap) {
+  const updated = JSON.parse(JSON.stringify(originalJson));
+  for (const [tokenPath, change] of changesMap) {
+    const parts = tokenPath.split("/");
+    let node = updated;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!node[parts[i]] || typeof node[parts[i]] !== "object") {
+        node = null;
+        break;
+      }
+      node = node[parts[i]];
+    }
+    if (!node) continue;
+    const last = parts[parts.length - 1];
+    if (node[last] && typeof node[last] === "object") {
+      Object.assign(node[last], change.new);
+    }
+  }
+  return updated;
+}
+async function ghGetMainSha() {
+  const url = "https://api.github.com/repos/" + REPO + "/git/ref/heads/" + BRANCH;
+  const resp = await fetch(url, {
+    headers: {
+      "Authorization": "Bearer " + activePat,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    }
+  });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => "");
+    if (resp.status === 403) throw new Error("PAT lacks read scope to get branch ref. " + body.slice(0, 120));
+    throw new Error("GitHub " + resp.status + " getting main ref: " + body.slice(0, 100));
+  }
+  const data = await resp.json();
+  return data.object.sha;
+}
+async function ghCreateBranch(branchName, sha) {
+  const resp = await fetch("https://api.github.com/repos/" + REPO + "/git/refs", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + activePat,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    },
+    body: JSON.stringify({ ref: "refs/heads/" + branchName, sha })
+  });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => "");
+    if (resp.status === 403) throw new Error("PAT lacks Contents: Write or Pull Requests: Write scope \u2014 cannot create branch. Response: " + body.slice(0, 150));
+    throw new Error("GitHub " + resp.status + " creating branch: " + body.slice(0, 100));
+  }
+  return resp.json();
+}
+async function ghPutFile(filePath, content, sha, branch, message) {
+  const b64 = btoa(unescape(encodeURIComponent(content)));
+  const resp = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + filePath, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + activePat,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    },
+    body: JSON.stringify({ message, content: b64, sha, branch })
+  });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => "");
+    if (resp.status === 403) throw new Error("PAT lacks Contents: Write scope \u2014 cannot commit file. Response: " + body.slice(0, 150));
+    throw new Error("GitHub " + resp.status + " committing " + filePath + ": " + body.slice(0, 100));
+  }
+  return resp.json();
+}
+async function ghCreatePR(branchName, title, body) {
+  const resp = await fetch("https://api.github.com/repos/" + REPO + "/pulls", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + activePat,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    },
+    body: JSON.stringify({ title, head: branchName, base: BRANCH, body })
+  });
+  if (!resp.ok) {
+    const body2 = await resp.text().catch(() => "");
+    if (resp.status === 403) throw new Error("PAT lacks Pull Requests: Write scope \u2014 cannot create PR. Response: " + body2.slice(0, 150));
+    throw new Error("GitHub " + resp.status + " creating PR: " + body2.slice(0, 100));
+  }
+  return resp.json();
+}
+async function executePush(sourceFiles, changes) {
+  const now = /* @__PURE__ */ new Date();
+  const ts = now.toISOString().replace(/[-T:.Z]/g, "").slice(0, 14);
+  const branch = "figma/push-" + ts;
+  let totalTokens = 0;
+  for (const fc of Object.values(changes)) totalTokens += fc.size;
+  const fileNames = Object.keys(changes);
+  log("Getting main branch SHA\u2026", "muted");
+  const mainSha = await ghGetMainSha();
+  log("Creating branch " + branch + "\u2026", "muted");
+  await ghCreateBranch(branch, mainSha);
+  for (const fname of fileNames) {
+    const fileChanges = changes[fname];
+    const srcFile = sourceFiles[fname];
+    const updatedJson = applyChangesToJson(srcFile.json, fileChanges);
+    const content = JSON.stringify(updatedJson, null, 2) + "\n";
+    const commitMsg = "tokens(figma-push): " + fileChanges.size + " change" + (fileChanges.size > 1 ? "s" : "") + " in " + fname + ".json";
+    log("Committing " + fname + ".json (" + fileChanges.size + " tokens)\u2026", "muted");
+    await ghPutFile(srcFile.path, content, srcFile.sha, branch, commitMsg);
+  }
+  const prBody = [
+    "## Figma \u2192 Source Token Push",
+    "",
+    "**" + totalTokens + " token" + (totalTokens > 1 ? "s" : "") + " changed** across " + fileNames.length + " source file" + (fileNames.length > 1 ? "s" : "") + ".",
+    "",
+    "| Source file | Changed tokens |",
+    "|---|:---:|",
+    ...fileNames.map((f) => "| `" + SOURCE_BASE + f + ".json` | " + changes[f].size + " |"),
+    "",
+    "After merging:",
+    "- Run `npm run tokens:build` to regenerate `tokens.figma-variables.json`",
+    "- Run `npm run tokens:check` to verify the build output",
+    "- Sync the new `tokens.figma-variables.json` back to Figma via **Sync tokens**",
+    "",
+    "> Generated by the Design System Sync Figma plugin on " + now.toLocaleDateString() + "."
+  ].join("\n");
+  const prTitle = "tokens(figma-push): " + totalTokens + " token" + (totalTokens > 1 ? "s" : "") + " from Figma Foundations";
+  log("Opening PR\u2026", "muted");
+  const pr = await ghCreatePR(branch, prTitle, prBody);
+  return { pr, branch, totalTokens, fileNames };
+}
+function renderPushPreview(changes) {
+  let totalTokens = 0;
+  for (const fc of Object.values(changes)) totalTokens += fc.size;
+  if (totalTokens === 0) {
+    return `<div class="push-ok">\u2713 Figma variables match the source files \u2014 nothing to push.</div><p style="font-size:11px;color:var(--fg-muted);margin:0">If you expected changes, make sure you've synced first so the collection is up to date.</p>`;
+  }
+  let html = '<div class="push-scope-note"><strong>' + totalTokens + " token" + (totalTokens > 1 ? "s" : "") + "</strong> will be written to " + Object.keys(changes).length + " source file" + (Object.keys(changes).length > 1 ? "s" : "") + ". Only tokens that already exist in <code>packages/tokens/source/</code> are updated \u2014 new Figma variables are skipped.</div>";
+  for (const [fname, fileChanges] of Object.entries(changes)) {
+    html += '<div class="push-file-section">';
+    html += '<div class="push-file-title"><span class="push-file-badge">' + fileChanges.size + "</span>" + esc(fname) + ".json</div>";
+    let count = 0;
+    for (const [tokenPath, change] of fileChanges) {
+      if (count++ >= 40) {
+        html += '<div class="diff-more">\u2026 ' + (fileChanges.size - 40) + " more</div>";
+        break;
+      }
+      const oldV = String(srcVal(change.old));
+      const newV = String(srcVal(change.new));
+      const isColor = /^#[0-9a-f]{6}/i.test(oldV) || /^#[0-9a-f]{6}/i.test(newV);
+      html += '<div class="diff-row">';
+      html += '<div class="var-name changed">' + esc(tokenPath) + "</div>";
+      html += '<div class="mode-change"><span class="mode-lbl">' + esc(change.modes.map((m) => m.replace(" \xB7 ", "\xB7").replace("Light", "L").replace("Dark", "D")).join(", ")) + "</span> ";
+      if (isColor) {
+        const oldHex = oldV.toLowerCase();
+        const newHex = newV.toLowerCase();
+        html += '<span class="val-old">' + renderSwatch(oldHex) + esc(oldV) + "</span>";
+        html += '<span class="val-arr">\u2192</span>';
+        html += renderSwatch(newHex) + esc(newV);
+      } else {
+        html += '<span class="val-old"><code>' + esc(oldV) + "</code></span>";
+        html += '<span class="val-arr">\u2192</span>';
+        html += "<code>" + esc(newV) + "</code>";
+      }
+      html += "</div></div>";
+    }
+    html += "</div>";
+  }
+  return html;
+}
+let pushState = null;
 document.getElementById("sync-tokens").addEventListener("click", async () => {
   setBusy(true);
   log("Fetching tokens via GitHub API\u2026", "muted");
@@ -339,6 +617,42 @@ document.getElementById("close-diff").addEventListener("click", () => {
   document.getElementById("diff-panel").hidden = true;
   setBusy(false);
 });
+document.getElementById("btn-push").addEventListener("click", () => {
+  setBusy(true);
+  log("Reading Figma variable collection\u2026", "muted");
+  parent.postMessage({ pluginMessage: { type: "read-collection" } }, "*");
+});
+function closePushPanel() {
+  document.getElementById("push-panel").hidden = true;
+  pushState = null;
+  setBusy(false);
+}
+document.getElementById("close-push").addEventListener("click", closePushPanel);
+document.getElementById("push-cancel").addEventListener("click", closePushPanel);
+document.getElementById("push-confirm").addEventListener("click", async () => {
+  if (!pushState || !Object.keys(pushState.changes).length) {
+    closePushPanel();
+    return;
+  }
+  document.getElementById("push-confirm").disabled = true;
+  document.getElementById("push-cancel").disabled = true;
+  try {
+    const { pr, branch, totalTokens, fileNames } = await executePush(pushState.sourceFiles, pushState.changes);
+    document.getElementById("push-panel").hidden = true;
+    pushState = null;
+    log("PR opened: " + pr.html_url, "ok");
+    log("Branch: " + branch + " \xB7 " + totalTokens + " token" + (totalTokens > 1 ? "s" : "") + " in " + fileNames.join(", "), "ok");
+    const prLinkHtml = '<div class="line ok">PR: <a class="pr-link" href="' + esc(pr.html_url) + '" target="_blank">' + esc(pr.html_url) + "</a></div>";
+    const logEl2 = document.getElementById("log");
+    logEl2.insertAdjacentHTML("beforeend", prLinkHtml);
+    logEl2.scrollTop = logEl2.scrollHeight;
+  } catch (e) {
+    log("Push failed: " + e.message, "err");
+  }
+  document.getElementById("push-confirm").disabled = false;
+  document.getElementById("push-cancel").disabled = false;
+  setBusy(false);
+});
 window.onmessage = (event) => {
   const msg = event.data.pluginMessage;
   if (!msg) return;
@@ -353,6 +667,40 @@ window.onmessage = (event) => {
       log("PAT saved to clientStorage", "ok");
       document.getElementById("pat-settings").open = false;
       break;
+    case "collection-data": {
+      const colResult = msg.result;
+      if (colResult.error) {
+        log("Push error: " + colResult.error, "err");
+        setBusy(false);
+        break;
+      }
+      (async () => {
+        try {
+          log("Fetching " + SOURCE_FILES.length + " source token files from GitHub\u2026", "muted");
+          const sourceFiles = await fetchSourceFilesWithMeta();
+          log("Computing changes\u2026", "muted");
+          const changes = computePushChanges(colResult, sourceFiles);
+          pushState = { figmaCollection: colResult, sourceFiles, changes };
+          document.getElementById("push-body").innerHTML = renderPushPreview(changes);
+          document.getElementById("push-panel").hidden = false;
+          document.getElementById("push-confirm").disabled = false;
+          document.getElementById("push-cancel").disabled = false;
+          let total = 0;
+          for (const fc of Object.values(changes)) total += fc.size;
+          const fileCount = Object.keys(changes).length;
+          if (total === 0) {
+            log("Push preview: Figma matches source \u2014 nothing to push", "info");
+          } else {
+            log("Push preview: " + total + " token" + (total > 1 ? "s" : "") + " changed across " + fileCount + " file" + (fileCount > 1 ? "s" : ""), "info");
+          }
+          setBusy(false);
+        } catch (e) {
+          log("Push preview failed: " + e.message, "err");
+          setBusy(false);
+        }
+      })();
+      break;
+    }
     case "pull-preview": {
       const preview = msg.preview;
       pullPreviewCache = preview;

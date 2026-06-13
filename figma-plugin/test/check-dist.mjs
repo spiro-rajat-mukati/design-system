@@ -101,6 +101,21 @@ check(
   code.includes("compute-pull-preview"),
   "The Pull message handler is missing from the router."
 );
+check(
+  "read-collection handler present (Push step 1)",
+  code.includes("read-collection"),
+  "The Push 'read-collection' message handler is missing from the router."
+);
+check(
+  "readFigmaCollection function present in code.js",
+  code.includes("readFigmaCollection"),
+  "The readFigmaCollection() function was not emitted in dist/code.js."
+);
+check(
+  "figmaColorToHex emitted (color serialization for Push)",
+  code.includes("figmaColorToHex"),
+  "figmaColorToHex() is missing — Push color serialization will not work."
+);
 
 // ─── dist/ui.js ──────────────────────────────────────────────────────────────
 console.log("\ndist/ui.js");
@@ -110,6 +125,31 @@ check(
   "No ES2018 object spread in ui.js",
   !(/\{\s*\.\.\.[a-zA-Z_$]/.test(uiJs) || /,\s*\.\.\.[a-zA-Z_$][^(]*\}/.test(uiJs)),
   "esbuild must lower object spread — check target is es2017."
+);
+check(
+  "Push button handler wired (btn-push listener)",
+  uiJs.includes("btn-push"),
+  "document.getElementById('btn-push') event listener is missing from src/ui.js."
+);
+check(
+  "computePushChanges function present",
+  uiJs.includes("computePushChanges"),
+  "computePushChanges() is missing from dist/ui.js."
+);
+check(
+  "executePush function present (GitHub write flow)",
+  uiJs.includes("executePush"),
+  "executePush() is missing from dist/ui.js."
+);
+check(
+  "403 write-scope error message present",
+  uiJs.includes("Contents: Write"),
+  "Write-scope error message missing — PAT failures won't be clearly surfaced."
+);
+check(
+  "collection-data message handler present",
+  uiJs.includes("collection-data"),
+  "The 'collection-data' message case is missing from window.onmessage."
 );
 
 // ─── Summary ─────────────────────────────────────────────────────────────────
