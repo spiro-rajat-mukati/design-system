@@ -26,7 +26,7 @@ export const themes = {
       "200": "#ADBFF5",
       "300": "#8FA6F0",
       "400": "#6F8AE8",
-      "500": "#5277e2",
+      "500": "#092d97",
       "600": "#4567DD",
       "700": "#3C61DD",
       "800": "#385BCC",
@@ -745,7 +745,7 @@ export const themes = {
       "200": "#ADBFF5",
       "300": "#8FA6F0",
       "400": "#6F8AE8",
-      "500": "#5277e2",
+      "500": "#092d97",
       "600": "#4567DD",
       "700": "#3C61DD",
       "800": "#385BCC",
@@ -848,7 +848,7 @@ export const themes = {
     "action": {
       "primary": {
         "bg": "#4567DD",
-        "bg-hover": "#5277e2",
+        "bg-hover": "#092d97",
         "bg-active": "#6F8AE8",
         "bg-disabled": "#3451B2",
         "fg": "#FFFFFF"
@@ -1171,7 +1171,7 @@ export const themes = {
     },
     "primary": {
       "bg": "#4567DD",
-      "bg-hover": "#5277e2",
+      "bg-hover": "#092d97",
       "bg-active": "#6F8AE8",
       "bg-disabled": "#3451B2",
       "fg": "#FFFFFF",

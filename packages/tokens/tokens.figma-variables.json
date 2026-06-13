@@ -3081,22 +3081,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#5277e2"
+          "value": "#092d97"
         },
         "dark-web": {
-          "value": "#5277e2"
+          "value": "#092d97"
         },
         "light-ios": {
-          "value": "#5277e2"
+          "value": "#092d97"
         },
         "dark-ios": {
-          "value": "#5277e2"
+          "value": "#092d97"
         },
         "light-android": {
-          "value": "#5277e2"
+          "value": "#092d97"
         },
         "dark-android": {
-          "value": "#5277e2"
+          "value": "#092d97"
         }
       }
     },
