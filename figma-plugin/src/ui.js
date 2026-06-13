@@ -1,3 +1,31 @@
+/* ── global error surfacing (must be first) ── */
+window.addEventListener('error', (e) => {
+  // Surface JS errors that would otherwise silently break all listeners.
+  try {
+    const logEl = document.getElementById('log');
+    if (logEl) {
+      const line = document.createElement('div');
+      line.className = 'line err';
+      line.textContent = 'Script error: ' + (e.message || String(e));
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  } catch (_) {}
+});
+window.addEventListener('unhandledrejection', (e) => {
+  try {
+    const logEl = document.getElementById('log');
+    if (logEl) {
+      const msg = (e.reason && e.reason.message) ? e.reason.message : String(e.reason);
+      const line = document.createElement('div');
+      line.className = 'line err';
+      line.textContent = 'Unhandled error: ' + msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  } catch (_) {}
+});
+
 /* ── constants ── */
 const REPO   = 'spiro-rajat-mukati/design-system';
 const BRANCH = 'main';
@@ -424,6 +452,8 @@ window.onmessage = (event) => {
       break;
     }
     case 'log':  log(msg.text, msg.kind || 'info'); break;
+    // 'sync-done' is sent by uiDone() in code.js on success or error — always unblock UI.
+    case 'done':
     case 'sync-done':
     case 'sync-text-styles-done':
     case 'foundations-done':

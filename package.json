@@ -11,6 +11,7 @@
     "tokens:build": "node packages/tokens/build.mjs",
     "tokens:check": "node packages/tokens/check-generated.mjs",
     "plugin:build": "npm run build -w @kijani/figma-plugin",
+    "plugin:check": "node figma-plugin/test/check-dist.mjs",
     "start": "npm run start -w @kijani/web",
     "build": "npm run build -w @kijani/web",
     "test": "npm run test -w @kijani/web",
