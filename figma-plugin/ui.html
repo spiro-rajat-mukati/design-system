@@ -98,6 +98,26 @@
   .diff-collapse { border:none; margin-top:6px; }
   .diff-collapse > summary { background:none; padding:4px 0; border-radius:0; }
   .panel-error { color:var(--error); font-size:12px; padding:16px 0; }
+
+  /* Pull overlay extras */
+  .pull-section { margin-bottom:14px; }
+  .pull-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:6px; }
+  .mode-recon-item { font-size:11px; padding:3px 0; border-bottom:1px solid var(--border); display:flex; align-items:baseline; gap:5px; }
+  .mode-recon-item:last-child { border-bottom:none; }
+  .mode-badge { padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
+  .mode-badge.rename { background:var(--changed-bg); color:var(--changed-fg); }
+  .mode-badge.add    { background:var(--added-bg);   color:var(--added-fg);   }
+  .mode-badge.remove { background:var(--removed-bg); color:var(--removed-fg); }
+  .mode-badge.ok     { background:var(--added-bg);   color:var(--added-fg);   }
+  .conflict-card { border:1px solid var(--conflict-bg); border-radius:6px; padding:8px 10px; margin-bottom:8px; background:var(--conflict-bg); color:var(--conflict-fg); }
+  .conflict-name { font-family:ui-monospace,monospace; font-size:10px; margin-bottom:4px; word-break:break-all; }
+  .conflict-mode { font-size:10px; color:var(--fg-muted); margin-bottom:4px; }
+  .conflict-radios { display:flex; flex-direction:column; gap:4px; }
+  .conflict-radio { display:flex; align-items:flex-start; gap:6px; cursor:pointer; font-size:11px; line-height:1.4; }
+  .conflict-radio input { margin:2px 0 0; cursor:pointer; flex-shrink:0; }
+  .pull-summary-pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+  .pill.conflict { background:var(--conflict-bg); color:var(--conflict-fg); }
+  .pill.muted-pill { background:var(--bg-sunken); color:var(--fg-muted); }
 </style>
 </head>
 <body>
@@ -116,6 +136,7 @@
   <div class="group-label">Tokens</div>
   <button id="sync-tokens">Sync tokens from GitHub</button>
   <button id="btn-diff" class="secondary">Diff tokens vs GitHub</button>
+  <button id="btn-pull" class="secondary">Pull tokens from GitHub → Figma</button>
 
   <div class="group-label">Styles &amp; components</div>
   <button id="sync-text-styles" class="secondary">Sync Text Styles</button>
@@ -138,6 +159,19 @@
   </div>
 </details>
 
+<!-- ═══════════ PULL OVERLAY ═══════════ -->
+<div id="pull-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">Pull — GitHub → Figma</span>
+    <button class="ov-close" id="close-pull" title="Close">✕</button>
+  </div>
+  <div class="ov-body" id="pull-body"><!-- populated by renderPullPreview() --></div>
+  <div class="ov-footer" id="pull-footer">
+    <button class="secondary" id="pull-cancel">Cancel</button>
+    <button id="pull-apply">Apply Pull</button>
+  </div>
+</div>
+
 <!-- ═══════════ DIFF OVERLAY ═══════════ -->
 <div id="diff-panel" class="overlay" hidden>
   <div class="ov-header">
@@ -159,6 +193,7 @@ const SPECS = [
 
 /* ── session state ── */
 let activePat = null;
+let pullPreviewCache = null; // last pull-preview result, used on Apply
 
 /* ── logging ── */
 const logEl = document.getElementById('log');
@@ -206,7 +241,7 @@ async function ghFetch(repoPath) {
 }
 
 /* ── busy state (all interactive buttons) ── */
-const ALL_BTNS = ['sync-tokens','btn-diff','sync-text-styles','generate-foundations','generate-components','save-pat'];
+const ALL_BTNS = ['sync-tokens','btn-diff','btn-pull','sync-text-styles','generate-foundations','generate-components','save-pat'];
 function setBusy(busy) {
   for (const id of ALL_BTNS) { const el = document.getElementById(id); if (el) el.disabled = busy; }
 }
@@ -313,6 +348,125 @@ function renderDiff(result) {
 }
 
 /* ══════════════════════════════════════════════════════════
+   PULL RENDERING
+   ══════════════════════════════════════════════════════════ */
+
+function renderModeRecon(recon) {
+  const { toRename, toAdd, toRemove } = recon;
+  const total = toRename.length + toAdd.length + toRemove.length;
+  if (total === 0) {
+    return '<div class="pull-section">' +
+      '<div class="pull-section-title">Mode reconciliation</div>' +
+      '<div class="mode-recon-item"><span class="mode-badge ok">✓</span> Collection already has all 6 correct modes</div>' +
+      '</div>';
+  }
+  let html = '<div class="pull-section">' +
+    '<div class="pull-section-title">Mode reconciliation (' + total + ' change' + (total > 1 ? 's' : '') + ')</div>';
+  for (const r of toRename) {
+    html += '<div class="mode-recon-item"><span class="mode-badge rename">rename</span> <span>' + esc(r.fromName) + ' → ' + esc(r.toName) + '</span></div>';
+  }
+  for (const name of toAdd) {
+    html += '<div class="mode-recon-item"><span class="mode-badge add">add</span> <span>' + esc(name) + '</span></div>';
+  }
+  for (const r of toRemove) {
+    html += '<div class="mode-recon-item"><span class="mode-badge remove">remove</span> <span>' + esc(r.name) + '</span></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderConflictCard(conflict, idx) {
+  const key = esc(conflict.name + ':' + conflict.repoModeId);
+  const isColor = conflict.isColor;
+  const figmaDesc = isColor
+    ? '<span style="display:inline-flex;align-items:center;gap:3px">' + renderSwatch(conflict.figmaStr) + esc(conflict.figmaLabel) + '</span>'
+    : '<code>' + esc(conflict.figmaLabel) + '</code>';
+  const repoDesc = isColor
+    ? '<span style="display:inline-flex;align-items:center;gap:3px">' + renderSwatch(conflict.repoStr) + esc(conflict.repoLabel) + '</span>'
+    : '<code>' + esc(conflict.repoLabel) + '</code>';
+
+  return '<div class="conflict-card">' +
+    '<div class="conflict-name">' + esc(conflict.name) + '</div>' +
+    '<div class="conflict-mode">Mode: ' + esc(conflict.modeName) + '</div>' +
+    '<div class="conflict-radios">' +
+      '<label class="conflict-radio">' +
+        '<input type="radio" name="conflict_' + idx + '" value="repo" data-key="' + key + '" checked />' +
+        '<span><strong>Repo</strong> → ' + repoDesc + '</span>' +
+      '</label>' +
+      '<label class="conflict-radio">' +
+        '<input type="radio" name="conflict_' + idx + '" value="figma" data-key="' + key + '" />' +
+        '<span><strong>Keep Figma</strong> → ' + figmaDesc + '</span>' +
+      '</label>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderPullPreview(preview) {
+  if (preview.error) return '<div class="panel-error">' + esc(preview.error) + '</div>';
+
+  const { modeRecon, conflicts, autoApply, figmaWins, summary, hasBase } = preview;
+  let html = '';
+
+  // Top-level summary pills
+  html += '<div class="pull-summary-pills">';
+  if (!hasBase) html += '<span class="pill muted-pill" title="No prior sync found — all repo values will be applied without conflict detection">First sync — no base</span>';
+  if (summary.modeChanges)  html += '<span class="pill changed">' + summary.modeChanges + ' mode change' + (summary.modeChanges > 1 ? 's' : '') + '</span>';
+  if (summary.autoApply)    html += '<span class="pill added">' + summary.autoApply + ' auto-apply</span>';
+  if (summary.conflicts)    html += '<span class="pill conflict">' + summary.conflicts + ' conflict' + (summary.conflicts > 1 ? 's' : '') + '</span>';
+  if (summary.figmaWins)    html += '<span class="pill muted-pill">' + summary.figmaWins + ' Figma-wins (skip)</span>';
+  if (summary.added)        html += '<span class="pill added">' + summary.added + ' new variable' + (summary.added > 1 ? 's' : '') + '</span>';
+  if (summary.removed)      html += '<span class="pill removed">' + summary.removed + ' Figma-only (kept)</span>';
+  html += '</div>';
+
+  // Mode reconciliation
+  html += renderModeRecon(modeRecon);
+
+  // Conflicts — require user choice (default: repo wins)
+  if (conflicts.length) {
+    html += '<div class="pull-section">';
+    html += '<div class="pull-section-title">Conflicts — choose which value to keep (' + conflicts.length + ')</div>';
+    conflicts.forEach((c, i) => { html += renderConflictCard(c, i); });
+    html += '</div>';
+  }
+
+  // Auto-apply preview (collapsed)
+  if (autoApply.length) {
+    html += '<details class="diff-collapse pull-section"><summary>Auto-applying (' + autoApply.length + ' mode-values)</summary>';
+    for (const item of autoApply.slice(0, 60)) {
+      html += '<div class="diff-row">';
+      html += '<div class="var-name changed">' + esc(item.name) + '</div>';
+      html += renderModeChange(item);
+      html += '</div>';
+    }
+    if (autoApply.length > 60) html += '<div class="diff-more">… ' + (autoApply.length - 60) + ' more</div>';
+    html += '</details>';
+  }
+
+  // Figma-wins (skipped)
+  if (figmaWins.length) {
+    html += '<details class="diff-collapse pull-section"><summary>Figma-wins — skipping (' + figmaWins.length + ')</summary>';
+    for (const item of figmaWins.slice(0, 40)) {
+      html += '<div class="diff-row"><div class="var-name">' + esc(item.name) + '</div></div>';
+    }
+    if (figmaWins.length > 40) html += '<div class="diff-more">… ' + (figmaWins.length - 40) + ' more</div>';
+    html += '</details>';
+  }
+
+  return html;
+}
+
+/** Collect conflict radio resolutions from the Pull overlay DOM. */
+function collectResolutions() {
+  const resolutions = {};
+  document.querySelectorAll('#pull-body input[type="radio"]:checked').forEach(radio => {
+    // data-key = "varName:repoModeId" (HTML-escaped on write, unescaped here)
+    const key = radio.dataset.key.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
+    resolutions[key] = radio.value; // "repo" | "figma"
+  });
+  return resolutions;
+}
+
+/* ══════════════════════════════════════════════════════════
    ACTION HANDLERS
    ══════════════════════════════════════════════════════════ */
 
@@ -368,6 +522,35 @@ document.getElementById('save-pat').addEventListener('click', () => {
   input.value = '';
 });
 
+document.getElementById('btn-pull').addEventListener('click', async () => {
+  setBusy(true);
+  log('Fetching tokens for pull preview…', 'muted');
+  try {
+    const repoData = await ghFetch('packages/tokens/tokens.figma-variables.json');
+    log('Computing 3-way preview…', 'muted');
+    parent.postMessage({ pluginMessage: { type: 'compute-pull-preview', repoData } }, '*');
+  } catch (e) { log('Fetch failed: ' + e.message, 'err'); setBusy(false); }
+});
+
+document.getElementById('close-pull').addEventListener('click', () => {
+  document.getElementById('pull-panel').hidden = true;
+  pullPreviewCache = null;
+  setBusy(false);
+});
+document.getElementById('pull-cancel').addEventListener('click', () => {
+  document.getElementById('pull-panel').hidden = true;
+  pullPreviewCache = null;
+  setBusy(false);
+});
+document.getElementById('pull-apply').addEventListener('click', () => {
+  if (!pullPreviewCache) return;
+  const resolutions = collectResolutions();
+  document.getElementById('pull-apply').disabled = true;
+  document.getElementById('pull-cancel').disabled = true;
+  log('Applying pull…', 'muted');
+  parent.postMessage({ pluginMessage: { type: 'apply-pull', resolutions } }, '*');
+});
+
 document.getElementById('close-diff').addEventListener('click', () => {
   document.getElementById('diff-panel').hidden = true;
   setBusy(false);
@@ -391,6 +574,28 @@ window.onmessage = (event) => {
       log('PAT saved to clientStorage', 'ok');
       document.getElementById('pat-settings').open = false;
       break;
+    case 'pull-preview': {
+      const preview = msg.preview;
+      pullPreviewCache = preview;
+      document.getElementById('pull-body').innerHTML = renderPullPreview(preview);
+      document.getElementById('pull-panel').hidden = false;
+      document.getElementById('pull-apply').disabled = false;
+      document.getElementById('pull-cancel').disabled = false;
+      if (!preview.error) {
+        const s = preview.summary;
+        log('Pull preview: ' + s.autoApply + ' auto · ' + s.conflicts + ' conflicts · ' + s.figmaWins + ' Figma-wins', 'info');
+      }
+      setBusy(false);
+      break;
+    }
+    case 'pull-done': {
+      document.getElementById('pull-panel').hidden = true;
+      pullPreviewCache = null;
+      const n = msg.totalApplied != null ? msg.totalApplied + ' values applied' : 'done';
+      log('Pull complete — ' + n + (msg.skipped ? ' (' + msg.skipped + ' Figma-wins kept)' : ''), 'ok');
+      setBusy(false);
+      break;
+    }
     case 'diff-result': {
       const html = renderDiff(msg.result);
       document.getElementById('diff-body').innerHTML = html;
