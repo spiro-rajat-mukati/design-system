@@ -19,7 +19,7 @@
       "200": { "$value": "#ADBFF5", "$type": "color", "$description": "Existing token: button primary disabled bg" },
       "300": { "$value": "#8FA6F0", "$type": "color" },
       "400": { "$value": "#6F8AE8", "$type": "color" },
-      "500": { "$value": "#0000ff", "$type": "color" },
+      "500": { "$value": "#5277e2", "$type": "color" },
       "600": { "$value": "#4567DD", "$type": "color" },
       "700": { "$value": "#3C61DD", "$type": "color", "$description": "Existing token: brand 700, button primary bg" },
       "800": { "$value": "#385BCC", "$type": "color", "$description": "Existing token: button primary hover" },
