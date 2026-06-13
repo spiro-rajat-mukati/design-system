@@ -1380,11 +1380,32 @@ async function generateFoundations() {
   figma.ui.postMessage({ type: "foundations-done" });
 }
 
+/* ---------- PAT — clientStorage ---------- */
+
+const PAT_KEY = "kijani.pat";
+
+/** Load the PAT from clientStorage on startup and send it to the UI. */
+async function loadPat() {
+  try {
+    const pat = await figma.clientStorage.getAsync(PAT_KEY);
+    figma.ui.postMessage({ type: "pat-loaded", pat: pat || null });
+  } catch (e) {
+    figma.ui.postMessage({ type: "pat-loaded", pat: null });
+  }
+}
+
 /* ---------- message router ---------- */
 
 figma.ui.onmessage = async (msg) => {
   try {
-    if (msg.type === "sync-tokens") {
+    if (msg.type === "get-pat") {
+      await loadPat();
+    } else if (msg.type === "set-pat") {
+      // msg.pat arrives from the UI — store it, then send it back so the UI
+      // can update activePat and the status indicator.
+      await figma.clientStorage.setAsync(PAT_KEY, msg.pat);
+      figma.ui.postMessage({ type: "pat-saved", pat: msg.pat });
+    } else if (msg.type === "sync-tokens") {
       await fontsReady;
       syncTokens(msg.data);
     } else if (msg.type === "sync-text-styles") {
