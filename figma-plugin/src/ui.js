@@ -376,31 +376,89 @@ function normSrcVal(entry) {
 }
 
 /**
+ * Parse a dimension string like "26px", "-0.02em", "1500ms" into {num, unit}.
+ * Returns null if the string isn't a recognisable dimension.
+ */
+function parseDimension(str) {
+  const m = String(str).trim().match(/^(-?[\d.]+)\s*([a-zA-Z%]*)$/);
+  return m ? { num: parseFloat(m[1]), unit: m[2] } : null;
+}
+
+/**
  * Convert a serialised Figma variable value into the source token entry format.
- * Aliases: Figma uses slash paths → source uses dot paths inside {}.
- * Everything else: raw value string or number.
+ *
+ * Round-trip invariant: reading the collection and immediately pushing back
+ * must produce zero changes. Key cases:
+ *   - Alias: Figma slash-path -> source dot-path inside {}
+ *   - Dimension: Figma FLOAT (bare 26) -> source "26px" (re-attach unit from existing entry)
+ *   - $extensions["design-system.figma-value"] tokens: update the extension field,
+ *     leave $value intact (those tokens intentionally store a different value in Figma)
  */
 function figmaValToSrcEntry(figmaVal, existingEntry) {
   const key = ('$value' in existingEntry) ? '$value' : 'value';
   const updated = Object.assign({}, existingEntry);
+
   if (figmaVal.alias) {
-    // Figma: "color/brand/500" → source: "{color.brand.500}"
     updated[key] = '{' + figmaVal.alias.replace(/\//g, '.') + '}';
-  } else {
-    updated[key] = figmaVal.value;
+    return updated;
   }
+
+  // $extensions token: Figma holds a different representation intentionally
+  // (e.g. "Inter", 110, "Regular"). Update only the extension field; $value stays.
+  const ext = existingEntry['$extensions'] && existingEntry['$extensions']['design-system.figma-value'];
+  if (ext !== undefined) {
+    const updatedExt = Object.assign({}, existingEntry['$extensions']);
+    updatedExt['design-system.figma-value'] = figmaVal.value;
+    updated['$extensions'] = updatedExt;
+    return updated;
+  }
+
+  // Dimension tokens: Figma stores bare floats; source stores strings with units.
+  const srcStr = String(srcVal(existingEntry));
+  const dim = parseDimension(srcStr);
+  if (dim && dim.unit) {
+    const newNum = typeof figmaVal.value === 'number' ? figmaVal.value : parseFloat(figmaVal.value);
+    updated[key] = String(newNum) + dim.unit;
+    return updated;
+  }
+
+  // Default: write the value as-is (colors are already hex strings from code.js).
+  updated[key] = figmaVal.value;
   return updated;
 }
 
-/** Compare a Figma value against a source entry, true if they represent the same token value. */
+/**
+ * Compare a Figma value against a source entry; returns true if they represent
+ * the same token value (round-trip equal).
+ *
+ * Priority order:
+ *   1. Alias comparison (Figma slash-path vs source dot-path in braces)
+ *   2. $extensions token: compare figmaVal against extension field, not $value
+ *   3. Dimension: strip unit from source, compare as floats (26 === "26px")
+ *   4. Fallback: lowercased string equality (colors, booleans, etc.)
+ */
 function figmaValMatchesSrc(figmaVal, existingEntry) {
-  const current = normSrcVal(existingEntry);
   if (figmaVal.alias) {
     const expected = '{' + figmaVal.alias.replace(/\//g, '.') + '}';
-    return current === expected.toLowerCase();
+    return normSrcVal(existingEntry) === expected.toLowerCase();
   }
-  // For colors, compare hex strings (already normalised by code.js)
-  return current === String(figmaVal.value).trim().toLowerCase();
+
+  // $extensions token: compare against the Figma-specific extension value.
+  const ext = existingEntry['$extensions'] && existingEntry['$extensions']['design-system.figma-value'];
+  if (ext !== undefined) {
+    return String(ext).trim().toLowerCase() === String(figmaVal.value).trim().toLowerCase();
+  }
+
+  // Dimension tokens: compare numerically after stripping units.
+  const srcStr = String(srcVal(existingEntry));
+  const dim = parseDimension(srcStr);
+  if (dim && dim.unit) {
+    const figmaNum = typeof figmaVal.value === 'number' ? figmaVal.value : parseFloat(String(figmaVal.value));
+    return Math.abs(dim.num - figmaNum) < 0.0001;
+  }
+
+  // Default: lowercased string equality (colors already normalised by code.js).
+  return normSrcVal(existingEntry) === String(figmaVal.value).trim().toLowerCase();
 }
 
 /**

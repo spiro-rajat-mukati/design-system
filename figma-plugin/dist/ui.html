@@ -507,23 +507,50 @@ function srcVal(entry) {
 function normSrcVal(entry) {
   return String(srcVal(entry)).trim().toLowerCase();
 }
+function parseDimension(str) {
+  const m = String(str).trim().match(/^(-?[\d.]+)\s*([a-zA-Z%]*)$/);
+  return m ? { num: parseFloat(m[1]), unit: m[2] } : null;
+}
 function figmaValToSrcEntry(figmaVal, existingEntry) {
   const key = "$value" in existingEntry ? "$value" : "value";
   const updated = Object.assign({}, existingEntry);
   if (figmaVal.alias) {
     updated[key] = "{" + figmaVal.alias.replace(/\//g, ".") + "}";
-  } else {
-    updated[key] = figmaVal.value;
+    return updated;
   }
+  const ext = existingEntry["$extensions"] && existingEntry["$extensions"]["design-system.figma-value"];
+  if (ext !== void 0) {
+    const updatedExt = Object.assign({}, existingEntry["$extensions"]);
+    updatedExt["design-system.figma-value"] = figmaVal.value;
+    updated["$extensions"] = updatedExt;
+    return updated;
+  }
+  const srcStr = String(srcVal(existingEntry));
+  const dim = parseDimension(srcStr);
+  if (dim && dim.unit) {
+    const newNum = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(figmaVal.value);
+    updated[key] = String(newNum) + dim.unit;
+    return updated;
+  }
+  updated[key] = figmaVal.value;
   return updated;
 }
 function figmaValMatchesSrc(figmaVal, existingEntry) {
-  const current = normSrcVal(existingEntry);
   if (figmaVal.alias) {
     const expected = "{" + figmaVal.alias.replace(/\//g, ".") + "}";
-    return current === expected.toLowerCase();
+    return normSrcVal(existingEntry) === expected.toLowerCase();
   }
-  return current === String(figmaVal.value).trim().toLowerCase();
+  const ext = existingEntry["$extensions"] && existingEntry["$extensions"]["design-system.figma-value"];
+  if (ext !== void 0) {
+    return String(ext).trim().toLowerCase() === String(figmaVal.value).trim().toLowerCase();
+  }
+  const srcStr = String(srcVal(existingEntry));
+  const dim = parseDimension(srcStr);
+  if (dim && dim.unit) {
+    const figmaNum = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(String(figmaVal.value));
+    return Math.abs(dim.num - figmaNum) < 1e-4;
+  }
+  return normSrcVal(existingEntry) === String(figmaVal.value).trim().toLowerCase();
 }
 async function fetchSourceFilesWithMeta() {
   const result = {};
