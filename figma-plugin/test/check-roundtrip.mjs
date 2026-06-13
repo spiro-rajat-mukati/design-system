@@ -194,5 +194,169 @@ if (failLines.length > 0) {
   if (failLines.length > 30) console.error("  ... and " + (failLines.length - 30) + " more");
 }
 
-console.log("\n" + totalTokens + " tokens checked: " + (totalTokens - failures) + " matched, " + failures + " mismatched\n");
-if (failures > 0) process.exit(1);
+console.log("\n" + totalTokens + " tokens checked: " + (totalTokens - failures) + " matched, " + failures + " mismatched");
+
+// ─── Byte-level write-path guard ─────────────────────────────────────────────
+// Replicate applyChangesToText from src/ui.js to verify the write path
+// preserves every byte when changesMap is empty, and changes exactly the
+// target line(s) when a real edit occurs.
+
+function escapeRe(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function toJsonLiteral(val) {
+  return typeof val === "string" ? JSON.stringify(val) : String(val);
+}
+function patchSingleLine(line, change) {
+  const vk = ("$value" in change.new) ? "$value" : "value";
+  const oldLit = toJsonLiteral(change.old[vk]);
+  const newLit = toJsonLiteral(change.new[vk]);
+  if (oldLit === newLit) return line;
+  return line.replace(
+    new RegExp('"(?:\\$value|value)"\\s*:\\s*' + escapeRe(oldLit)),
+    '"$value": ' + newLit
+  );
+}
+function patchMultiLine(line, change) {
+  const vk = ("$value" in change.new) ? "$value" : "value";
+  const oldLit = toJsonLiteral(change.old[vk]);
+  const newLit = toJsonLiteral(change.new[vk]);
+  if (oldLit !== newLit && (line.includes('"$value"') || line.includes('"value"'))) {
+    const p = line.replace(
+      new RegExp('"(?:\\$value|value)"\\s*:\\s*' + escapeRe(oldLit)),
+      '"$value": ' + newLit
+    );
+    if (p !== line) return p;
+  }
+  if (line.includes('"design-system.figma-value"')) {
+    const extObj = change.old["$extensions"];
+    const oldExt = extObj && extObj["design-system.figma-value"];
+    const newExt = change.new["$extensions"] && change.new["$extensions"]["design-system.figma-value"];
+    if (oldExt !== undefined && toJsonLiteral(oldExt) !== toJsonLiteral(newExt)) {
+      return line.replace(
+        new RegExp('"design-system\\.figma-value"\\s*:\\s*' + escapeRe(toJsonLiteral(oldExt))),
+        '"design-system.figma-value": ' + toJsonLiteral(newExt)
+      );
+    }
+  }
+  return line;
+}
+function applyChangesToText(originalText, changesMap) {
+  if (changesMap.size === 0) return originalText;
+  const lines = originalText.split("\n");
+  const result = lines.slice();
+  const pathStack = [];
+  let activeChange = null;
+  let arrayDepth = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (/^[}\]],?$/.test(trimmed)) {
+      if (trimmed[0] === "]") { if (arrayDepth > 0) arrayDepth--; }
+      else { if (activeChange) activeChange = null; if (pathStack.length > 0) pathStack.pop(); }
+      continue;
+    }
+    const m = trimmed.match(/^"([^"]+)"\s*:\s*([\s\S]*)/);
+    if (!m) continue;
+    const key = m[1];
+    const rest = m[2].trimEnd();
+    if (activeChange && key.startsWith("$")) {
+      if (rest === "[") arrayDepth++;
+      const p = patchMultiLine(line, activeChange);
+      if (p !== line) result[i] = p;
+      continue;
+    }
+    if (key.startsWith("$")) { if (rest === "[") arrayDepth++; continue; }
+    const fullPath = pathStack.length > 0 ? pathStack.join("/") + "/" + key : key;
+    const change = changesMap.get(fullPath);
+    if (rest.startsWith("{") && /\}[,]?\s*$/.test(rest)) {
+      if (change) result[i] = patchSingleLine(line, change);
+      continue;
+    }
+    if (rest === "{") {
+      pathStack.push(key);
+      for (let j = i + 1; j < lines.length; j++) {
+        const lt = lines[j].trim();
+        if (!lt) continue;
+        if (lt.startsWith('"$')) { if (change) activeChange = change; }
+        break;
+      }
+      continue;
+    }
+    if (rest === "[") { pathStack.push(key); arrayDepth++; continue; }
+  }
+  return result.join("\n");
+}
+
+console.log("\nByte-level write-path guard");
+let byteFailures = 0;
+
+// Test A: empty changesMap → text unchanged (verbatim identity)
+for (const name of FILES_TO_CHECK) {
+  const filePath = join(srcDir, name + ".json");
+  let text;
+  try { text = readFileSync(filePath, "utf8"); } catch { continue; }
+  const out = applyChangesToText(text, new Map());
+  const ok = out === text;
+  if (!ok) byteFailures++;
+  console.log("  " + (ok ? "✓" : "✗") + "  " + name + ".json — empty changesMap returns identical text");
+}
+
+// Test B: single-value change touches exactly 1 line in core.json
+{
+  const text = readFileSync(join(srcDir, "core.json"), "utf8");
+  const TEST_PATH = "color/brand/500";
+  const TEST_OLD = { "$value": "#5277E2", "$type": "color" };
+  const TEST_NEW = { "$value": "#abcdef", "$type": "color" };
+  const changesMap = new Map([[TEST_PATH, { old: TEST_OLD, new: TEST_NEW, modes: ["Light · Web"] }]]);
+
+  const modified = applyChangesToText(text, changesMap);
+  const origLines = text.split("\n");
+  const modLines = modified.split("\n");
+
+  const changedIdxs = origLines.reduce((acc, l, i) => { if (l !== modLines[i]) acc.push(i); return acc; }, []);
+  const exactlyOne = changedIdxs.length === 1;
+  const containsNewVal = exactlyOne && modLines[changedIdxs[0]].includes('"#abcdef"');
+  const keepsType = exactlyOne && modLines[changedIdxs[0]].includes('"color"');
+
+  if (!exactlyOne) byteFailures++;
+  if (!containsNewVal) byteFailures++;
+  console.log("  " + (exactlyOne ? "✓" : "✗") + "  Single color change touches exactly 1 line (" + changedIdxs.length + " changed)");
+  console.log("  " + (containsNewVal ? "✓" : "✗") + "  Changed line contains new value #abcdef" + (!containsNewVal && changedIdxs.length ? `: "${modLines[changedIdxs[0]].trim()}"` : ""));
+  console.log("  " + (keepsType ? "✓" : "✗") + "  Changed line preserves $type key");
+}
+
+// Test C: extension-field change for multi-line token
+{
+  const text = readFileSync(join(srcDir, "core.json"), "utf8");
+  const TEST_PATH = "font-weight/regular";
+  const TEST_OLD = {
+    "$value": "400", "$type": "fontWeights",
+    "$extensions": { "design-system.figma-value": "Regular" }
+  };
+  const TEST_NEW = {
+    "$value": "400", "$type": "fontWeights",
+    "$extensions": { "design-system.figma-value": "Light" }
+  };
+  const changesMap = new Map([[TEST_PATH, { old: TEST_OLD, new: TEST_NEW, modes: ["Light · Web"] }]]);
+
+  const modified = applyChangesToText(text, changesMap);
+  const origLines = text.split("\n");
+  const modLines = modified.split("\n");
+  const changedIdxs = origLines.reduce((acc, l, i) => { if (l !== modLines[i]) acc.push(i); return acc; }, []);
+
+  const exactlyOne = changedIdxs.length === 1;
+  const containsLight = exactlyOne && modLines[changedIdxs[0]].includes('"Light"');
+  const valueUnchanged = !modified.split("\n").some((l, i) => origLines[i] && l !== origLines[i] && l.includes('"400"') !== origLines[i].includes('"400"'));
+
+  if (!exactlyOne) byteFailures++;
+  if (!containsLight) byteFailures++;
+  console.log("  " + (exactlyOne ? "✓" : "✗") + "  $extensions change touches exactly 1 line (" + changedIdxs.length + " changed)");
+  console.log("  " + (containsLight ? "✓" : "✗") + "  Changed line contains new extension value \"Light\"");
+  console.log("  " + (valueUnchanged ? "✓" : "✗") + "  $value line is untouched");
+}
+
+const grandTotal = failures + byteFailures;
+console.log("\n" + (grandTotal === 0 ? "All checks passed." : grandTotal + " check(s) failed.") + "\n");
+if (grandTotal > 0) process.exit(1);

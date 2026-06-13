@@ -566,8 +566,9 @@ async function fetchSourceFilesWithMeta() {
     const meta = await ghFetchMeta(path, BRANCH);
     if (!meta) { result[name] = null; return; }
     // GitHub encodes content as base64 with line breaks
-    const json = JSON.parse(atob(meta.content.replace(/\n/g, '')));
-    result[name] = { json, sha: meta.sha, path, flat: flattenTokens(json) };
+    const text = atob(meta.content.replace(/\n/g, ''));
+    const json = JSON.parse(text);
+    result[name] = { json, sha: meta.sha, path, flat: flattenTokens(json), text };
   }));
   return result;
 }
@@ -612,26 +613,158 @@ function computePushChanges(figmaCollection, sourceFiles) {
   return changes;
 }
 
+/** Escape a value for use as a literal in a RegExp. */
+function escapeRe(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** Return the JSON literal for a token value: strings are quoted, numbers/booleans are bare. */
+function toJsonLiteral(val) {
+  return typeof val === 'string' ? JSON.stringify(val) : String(val);
+}
+
 /**
- * Deep-clone a JSON object and overwrite token values at the given paths.
- * Uses the existing nested structure — does not create new keys.
+ * Patch the $value field on a single-line token line.
+ * Only replaces the value bytes; indentation, $type, $description, etc. are untouched.
  */
-function applyChangesToJson(originalJson, changesMap) {
-  const updated = JSON.parse(JSON.stringify(originalJson));
-  for (const [tokenPath, change] of changesMap) {
-    const parts = tokenPath.split('/');
-    let node = updated;
-    for (let i = 0; i < parts.length - 1; i++) {
-      if (!node[parts[i]] || typeof node[parts[i]] !== 'object') { node = null; break; }
-      node = node[parts[i]];
-    }
-    if (!node) continue;
-    const last = parts[parts.length - 1];
-    if (node[last] && typeof node[last] === 'object') {
-      Object.assign(node[last], change.new);
+function patchSingleLine(line, change) {
+  const vk = ('$value' in change.new) ? '$value' : 'value';
+  const oldLit = toJsonLiteral(change.old[vk]);
+  const newLit = toJsonLiteral(change.new[vk]);
+  if (oldLit === newLit) return line;
+  return line.replace(
+    new RegExp('"(?:\\$value|value)"\\s*:\\s*' + escapeRe(oldLit)),
+    '"$value": ' + newLit
+  );
+}
+
+/**
+ * Patch a single inner line of a multi-line token block.
+ * Handles the "$value" line and the "$extensions" line.
+ */
+function patchMultiLine(line, change) {
+  const vk = ('$value' in change.new) ? '$value' : 'value';
+  const oldLit = toJsonLiteral(change.old[vk]);
+  const newLit = toJsonLiteral(change.new[vk]);
+
+  if (oldLit !== newLit && (line.includes('"$value"') || line.includes('"value"'))) {
+    const patched = line.replace(
+      new RegExp('"(?:\\$value|value)"\\s*:\\s*' + escapeRe(oldLit)),
+      '"$value": ' + newLit
+    );
+    if (patched !== line) return patched;
+  }
+
+  if (line.includes('"design-system.figma-value"')) {
+    const extObj = change.old['$extensions'];
+    const oldExt = extObj && extObj['design-system.figma-value'];
+    const newExt = change.new['$extensions'] && change.new['$extensions']['design-system.figma-value'];
+    if (oldExt !== undefined && toJsonLiteral(oldExt) !== toJsonLiteral(newExt)) {
+      return line.replace(
+        new RegExp('"design-system\\.figma-value"\\s*:\\s*' + escapeRe(toJsonLiteral(oldExt))),
+        '"design-system.figma-value": ' + toJsonLiteral(newExt)
+      );
     }
   }
-  return updated;
+
+  return line;
+}
+
+/**
+ * Apply token changes to the original source file text, editing ONLY the
+ * specific bytes that changed.  Every other byte — indentation, key order,
+ * trailing commas, compact one-liner style, $description, sibling fields —
+ * is left exactly as-is.
+ *
+ * Algorithm: line-by-line scan with a pathStack that mirrors the JSON nesting.
+ *   • Single-line tokens ("key": { … })  → patchSingleLine on that line.
+ *   • Multi-line token blocks ("key": {\n  "$value": …\n  …\n}) →
+ *     lookahead detects the opening, then patchMultiLine on each inner line.
+ *   • Shadow $value arrays ("$value": […]) → arrayDepth counter prevents
+ *     the closing ] from being mistaken for a scope-closing }.
+ *   • Empty changesMap → original text returned verbatim (zero byte change).
+ */
+function applyChangesToText(originalText, changesMap) {
+  if (changesMap.size === 0) return originalText;
+
+  const lines = originalText.split('\n');
+  const result = lines.slice();
+  const pathStack = [];
+  let activeChange = null; // non-null while inside a multi-line token block
+  let arrayDepth = 0;      // counts unmatched '[' inside $value arrays
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    // ── Closing brace or bracket ─────────────────────────────────────────────
+    if (/^[}\]],?$/.test(trimmed)) {
+      if (trimmed[0] === ']') {
+        if (arrayDepth > 0) arrayDepth--;
+        // Never pop pathStack for ']' — arrays don't open a new path segment.
+      } else {
+        if (activeChange) activeChange = null;
+        if (pathStack.length > 0) pathStack.pop();
+      }
+      continue;
+    }
+
+    // ── Key-value line ───────────────────────────────────────────────────────
+    const m = trimmed.match(/^"([^"]+)"\s*:\s*([\s\S]*)/);
+    if (!m) continue;
+
+    const key = m[1];
+    const rest = m[2].trimEnd();
+
+    // Inside a multi-line token block: patch $ fields as they appear.
+    if (activeChange && key.startsWith('$')) {
+      if (rest === '[') arrayDepth++;
+      const patched = patchMultiLine(line, activeChange);
+      if (patched !== line) result[i] = patched;
+      continue;
+    }
+
+    // Skip $ keys when not inside an active block (track array depth for $value:[...]).
+    if (key.startsWith('$')) {
+      if (rest === '[') arrayDepth++;
+      continue;
+    }
+
+    const fullPath = pathStack.length > 0 ? pathStack.join('/') + '/' + key : key;
+    const change = changesMap.get(fullPath);
+
+    // ── Single-line token: "key": { "$value": …, … } ───────────────────────
+    if (rest.startsWith('{') && /\}[,]?\s*$/.test(rest)) {
+      if (change) result[i] = patchSingleLine(line, change);
+      continue;
+    }
+
+    // ── Multi-line object opening: "key": { ─────────────────────────────────
+    if (rest === '{') {
+      pathStack.push(key);
+      // Lookahead: if the next non-empty line starts with "$", this is a
+      // multi-line token block (not a nested group of tokens).
+      for (let j = i + 1; j < lines.length; j++) {
+        const lt = lines[j].trim();
+        if (!lt) continue;
+        if (lt.startsWith('"$')) {
+          if (change) activeChange = change;
+        }
+        break;
+      }
+      continue;
+    }
+
+    // ── Array opening for a non-$ key: "key": [ ─────────────────────────────
+    if (rest === '[') {
+      pathStack.push(key);
+      arrayDepth++;
+      continue;
+    }
+  }
+
+  return result.join('\n');
 }
 
 /* ── GitHub write helpers ── */
@@ -737,8 +870,7 @@ async function executePush(sourceFiles, changes) {
   for (const fname of fileNames) {
     const fileChanges = changes[fname];
     const srcFile = sourceFiles[fname];
-    const updatedJson = applyChangesToJson(srcFile.json, fileChanges);
-    const content = JSON.stringify(updatedJson, null, 2) + '\n';
+    const content = applyChangesToText(srcFile.text, fileChanges);
     const commitMsg = 'tokens(figma-push): ' + fileChanges.size + ' change' +
       (fileChanges.size > 1 ? 's' : '') + ' in ' + fname + '.json';
     log('Committing ' + fname + '.json (' + fileChanges.size + ' tokens)…', 'muted');
