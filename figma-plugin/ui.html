@@ -124,7 +124,7 @@
 
 <script>
   const REPO_RAW = 'https://raw.githubusercontent.com/spiro-rajat-mukati/design-system/main';
-  const TOKENS_URL = REPO_RAW + '/src/tokens/tokens.figma-variables.json';
+  const TOKENS_URL = REPO_RAW + '/packages/tokens/tokens.figma-variables.json';
   const SPECS = [
     'Button',
     'Badge',
@@ -196,7 +196,7 @@
     try {
       const specs = [];
       for (const name of SPECS) {
-        const url = REPO_RAW + '/src/component-specs/' + name + '.json';
+        const url = REPO_RAW + '/packages/web/src/component-specs/' + name + '.json';
         const resp = await fetch(url, { cache: 'no-store' });
         if (!resp.ok) throw new Error(name + ': HTTP ' + resp.status);
         specs.push(await resp.json());
