@@ -511,6 +511,46 @@ function parseDimension(str) {
   const m = String(str).trim().match(/^(-?[\d.]+)\s*([a-zA-Z%]*)$/);
   return m ? { num: parseFloat(m[1]), unit: m[2] } : null;
 }
+function parseColorStr(str) {
+  const s = String(str).trim().toLowerCase();
+  if (s === "transparent") return { r: 0, g: 0, b: 0, a: 0 };
+  if (s.startsWith("#")) {
+    const h = s.slice(1);
+    if (h.length === 6) return {
+      r: parseInt(h.slice(0, 2), 16),
+      g: parseInt(h.slice(2, 4), 16),
+      b: parseInt(h.slice(4, 6), 16),
+      a: 1
+    };
+    if (h.length === 8) return {
+      r: parseInt(h.slice(0, 2), 16),
+      g: parseInt(h.slice(2, 4), 16),
+      b: parseInt(h.slice(4, 6), 16),
+      a: parseInt(h.slice(6, 8), 16) / 255
+    };
+  }
+  const m = s.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/);
+  if (m) return { r: parseFloat(m[1]), g: parseFloat(m[2]), b: parseFloat(m[3]), a: m[4] !== void 0 ? parseFloat(m[4]) : 1 };
+  return null;
+}
+function colorsEqual(a, b) {
+  return Math.abs(a.r - b.r) <= 1 && Math.abs(a.g - b.g) <= 1 && Math.abs(a.b - b.b) <= 1 && Math.abs(a.a - b.a) < 1.5 / 255;
+}
+function formatColor(parsed, srcStr) {
+  if (parsed.a < 0.5 / 255) {
+    return String(srcStr).trim().toLowerCase() === "transparent" ? "transparent" : "rgba(0, 0, 0, 0)";
+  }
+  if (parsed.a > 254.5 / 255) {
+    return "#" + Math.round(parsed.r).toString(16).padStart(2, "0") + Math.round(parsed.g).toString(16).padStart(2, "0") + Math.round(parsed.b).toString(16).padStart(2, "0");
+  }
+  const alphaMatch = String(srcStr).match(/,\s*([\d.]+)\s*\)$/);
+  const alphaDp = alphaMatch && alphaMatch[1].includes(".") ? alphaMatch[1].split(".")[1].length : 2;
+  return "rgba(" + Math.round(parsed.r) + ", " + Math.round(parsed.g) + ", " + Math.round(parsed.b) + ", " + parsed.a.toFixed(Math.max(alphaDp, 2)) + ")";
+}
+function decimalPlaces(str) {
+  const m = String(str).trim().match(/\.(\d+)$/);
+  return m ? m[1].length : 0;
+}
 function figmaValToSrcEntry(figmaVal, existingEntry) {
   const key = "$value" in existingEntry ? "$value" : "value";
   const updated = Object.assign({}, existingEntry);
@@ -518,18 +558,29 @@ function figmaValToSrcEntry(figmaVal, existingEntry) {
     updated[key] = "{" + figmaVal.alias.replace(/\//g, ".") + "}";
     return updated;
   }
-  const ext = existingEntry["$extensions"] && existingEntry["$extensions"]["design-system.figma-value"];
+  const extObj = existingEntry["$extensions"];
+  const ext = extObj && extObj["design-system.figma-value"];
   if (ext !== void 0) {
-    const updatedExt = Object.assign({}, existingEntry["$extensions"]);
+    const updatedExt = Object.assign({}, extObj);
     updatedExt["design-system.figma-value"] = figmaVal.value;
     updated["$extensions"] = updatedExt;
     return updated;
   }
   const srcStr = String(srcVal(existingEntry));
+  const figmaColor = parseColorStr(String(figmaVal.value));
+  if (figmaColor) {
+    updated[key] = formatColor(figmaColor, srcStr);
+    return updated;
+  }
   const dim = parseDimension(srcStr);
   if (dim && dim.unit) {
-    const newNum = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(figmaVal.value);
-    updated[key] = String(newNum) + dim.unit;
+    const n = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(figmaVal.value);
+    updated[key] = String(n) + dim.unit;
+    return updated;
+  }
+  if (typeof figmaVal.value === "number") {
+    const dp = decimalPlaces(srcStr);
+    updated[key] = figmaVal.value.toFixed(dp);
     return updated;
   }
   updated[key] = figmaVal.value;
@@ -540,15 +591,25 @@ function figmaValMatchesSrc(figmaVal, existingEntry) {
     const expected = "{" + figmaVal.alias.replace(/\//g, ".") + "}";
     return normSrcVal(existingEntry) === expected.toLowerCase();
   }
-  const ext = existingEntry["$extensions"] && existingEntry["$extensions"]["design-system.figma-value"];
+  const extObj = existingEntry["$extensions"];
+  const ext = extObj && extObj["design-system.figma-value"];
   if (ext !== void 0) {
     return String(ext).trim().toLowerCase() === String(figmaVal.value).trim().toLowerCase();
   }
   const srcStr = String(srcVal(existingEntry));
+  const figmaColor = parseColorStr(String(figmaVal.value));
+  if (figmaColor) {
+    const srcColor = parseColorStr(srcStr);
+    return srcColor ? colorsEqual(figmaColor, srcColor) : false;
+  }
   const dim = parseDimension(srcStr);
   if (dim && dim.unit) {
-    const figmaNum = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(String(figmaVal.value));
-    return Math.abs(dim.num - figmaNum) < 1e-4;
+    const n = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(String(figmaVal.value));
+    return Math.abs(dim.num - n) < 1e-4;
+  }
+  if (typeof figmaVal.value === "number") {
+    const dp = decimalPlaces(srcStr);
+    return parseFloat(figmaVal.value.toFixed(dp)) === parseFloat(srcStr);
   }
   return normSrcVal(existingEntry) === String(figmaVal.value).trim().toLowerCase();
 }

@@ -377,7 +377,7 @@ function normSrcVal(entry) {
 
 /**
  * Parse a dimension string like "26px", "-0.02em", "1500ms" into {num, unit}.
- * Returns null if the string isn't a recognisable dimension.
+ * Returns {num, unit:""} for bare numbers. Returns null only on non-numeric input.
  */
 function parseDimension(str) {
   const m = String(str).trim().match(/^(-?[\d.]+)\s*([a-zA-Z%]*)$/);
@@ -385,14 +385,78 @@ function parseDimension(str) {
 }
 
 /**
+ * Parse a CSS color string into {r, g, b} (0-255) and a (0-1).
+ * Handles: "transparent", "#rrggbb", "#rrggbbaa", "rgba(...)", "rgb(...)".
+ * Returns null if the string is not a recognisable color.
+ */
+function parseColorStr(str) {
+  const s = String(str).trim().toLowerCase();
+  if (s === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
+  if (s.startsWith('#')) {
+    const h = s.slice(1);
+    if (h.length === 6) return {
+      r: parseInt(h.slice(0, 2), 16),
+      g: parseInt(h.slice(2, 4), 16),
+      b: parseInt(h.slice(4, 6), 16), a: 1
+    };
+    if (h.length === 8) return {
+      r: parseInt(h.slice(0, 2), 16),
+      g: parseInt(h.slice(2, 4), 16),
+      b: parseInt(h.slice(4, 6), 16),
+      a: parseInt(h.slice(6, 8), 16) / 255
+    };
+  }
+  const m = s.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/);
+  if (m) return { r: parseFloat(m[1]), g: parseFloat(m[2]), b: parseFloat(m[3]), a: m[4] !== undefined ? parseFloat(m[4]) : 1 };
+  return null;
+}
+
+/** True when two parsed colors represent the same visual color within 8-bit rounding. */
+function colorsEqual(a, b) {
+  return Math.abs(a.r - b.r) <= 1 &&
+         Math.abs(a.g - b.g) <= 1 &&
+         Math.abs(a.b - b.b) <= 1 &&
+         Math.abs(a.a - b.a) < (1.5 / 255); // ~0.006, one 8-bit step
+}
+
+/**
+ * Serialise a parsed color back to a string, preserving the source token's
+ * convention (transparent / hex6 for opaque / rgba() for alpha).
+ */
+function formatColor(parsed, srcStr) {
+  if (parsed.a < (0.5 / 255)) {
+    return String(srcStr).trim().toLowerCase() === 'transparent' ? 'transparent' : 'rgba(0, 0, 0, 0)';
+  }
+  if (parsed.a > (254.5 / 255)) {
+    return '#' +
+      Math.round(parsed.r).toString(16).padStart(2, '0') +
+      Math.round(parsed.g).toString(16).padStart(2, '0') +
+      Math.round(parsed.b).toString(16).padStart(2, '0');
+  }
+  // Alpha channel: preserve source decimal places (e.g. "0.40" -> 2dp).
+  const alphaMatch = String(srcStr).match(/,\s*([\d.]+)\s*\)$/);
+  const alphaDp = alphaMatch && alphaMatch[1].includes('.') ? alphaMatch[1].split('.')[1].length : 2;
+  return 'rgba(' + Math.round(parsed.r) + ', ' + Math.round(parsed.g) + ', ' +
+         Math.round(parsed.b) + ', ' + parsed.a.toFixed(Math.max(alphaDp, 2)) + ')';
+}
+
+/** Count decimal places in a numeric string: "0.10" -> 2, "1" -> 0. */
+function decimalPlaces(str) {
+  const m = String(str).trim().match(/\.(\d+)$/);
+  return m ? m[1].length : 0;
+}
+
+/**
  * Convert a serialised Figma variable value into the source token entry format.
  *
- * Round-trip invariant: reading the collection and immediately pushing back
- * must produce zero changes. Key cases:
- *   - Alias: Figma slash-path -> source dot-path inside {}
- *   - Dimension: Figma FLOAT (bare 26) -> source "26px" (re-attach unit from existing entry)
- *   - $extensions["design-system.figma-value"] tokens: update the extension field,
- *     leave $value intact (those tokens intentionally store a different value in Figma)
+ * Round-trip invariant: reading the collection and pushing straight back = zero changes.
+ *
+ *   Alias     → Figma slash-path to source dot-path in {}
+ *   $extensions → update only extension field; leave $value intact
+ *   Color     → parse Figma hex8/hex6; format using source convention
+ *               (transparent / hex6 / rgba()) with source alpha precision
+ *   Dimension → re-attach source unit (26 -> "26px")
+ *   Number    → round to source decimal places to strip float32 noise
  */
 function figmaValToSrcEntry(figmaVal, existingEntry) {
   const key = ('$value' in existingEntry) ? '$value' : 'value';
@@ -403,39 +467,55 @@ function figmaValToSrcEntry(figmaVal, existingEntry) {
     return updated;
   }
 
-  // $extensions token: Figma holds a different representation intentionally
-  // (e.g. "Inter", 110, "Regular"). Update only the extension field; $value stays.
-  const ext = existingEntry['$extensions'] && existingEntry['$extensions']['design-system.figma-value'];
+  // $extensions token: only update the extension field; $value intentionally differs.
+  const extObj = existingEntry['$extensions'];
+  const ext = extObj && extObj['design-system.figma-value'];
   if (ext !== undefined) {
-    const updatedExt = Object.assign({}, existingEntry['$extensions']);
+    const updatedExt = Object.assign({}, extObj);
     updatedExt['design-system.figma-value'] = figmaVal.value;
     updated['$extensions'] = updatedExt;
     return updated;
   }
 
-  // Dimension tokens: Figma stores bare floats; source stores strings with units.
   const srcStr = String(srcVal(existingEntry));
-  const dim = parseDimension(srcStr);
-  if (dim && dim.unit) {
-    const newNum = typeof figmaVal.value === 'number' ? figmaVal.value : parseFloat(figmaVal.value);
-    updated[key] = String(newNum) + dim.unit;
+
+  // Color tokens: Figma colors arrive as hex strings from figmaColorToHex().
+  const figmaColor = parseColorStr(String(figmaVal.value));
+  if (figmaColor) {
+    updated[key] = formatColor(figmaColor, srcStr);
     return updated;
   }
 
-  // Default: write the value as-is (colors are already hex strings from code.js).
+  // Dimension tokens: Figma FLOAT bare number -> re-attach source unit.
+  const dim = parseDimension(srcStr);
+  if (dim && dim.unit) {
+    const n = typeof figmaVal.value === 'number' ? figmaVal.value : parseFloat(figmaVal.value);
+    updated[key] = String(n) + dim.unit;
+    return updated;
+  }
+
+  // Pure number (opacity, etc.): round to source string's decimal precision.
+  if (typeof figmaVal.value === 'number') {
+    const dp = decimalPlaces(srcStr);
+    updated[key] = figmaVal.value.toFixed(dp);
+    return updated;
+  }
+
   updated[key] = figmaVal.value;
   return updated;
 }
 
 /**
- * Compare a Figma value against a source entry; returns true if they represent
- * the same token value (round-trip equal).
+ * Compare a Figma value against a source entry; true iff they represent the same
+ * token value after accounting for format differences (round-trip equal).
  *
- * Priority order:
- *   1. Alias comparison (Figma slash-path vs source dot-path in braces)
- *   2. $extensions token: compare figmaVal against extension field, not $value
- *   3. Dimension: strip unit from source, compare as floats (26 === "26px")
- *   4. Fallback: lowercased string equality (colors, booleans, etc.)
+ * Priority:
+ *   1. Alias        — Figma slash-path vs source dot-path in {}
+ *   2. $extensions  — compare against extension field, not $value
+ *   3. Color        — parse both to RGBA, compare with 8-bit tolerance
+ *   4. Dimension    — strip unit, compare as floats
+ *   5. Pure number  — round figma float to source precision, compare
+ *   6. Fallback     — lowercased string equality
  */
 function figmaValMatchesSrc(figmaVal, existingEntry) {
   if (figmaVal.alias) {
@@ -443,21 +523,34 @@ function figmaValMatchesSrc(figmaVal, existingEntry) {
     return normSrcVal(existingEntry) === expected.toLowerCase();
   }
 
-  // $extensions token: compare against the Figma-specific extension value.
-  const ext = existingEntry['$extensions'] && existingEntry['$extensions']['design-system.figma-value'];
+  const extObj = existingEntry['$extensions'];
+  const ext = extObj && extObj['design-system.figma-value'];
   if (ext !== undefined) {
     return String(ext).trim().toLowerCase() === String(figmaVal.value).trim().toLowerCase();
   }
 
-  // Dimension tokens: compare numerically after stripping units.
   const srcStr = String(srcVal(existingEntry));
-  const dim = parseDimension(srcStr);
-  if (dim && dim.unit) {
-    const figmaNum = typeof figmaVal.value === 'number' ? figmaVal.value : parseFloat(String(figmaVal.value));
-    return Math.abs(dim.num - figmaNum) < 0.0001;
+
+  // Color: parse both sides and compare numerically.
+  const figmaColor = parseColorStr(String(figmaVal.value));
+  if (figmaColor) {
+    const srcColor = parseColorStr(srcStr);
+    return srcColor ? colorsEqual(figmaColor, srcColor) : false;
   }
 
-  // Default: lowercased string equality (colors already normalised by code.js).
+  // Dimension with unit: compare as floats.
+  const dim = parseDimension(srcStr);
+  if (dim && dim.unit) {
+    const n = typeof figmaVal.value === 'number' ? figmaVal.value : parseFloat(String(figmaVal.value));
+    return Math.abs(dim.num - n) < 0.0001;
+  }
+
+  // Pure number (opacity/number type): round Figma float32 to source precision.
+  if (typeof figmaVal.value === 'number') {
+    const dp = decimalPlaces(srcStr);
+    return parseFloat(figmaVal.value.toFixed(dp)) === parseFloat(srcStr);
+  }
+
   return normSrcVal(existingEntry) === String(figmaVal.value).trim().toLowerCase();
 }
 
