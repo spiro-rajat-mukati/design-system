@@ -507,23 +507,111 @@ function srcVal(entry) {
 function normSrcVal(entry) {
   return String(srcVal(entry)).trim().toLowerCase();
 }
+function parseDimension(str) {
+  const m = String(str).trim().match(/^(-?[\d.]+)\s*([a-zA-Z%]*)$/);
+  return m ? { num: parseFloat(m[1]), unit: m[2] } : null;
+}
+function parseColorStr(str) {
+  const s = String(str).trim().toLowerCase();
+  if (s === "transparent") return { r: 0, g: 0, b: 0, a: 0 };
+  if (s.startsWith("#")) {
+    const h = s.slice(1);
+    if (h.length === 6) return {
+      r: parseInt(h.slice(0, 2), 16),
+      g: parseInt(h.slice(2, 4), 16),
+      b: parseInt(h.slice(4, 6), 16),
+      a: 1
+    };
+    if (h.length === 8) return {
+      r: parseInt(h.slice(0, 2), 16),
+      g: parseInt(h.slice(2, 4), 16),
+      b: parseInt(h.slice(4, 6), 16),
+      a: parseInt(h.slice(6, 8), 16) / 255
+    };
+  }
+  const m = s.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/);
+  if (m) return { r: parseFloat(m[1]), g: parseFloat(m[2]), b: parseFloat(m[3]), a: m[4] !== void 0 ? parseFloat(m[4]) : 1 };
+  return null;
+}
+function colorsEqual(a, b) {
+  return Math.abs(a.r - b.r) <= 1 && Math.abs(a.g - b.g) <= 1 && Math.abs(a.b - b.b) <= 1 && Math.abs(a.a - b.a) < 1.5 / 255;
+}
+function formatColor(parsed, srcStr) {
+  if (parsed.a < 0.5 / 255) {
+    return String(srcStr).trim().toLowerCase() === "transparent" ? "transparent" : "rgba(0, 0, 0, 0)";
+  }
+  if (parsed.a > 254.5 / 255) {
+    return "#" + Math.round(parsed.r).toString(16).padStart(2, "0") + Math.round(parsed.g).toString(16).padStart(2, "0") + Math.round(parsed.b).toString(16).padStart(2, "0");
+  }
+  const alphaMatch = String(srcStr).match(/,\s*([\d.]+)\s*\)$/);
+  const alphaDp = alphaMatch && alphaMatch[1].includes(".") ? alphaMatch[1].split(".")[1].length : 2;
+  return "rgba(" + Math.round(parsed.r) + ", " + Math.round(parsed.g) + ", " + Math.round(parsed.b) + ", " + parsed.a.toFixed(Math.max(alphaDp, 2)) + ")";
+}
+function decimalPlaces(str) {
+  const m = String(str).trim().match(/\.(\d+)$/);
+  return m ? m[1].length : 0;
+}
 function figmaValToSrcEntry(figmaVal, existingEntry) {
   const key = "$value" in existingEntry ? "$value" : "value";
   const updated = Object.assign({}, existingEntry);
   if (figmaVal.alias) {
     updated[key] = "{" + figmaVal.alias.replace(/\//g, ".") + "}";
-  } else {
-    updated[key] = figmaVal.value;
+    return updated;
   }
+  const extObj = existingEntry["$extensions"];
+  const ext = extObj && extObj["design-system.figma-value"];
+  if (ext !== void 0) {
+    const updatedExt = Object.assign({}, extObj);
+    updatedExt["design-system.figma-value"] = figmaVal.value;
+    updated["$extensions"] = updatedExt;
+    return updated;
+  }
+  const srcStr = String(srcVal(existingEntry));
+  const figmaColor = parseColorStr(String(figmaVal.value));
+  if (figmaColor) {
+    updated[key] = formatColor(figmaColor, srcStr);
+    return updated;
+  }
+  const dim = parseDimension(srcStr);
+  if (dim && dim.unit) {
+    const n = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(figmaVal.value);
+    updated[key] = String(n) + dim.unit;
+    return updated;
+  }
+  if (typeof figmaVal.value === "number") {
+    const dp = decimalPlaces(srcStr);
+    updated[key] = figmaVal.value.toFixed(dp);
+    return updated;
+  }
+  updated[key] = figmaVal.value;
   return updated;
 }
 function figmaValMatchesSrc(figmaVal, existingEntry) {
-  const current = normSrcVal(existingEntry);
   if (figmaVal.alias) {
     const expected = "{" + figmaVal.alias.replace(/\//g, ".") + "}";
-    return current === expected.toLowerCase();
+    return normSrcVal(existingEntry) === expected.toLowerCase();
   }
-  return current === String(figmaVal.value).trim().toLowerCase();
+  const extObj = existingEntry["$extensions"];
+  const ext = extObj && extObj["design-system.figma-value"];
+  if (ext !== void 0) {
+    return String(ext).trim().toLowerCase() === String(figmaVal.value).trim().toLowerCase();
+  }
+  const srcStr = String(srcVal(existingEntry));
+  const figmaColor = parseColorStr(String(figmaVal.value));
+  if (figmaColor) {
+    const srcColor = parseColorStr(srcStr);
+    return srcColor ? colorsEqual(figmaColor, srcColor) : false;
+  }
+  const dim = parseDimension(srcStr);
+  if (dim && dim.unit) {
+    const n = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(String(figmaVal.value));
+    return Math.abs(dim.num - n) < 1e-4;
+  }
+  if (typeof figmaVal.value === "number") {
+    const dp = decimalPlaces(srcStr);
+    return parseFloat(figmaVal.value.toFixed(dp)) === parseFloat(srcStr);
+  }
+  return normSrcVal(existingEntry) === String(figmaVal.value).trim().toLowerCase();
 }
 async function fetchSourceFilesWithMeta() {
   const result = {};
@@ -534,8 +622,9 @@ async function fetchSourceFilesWithMeta() {
       result[name] = null;
       return;
     }
-    const json = JSON.parse(atob(meta.content.replace(/\n/g, "")));
-    result[name] = { json, sha: meta.sha, path, flat: flattenTokens(json) };
+    const text = atob(meta.content.replace(/\n/g, ""));
+    const json = JSON.parse(text);
+    result[name] = { json, sha: meta.sha, path, flat: flattenTokens(json), text };
   }));
   return result;
 }
@@ -561,25 +650,105 @@ function computePushChanges(figmaCollection, sourceFiles) {
   }
   return changes;
 }
-function applyChangesToJson(originalJson, changesMap) {
-  const updated = JSON.parse(JSON.stringify(originalJson));
-  for (const [tokenPath, change] of changesMap) {
-    const parts = tokenPath.split("/");
-    let node = updated;
-    for (let i = 0; i < parts.length - 1; i++) {
-      if (!node[parts[i]] || typeof node[parts[i]] !== "object") {
-        node = null;
-        break;
-      }
-      node = node[parts[i]];
-    }
-    if (!node) continue;
-    const last = parts[parts.length - 1];
-    if (node[last] && typeof node[last] === "object") {
-      Object.assign(node[last], change.new);
+function escapeRe(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function toJsonLiteral(val) {
+  return typeof val === "string" ? JSON.stringify(val) : String(val);
+}
+function patchSingleLine(line, change) {
+  const vk = "$value" in change.new ? "$value" : "value";
+  const oldLit = toJsonLiteral(change.old[vk]);
+  const newLit = toJsonLiteral(change.new[vk]);
+  if (oldLit === newLit) return line;
+  return line.replace(
+    new RegExp('"(?:\\$value|value)"\\s*:\\s*' + escapeRe(oldLit)),
+    '"$value": ' + newLit
+  );
+}
+function patchMultiLine(line, change) {
+  const vk = "$value" in change.new ? "$value" : "value";
+  const oldLit = toJsonLiteral(change.old[vk]);
+  const newLit = toJsonLiteral(change.new[vk]);
+  if (oldLit !== newLit && (line.includes('"$value"') || line.includes('"value"'))) {
+    const patched = line.replace(
+      new RegExp('"(?:\\$value|value)"\\s*:\\s*' + escapeRe(oldLit)),
+      '"$value": ' + newLit
+    );
+    if (patched !== line) return patched;
+  }
+  if (line.includes('"design-system.figma-value"')) {
+    const extObj = change.old["$extensions"];
+    const oldExt = extObj && extObj["design-system.figma-value"];
+    const newExt = change.new["$extensions"] && change.new["$extensions"]["design-system.figma-value"];
+    if (oldExt !== void 0 && toJsonLiteral(oldExt) !== toJsonLiteral(newExt)) {
+      return line.replace(
+        new RegExp('"design-system\\.figma-value"\\s*:\\s*' + escapeRe(toJsonLiteral(oldExt))),
+        '"design-system.figma-value": ' + toJsonLiteral(newExt)
+      );
     }
   }
-  return updated;
+  return line;
+}
+function applyChangesToText(originalText, changesMap) {
+  if (changesMap.size === 0) return originalText;
+  const lines = originalText.split("\n");
+  const result = lines.slice();
+  const pathStack = [];
+  let activeChange = null;
+  let arrayDepth = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (/^[}\]],?$/.test(trimmed)) {
+      if (trimmed[0] === "]") {
+        if (arrayDepth > 0) arrayDepth--;
+      } else {
+        if (activeChange) activeChange = null;
+        if (pathStack.length > 0) pathStack.pop();
+      }
+      continue;
+    }
+    const m = trimmed.match(/^"([^"]+)"\s*:\s*([\s\S]*)/);
+    if (!m) continue;
+    const key = m[1];
+    const rest = m[2].trimEnd();
+    if (activeChange && key.startsWith("$")) {
+      if (rest === "[") arrayDepth++;
+      const patched = patchMultiLine(line, activeChange);
+      if (patched !== line) result[i] = patched;
+      continue;
+    }
+    if (key.startsWith("$")) {
+      if (rest === "[") arrayDepth++;
+      continue;
+    }
+    const fullPath = pathStack.length > 0 ? pathStack.join("/") + "/" + key : key;
+    const change = changesMap.get(fullPath);
+    if (rest.startsWith("{") && /\}[,]?\s*$/.test(rest)) {
+      if (change) result[i] = patchSingleLine(line, change);
+      continue;
+    }
+    if (rest === "{") {
+      pathStack.push(key);
+      for (let j = i + 1; j < lines.length; j++) {
+        const lt = lines[j].trim();
+        if (!lt) continue;
+        if (lt.startsWith('"$')) {
+          if (change) activeChange = change;
+        }
+        break;
+      }
+      continue;
+    }
+    if (rest === "[") {
+      pathStack.push(key);
+      arrayDepth++;
+      continue;
+    }
+  }
+  return result.join("\n");
 }
 async function ghGetMainSha() {
   const url = "https://api.github.com/repos/" + REPO + "/git/ref/heads/" + BRANCH;
@@ -667,8 +836,7 @@ async function executePush(sourceFiles, changes) {
   for (const fname of fileNames) {
     const fileChanges = changes[fname];
     const srcFile = sourceFiles[fname];
-    const updatedJson = applyChangesToJson(srcFile.json, fileChanges);
-    const content = JSON.stringify(updatedJson, null, 2) + "\n";
+    const content = applyChangesToText(srcFile.text, fileChanges);
     const commitMsg = "tokens(figma-push): " + fileChanges.size + " change" + (fileChanges.size > 1 ? "s" : "") + " in " + fname + ".json";
     log("Committing " + fname + ".json (" + fileChanges.size + " tokens)\u2026", "muted");
     await ghPutFile(srcFile.path, content, srcFile.sha, branch, commitMsg);

@@ -57,7 +57,9 @@ function assembleHtml() {
     console.error('    ' + MARKER);
     process.exit(1);
   }
-  const html = shell.replace(MARKER, `<script>\n${script}</script>`);
+  // Use a function replacer — string replacer interprets $& / $' / $` as special
+  // patterns, which would corrupt any JS that contains those sequences (e.g. escapeRe).
+  const html = shell.replace(MARKER, () => `<script>\n${script}</script>`);
   writeFileSync("dist/ui.html", html);
 }
 
