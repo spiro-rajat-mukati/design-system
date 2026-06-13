@@ -111,8 +111,23 @@ const baseCore = sets["core"];
 const compactComponentsLight = sets["components"];
 const compactComponentsDark  = merge(sets["components"], sets["components-dark"] || {});
 
+// Base semantic trees (no platform override) — used by CSS + tokens.native.ts.
 const lightTree   = merge(baseCore, merge(sets["color-light"], compactComponentsLight));
 const darkTree    = merge(baseCore, merge(sets["color-dark"],  compactComponentsDark));
+
+// Platform-mode trees for tokens.figma-variables.json (6 modes: Web/iOS/Android × light/dark).
+const platformWeb     = sets["platform-web"]     || {};
+const platformIOS     = sets["platform-ios"]     || {};
+const platformAndroid = sets["platform-android"] || {};
+
+const figmaModes = [
+  { id: "light-web",     name: "Light · Web",     tree: merge(lightTree, platformWeb) },
+  { id: "dark-web",      name: "Dark · Web",       tree: merge(darkTree,  platformWeb) },
+  { id: "light-ios",     name: "Light · iOS",      tree: merge(lightTree, platformIOS) },
+  { id: "dark-ios",      name: "Dark · iOS",       tree: merge(darkTree,  platformIOS) },
+  { id: "light-android", name: "Light · Android",  tree: merge(lightTree, platformAndroid) },
+  { id: "dark-android",  name: "Dark · Android",   tree: merge(darkTree,  platformAndroid) },
+];
 
 /* ---------- build flat lookups for ref resolution ---------- */
 
@@ -398,10 +413,7 @@ function figmaValueFor(node, type) {
 }
 
 function emitFigmaVariablesJSON() {
-  const modes = [
-    { id: "light", name: "Light", tree: lightTree },
-    { id: "dark",  name: "Dark",  tree: darkTree },
-  ].map((m) => ({ ...m, lookup: flatten(m.tree) }));
+  const modes = figmaModes.map((m) => ({ ...m, lookup: flatten(m.tree) }));
 
   // Union of every token path across every mode.
   const allPaths = new Set();
