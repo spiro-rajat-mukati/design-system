@@ -1537,6 +1537,230 @@ function computeDiff(repoData, collection) {
   return { modeMap, unmatchedFigmaModes, added, changed, removed };
 }
 
+/* ============================================================
+   PULL — 3-way preview + apply
+   ============================================================ */
+
+const BASE_KEY = "kijani.base";
+
+// Stash repoData between compute-pull-preview and apply-pull so the UI
+// doesn't have to re-send the full JSON payload.
+let pendingPullData = null;
+
+/**
+ * Decide how Figma modes should be reconciled to match the 6 repo modes.
+ *
+ * Legacy name → target name mappings handle the old density modes and the
+ * previous 2-mode ("Light" / "Dark") state from before PR #28.
+ *
+ * Returns { toRename, toAdd, toRemove } where each entry is enough info to
+ * drive the Figma API calls and the preview UI.
+ */
+function planModeReconciliation(existingModes, desiredModes) {
+  const LEGACY = {
+    "Light":               "Light · Web",
+    "Dark":                "Dark · Web",
+    "Light · Compact":     "Light · Web",
+    "Dark · Compact":      "Dark · Web",
+    "Light · Comfortable": "Light · Web",
+    "Dark · Comfortable":  "Dark · Web",
+  };
+
+  const desiredNames = new Set(desiredModes.map(m => m.name));
+  const alreadyCorrect = new Set(existingModes.filter(m => desiredNames.has(m.name)).map(m => m.name));
+
+  const toRename = [];
+  const usedTargets = new Set(alreadyCorrect);
+  const toRemove = [];
+
+  for (const em of existingModes) {
+    if (alreadyCorrect.has(em.name)) continue;
+    const target = LEGACY[em.name];
+    if (target && desiredNames.has(target) && !usedTargets.has(target)) {
+      toRename.push({ fromName: em.name, toName: target, modeId: em.modeId });
+      usedTargets.add(target);
+    } else {
+      toRemove.push({ name: em.name, modeId: em.modeId });
+    }
+  }
+
+  const toAdd = desiredModes
+    .filter(m => !usedTargets.has(m.name))
+    .map(m => m.name);
+
+  return { toRename, toAdd, toRemove };
+}
+
+/**
+ * Compute a 3-way pull preview.
+ *
+ * Base = last-applied repo snapshot (clientStorage["kijani.base"]).
+ * Figma = current Figma variable values.
+ * Repo  = current repo JSON.
+ *
+ * Verdict per (variable, mode):
+ *   "repo-wins"  — apply repo value (no conflict or no base)
+ *   "figma-wins" — repo unchanged since base, Figma has a local edit → skip
+ *   "conflict"   — both sides changed since base → user must pick
+ */
+async function computePullPreview(repoData) {
+  const collection = figma.variables.getLocalVariableCollections()
+    .find(c => c.name === COLLECTION_NAME);
+  if (!collection) {
+    return { error: "No '" + COLLECTION_NAME + "' collection found — run Sync Tokens first." };
+  }
+
+  const diff = computeDiff(repoData, collection);
+  if (diff.error) return { error: diff.error };
+
+  let baseData = null;
+  try { baseData = await figma.clientStorage.getAsync(BASE_KEY); } catch (_) {}
+
+  // Index base variables by name → {repoModeId → normalizedStr}
+  const baseIndex = new Map();
+  if (baseData && Array.isArray(baseData.variables)) {
+    for (const bv of baseData.variables) {
+      const modeMap = {};
+      for (const [modeId, entry] of Object.entries(bv.values)) {
+        modeMap[modeId] = normalizeRepoValStr(entry, bv.type);
+      }
+      baseIndex.set(bv.name, modeMap);
+    }
+  }
+
+  const modeRecon = planModeReconciliation(collection.modes, repoData.modes);
+
+  const autoApply = [], figmaWins = [], conflicts = [];
+
+  for (const item of diff.changed) {
+    for (const mc of item.modeChanges) {
+      let verdict;
+      if (!baseData) {
+        verdict = "repo-wins";
+      } else {
+        const baseModes = baseIndex.get(item.name) || {};
+        const baseStr   = baseModes[mc.repoModeId];
+        const figmaChanged = !baseStr || mc.figmaStr !== baseStr;
+        const repoChanged  = !baseStr || mc.repoStr  !== baseStr;
+        if (figmaChanged && repoChanged) verdict = "conflict";
+        else if (!figmaChanged)          verdict = "repo-wins";
+        else                             verdict = "figma-wins";
+      }
+      const entry = { name: item.name, type: item.type, ...mc, verdict };
+      if (verdict === "conflict")    conflicts.push(entry);
+      else if (verdict === "figma-wins") figmaWins.push(entry);
+      else                           autoApply.push(entry);
+    }
+  }
+
+  return {
+    diff,
+    modeRecon,
+    conflicts,
+    autoApply,
+    figmaWins,
+    hasBase: !!baseData,
+    summary: {
+      added:       diff.added.length,
+      autoApply:   autoApply.length,
+      figmaWins:   figmaWins.length,
+      conflicts:   conflicts.length,
+      removed:     diff.removed.length,
+      modeChanges: modeRecon.toRename.length + modeRecon.toAdd.length + modeRecon.toRemove.length,
+    },
+  };
+}
+
+/**
+ * Apply a pull to the Figma document.
+ *
+ * @param {object} repoData     Parsed tokens.figma-variables.json
+ * @param {object} resolutions  { "varname:repoModeId": "repo"|"figma" } for conflicts
+ */
+async function applyPull(repoData, resolutions) {
+  const collection = figma.variables.getLocalVariableCollections()
+    .find(c => c.name === COLLECTION_NAME);
+  if (!collection) {
+    uiLog("No '" + COLLECTION_NAME + "' collection — run Sync Tokens first.", "err");
+    figma.ui.postMessage({ type: "pull-done" });
+    return;
+  }
+
+  // Step 1: reconcile modes ---------------------------------------------------
+  uiLog("Reconciling modes…", "muted");
+  const recon = planModeReconciliation(collection.modes, repoData.modes);
+
+  for (const r of recon.toRename) {
+    try { collection.renameMode(r.modeId, r.toName); uiLog("Renamed '" + r.fromName + "' → '" + r.toName + "'", "muted"); }
+    catch (e) { uiLog("Could not rename '" + r.fromName + "': " + e.message, "warn"); }
+  }
+  for (const name of recon.toAdd) {
+    try { collection.addMode(name); uiLog("Added mode: " + name, "ok"); }
+    catch (e) { uiLog("Could not add '" + name + "': " + e.message, "warn"); }
+  }
+  // Remove stale modes (re-read after renames/adds in case modeId list shifted).
+  const desiredNames = new Set(repoData.modes.map(m => m.name));
+  for (const m of [...collection.modes]) {
+    if (!desiredNames.has(m.name)) {
+      try { collection.removeMode(m.modeId); uiLog("Removed stale mode: " + m.name, "muted"); }
+      catch (e) { uiLog("Could not remove '" + m.name + "': " + e.message, "warn"); }
+    }
+  }
+
+  // Step 2: build mode id map after reconciliation ----------------------------
+  const modeByName = new Map(collection.modes.map(m => [m.name, m.modeId]));
+  const modeIdMap  = new Map(); // repoModeId → figmaModeId
+  for (const rm of repoData.modes) {
+    const fId = modeByName.get(rm.name);
+    if (fId) modeIdMap.set(rm.id, fId);
+  }
+
+  // Step 3: apply variables ---------------------------------------------------
+  uiLog("Applying values…", "muted");
+  const varIndex = indexVariables(collection);
+  let applied = 0, skipped = 0, pass1Failures = 0;
+
+  // Pass 1: literal values
+  for (const rv of repoData.variables) {
+    const v = ensureVariable(rv.name, rv.type, collection, varIndex);
+    if (!v) continue;
+    for (const [repoModeId, entry] of Object.entries(rv.values)) {
+      const figmaModeId = modeIdMap.get(repoModeId);
+      if (!figmaModeId || entry.value === undefined) continue;
+      // Honour conflict resolution: "figma" means keep Figma value.
+      if ((resolutions[rv.name + ":" + repoModeId] || "repo") === "figma") { skipped++; continue; }
+      try { applyValue(v, figmaModeId, entry, rv.type, varIndex); applied++; }
+      catch (e) { if (++pass1Failures <= 5) uiLog("Set failed " + rv.name + ": " + e.message, "warn"); }
+    }
+  }
+  uiLog("Pass 1: " + applied + " values applied" + (pass1Failures ? " (" + pass1Failures + " failures)" : "") + (skipped ? ", " + skipped + " kept as Figma" : ""), pass1Failures ? "warn" : "ok");
+
+  // Pass 2: alias values
+  let aliases = 0, aliasFail = 0;
+  for (const rv of repoData.variables) {
+    const v = varIndex.get(rv.name);
+    if (!v) continue;
+    for (const [repoModeId, entry] of Object.entries(rv.values)) {
+      const figmaModeId = modeIdMap.get(repoModeId);
+      if (!figmaModeId || !entry.alias) continue;
+      if ((resolutions[rv.name + ":" + repoModeId] || "repo") === "figma") continue;
+      try { applyValue(v, figmaModeId, entry, rv.type, varIndex); aliases++; }
+      catch (e) { aliasFail++; }
+    }
+  }
+  uiLog("Pass 2: " + aliases + " aliases set" + (aliasFail ? " (" + aliasFail + " failures)" : ""), aliasFail ? "warn" : "ok");
+
+  // Step 4: store new base snapshot -------------------------------------------
+  try {
+    await figma.clientStorage.setAsync(BASE_KEY, repoData);
+    uiLog("Base snapshot saved (future pulls will detect Figma edits since now).", "muted");
+  } catch (e) { uiLog("Could not save base: " + e.message, "warn"); }
+
+  const totalApplied = applied + aliases - skipped;
+  uiLog("Pull complete — " + totalApplied + " values written.", "ok");
+  figma.ui.postMessage({ type: "pull-done", totalApplied, skipped });
+}
+
 const PAT_KEY = "kijani.pat";
 
 /** Load the PAT from clientStorage on startup and send it to the UI. */
@@ -1557,6 +1781,18 @@ figma.ui.onmessage = async (msg) => {
       const col = figma.variables.getLocalVariableCollections().find(c => c.name === COLLECTION_NAME);
       const result = computeDiff(msg.repoData, col);
       figma.ui.postMessage({ type: "diff-result", result });
+    } else if (msg.type === "compute-pull-preview") {
+      pendingPullData = msg.repoData;
+      const preview = await computePullPreview(msg.repoData);
+      figma.ui.postMessage({ type: "pull-preview", preview });
+    } else if (msg.type === "apply-pull") {
+      if (!pendingPullData) {
+        uiLog("No pending pull data — re-fetch tokens first.", "err");
+        figma.ui.postMessage({ type: "pull-done" });
+      } else {
+        await applyPull(pendingPullData, msg.resolutions || {});
+        pendingPullData = null;
+      }
     } else if (msg.type === "get-pat") {
       await loadPat();
     } else if (msg.type === "set-pat") {
