@@ -34,6 +34,18 @@
     }
   },
   {
+    "id": "dark-ios",
+    "name": "Dark · iOS",
+    "group": "Platform",
+    "selectedTokenSets": {
+      "core": "source",
+      "color-dark": "enabled",
+      "components": "enabled",
+      "components-dark": "enabled",
+      "platform-ios": "enabled"
+    }
+  },
+  {
     "id": "light-android",
     "name": "Light · Android",
     "group": "Platform",
@@ -41,6 +53,18 @@
       "core": "source",
       "color-light": "enabled",
       "components": "enabled",
+      "platform-android": "enabled"
+    }
+  },
+  {
+    "id": "dark-android",
+    "name": "Dark · Android",
+    "group": "Platform",
+    "selectedTokenSets": {
+      "core": "source",
+      "color-dark": "enabled",
+      "components": "enabled",
+      "components-dark": "enabled",
       "platform-android": "enabled"
     }
   }
