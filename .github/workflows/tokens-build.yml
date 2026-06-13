@@ -1,0 +1,73 @@
+name: Regenerate token build output
+
+# Approach: (a) — PAT-signed auto-commit
+#
+# Why PAT and not GITHUB_TOKEN:
+#   Commits made with GITHUB_TOKEN are explicitly exempt from triggering new
+#   workflow runs (GitHub's anti-loop safety).  If we used GITHUB_TOKEN here,
+#   the auto-committed build output would become the new PR head, but no CI
+#   would run on that head — GitHub would see the required "tokens:check" check
+#   as "Expected / not yet run", blocking auto-merge forever.
+#
+#   A PAT-signed commit re-triggers all workflows normally.  The subsequent run
+#   of THIS workflow and of tokens-validate.yml will both be path-filtered out
+#   (the auto-commit only touches packages/tokens/build/**, not source/**),
+#   and GitHub treats path-skipped workflows as "Success" for branch-protection
+#   purposes — so auto-merge can fire.
+#
+# Required secret: TOKENS_BUILD_PAT
+#   Fine-grained personal access token scoped to this repository.
+#   Permission required: Contents → Read and Write.
+#   Create at: https://github.com/settings/personal-access-tokens/new
+#   Then add as a repository secret named TOKENS_BUILD_PAT at:
+#   https://github.com/spiro-rajat-mukati/design-system/settings/secrets/actions
+
+on:
+  pull_request:
+    paths:
+      # Re-run whenever source tokens change or the build script itself changes.
+      # The auto-commit only touches packages/tokens/build/**, so the
+      # path filter prevents an infinite self-trigger loop.
+      - "packages/tokens/source/**"
+      - "packages/tokens/build.mjs"
+
+permissions:
+  contents: read  # GITHUB_TOKEN is read-only; write ops use the PAT below.
+
+jobs:
+  build:
+    name: tokens:build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        # actions/checkout v4.2.2 — pinned to commit SHA for supply-chain safety
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ github.head_ref }}
+          # Check out with the PAT so that the subsequent `git push` uses it.
+          # GITHUB_TOKEN would prevent the push from re-triggering CI (see above).
+          token: ${{ secrets.TOKENS_BUILD_PAT }}
+
+      - name: Set up Node.js 20
+        # actions/setup-node v4.1.0 — pinned to commit SHA
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+
+      - name: Rebuild token output
+        # The build script is zero-dependency (pure Node built-ins + tokens JSON).
+        # No npm install needed.
+        run: node packages/tokens/build.mjs
+
+      - name: Commit and push regenerated files (if changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/tokens/build/
+          if git diff --cached --quiet; then
+            echo "Build output already in sync — nothing to commit."
+          else
+            git commit -m "chore(tokens): regenerate build output"
+            git push
+          fi
