@@ -9,11 +9,11 @@ name: Regenerate token build output
 #   would run on that head — GitHub would see the required "tokens:check" check
 #   as "Expected / not yet run", blocking auto-merge forever.
 #
-#   A PAT-signed commit re-triggers all workflows normally.  The subsequent run
-#   of THIS workflow and of tokens-validate.yml will both be path-filtered out
-#   (the auto-commit only touches packages/tokens/build/**, not source/**),
-#   and GitHub treats path-skipped workflows as "Success" for branch-protection
-#   purposes — so auto-merge can fire.
+#   A PAT-signed commit re-triggers all workflows normally.  THIS workflow is
+#   path-filtered to source/**, so it is skipped on the build-only auto-commit
+#   (preventing an infinite loop).  tokens-validate.yml has NO paths filter and
+#   will re-run on the new head SHA, verifying the build output and going green
+#   so auto-merge can fire if branch protection is configured.
 #
 # Required secret: TOKENS_BUILD_PAT
 #   Fine-grained personal access token scoped to this repository.

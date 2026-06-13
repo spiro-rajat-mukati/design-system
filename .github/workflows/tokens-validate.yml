@@ -1,21 +1,15 @@
 name: Validate tokens
 
-# Runs on any PR that touches token sources or the build/check scripts.
-# When designers (or anyone) push a token change from Tokens Studio, this
-# guard ensures the source is parseable and the generated CSS / TS would
-# be in sync after re-running the build.
+# Runs on every PR commit (no paths filter) so that when tokens-build.yml
+# auto-commits regenerated build output, this check re-runs on the new head
+# SHA and can go green — allowing auto-merge to fire if branch protection
+# is configured. (A path-filtered workflow that is skipped counts as
+# "Expected / pending", not "Success", for required status checks.)
+#
+# Also runs on push to main to keep the build gate on the default branch.
 
 on:
   pull_request:
-    paths:
-      - "packages/tokens/source/**"
-      - "packages/tokens/build.mjs"
-      - "packages/tokens/check-generated.mjs"
-      - "packages/tokens/primitives.css"
-      - "packages/tokens/semantics.css"
-      - "packages/tokens/component-tokens.css"
-      - "packages/tokens/tokens.ts"
-      - "packages/tokens/tokens.native.ts"
   push:
     branches: [main]
     paths:
