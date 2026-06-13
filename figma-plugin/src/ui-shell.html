@@ -61,7 +61,7 @@
   .pat-row input { flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--fg); font-family:ui-monospace,monospace; font-size:11px; outline:none; }
   .pat-row input:focus { border-color:var(--action-bg); }
 
-  /* ── Overlay panels (Diff / Pull) ─────────────────────── */
+  /* ── Overlay panels ─────────────────────── */
   .overlay { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; z-index:20; }
   .overlay[hidden] { display:none; }
   .ov-header { display:flex; align-items:center; gap:8px; padding:11px 12px 9px; border-bottom:1px solid var(--border); flex-shrink:0; }
@@ -72,7 +72,7 @@
   .ov-footer { display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--border); flex-shrink:0; }
   .ov-footer button { flex:1; }
 
-  /* Diff content */
+  /* Diff / shared content */
   .diff-summary { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
   .pill { padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:600; }
   .pill.changed { background:var(--changed-bg); color:var(--changed-fg); }
@@ -118,6 +118,15 @@
   .pull-summary-pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
   .pill.conflict { background:var(--conflict-bg); color:var(--conflict-fg); }
   .pill.muted-pill { background:var(--bg-sunken); color:var(--fg-muted); }
+
+  /* Push overlay extras */
+  .push-file-section { margin-bottom:16px; }
+  .push-file-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+  .push-file-badge { background:var(--changed-bg); color:var(--changed-fg); padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
+  .push-scope-note { font-size:11px; color:var(--fg-muted); margin-bottom:10px; line-height:1.5; }
+  .push-scope-note strong { color:var(--fg); }
+  .pr-link { display:inline-block; margin-top:8px; font-size:11px; color:var(--action-bg); text-decoration:underline; word-break:break-all; }
+  .push-ok { color:var(--success); font-size:12px; padding:16px 0; }
 </style>
 </head>
 <body>
@@ -137,6 +146,7 @@
   <button id="sync-tokens">Sync tokens from GitHub</button>
   <button id="btn-diff" class="secondary">Diff tokens vs GitHub</button>
   <button id="btn-pull" class="secondary">Pull tokens from GitHub → Figma</button>
+  <button id="btn-push" class="secondary">Push Figma → GitHub (create PR)</button>
 
   <div class="group-label">Styles &amp; components</div>
   <button id="sync-text-styles" class="secondary">Sync Text Styles</button>
@@ -151,13 +161,30 @@
 <details id="pat-settings">
   <summary>PAT Settings</summary>
   <div class="settings-body">
-    <p>Fine-grained PAT with <strong>Contents: Read</strong> on <code>spiro-rajat-mukati/design-system</code>. Stored in Figma clientStorage — never committed.</p>
+    <p>
+      <strong>Pull / Diff / Sync:</strong> fine-grained PAT with <strong>Contents: Read</strong>.<br>
+      <strong>Push (create PR):</strong> requires <strong>Contents: Write</strong> + <strong>Pull Requests: Write</strong> on <code>spiro-rajat-mukati/design-system</code>.<br>
+      Stored in Figma clientStorage — never committed.
+    </p>
     <div class="pat-row">
       <input type="password" id="pat-input" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
       <button class="secondary small" id="save-pat">Save</button>
     </div>
   </div>
 </details>
+
+<!-- ═══════════ PUSH OVERLAY ═══════════ -->
+<div id="push-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">Push — Figma → GitHub</span>
+    <button class="ov-close" id="close-push" title="Close">✕</button>
+  </div>
+  <div class="ov-body" id="push-body"><!-- populated by renderPushPreview() --></div>
+  <div class="ov-footer">
+    <button class="secondary" id="push-cancel">Cancel</button>
+    <button id="push-confirm">Push &amp; open PR</button>
+  </div>
+</div>
 
 <!-- ═══════════ PULL OVERLAY ═══════════ -->
 <div id="pull-panel" class="overlay" hidden>

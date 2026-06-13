@@ -1761,6 +1761,75 @@ async function applyPull(repoData, resolutions) {
   figma.ui.postMessage({ type: "pull-done", totalApplied, skipped });
 }
 
+/* ============================================================
+   PUSH — serialize the local Figma variable collection so ui.js
+   can diff it against the GitHub source files and create a PR.
+   All Figma API calls live here; network calls live in ui.js.
+   ============================================================ */
+
+/** Convert Figma RGBA float object to lowercase hex string.
+ *  Alpha is omitted when fully opaque. */
+function figmaColorToHex(c) {
+  var toHex = function(n) { return Math.round(n * 255).toString(16).padStart(2, "0"); };
+  var hex = "#" + toHex(c.r) + toHex(c.g) + toHex(c.b);
+  return (Math.round((c.a !== undefined ? c.a : 1) * 255) < 255) ? hex + toHex(c.a) : hex;
+}
+
+/**
+ * Read the local "Design System" variable collection and return a plain-object
+ * representation that can be sent to ui.js via postMessage.
+ *
+ * Values are normalised:
+ *  - COLOR → lowercase hex string (#rrggbb or #rrggbbaa)
+ *  - VARIABLE_ALIAS → { alias: "target/variable/name" } (Figma slash path)
+ *  - Everything else → raw value
+ */
+function readFigmaCollection() {
+  var collection = figma.variables.getLocalVariableCollections()
+    .find(function(c) { return c.name === COLLECTION_NAME; });
+  if (!collection) {
+    return { error: "No '" + COLLECTION_NAME + "' collection — run Sync Tokens first." };
+  }
+
+  var modeById = {};
+  collection.modes.forEach(function(m) { modeById[m.modeId] = m.name; });
+
+  var variables = [];
+  var idToName = {}; // pre-index variable names for alias lookup
+  collection.variableIds.forEach(function(id) {
+    var v = figma.variables.getVariableById(id);
+    if (v) idToName[id] = v.name;
+  });
+
+  collection.variableIds.forEach(function(id) {
+    var v = figma.variables.getVariableById(id);
+    if (!v || v.remote) return;
+
+    var values = {};
+    Object.entries(v.valuesByMode).forEach(function(pair) {
+      var modeId = pair[0];
+      var raw    = pair[1];
+      var modeName = modeById[modeId];
+      if (!modeName) return;
+
+      if (raw && typeof raw === "object" && raw.type === "VARIABLE_ALIAS") {
+        values[modeName] = { alias: idToName[raw.id] || "__unresolved__" };
+      } else if (v.resolvedType === "COLOR" && raw && typeof raw === "object") {
+        values[modeName] = { value: figmaColorToHex(raw) };
+      } else {
+        values[modeName] = { value: raw };
+      }
+    });
+
+    variables.push({ name: v.name, type: v.resolvedType, values: values });
+  });
+
+  return {
+    modes: collection.modes.map(function(m) { return m.name; }),
+    variables: variables,
+  };
+}
+
 const PAT_KEY = "kijani.pat";
 
 /** Load the PAT from clientStorage on startup and send it to the UI. */
@@ -1781,6 +1850,10 @@ figma.ui.onmessage = async (msg) => {
       const col = figma.variables.getLocalVariableCollections().find(c => c.name === COLLECTION_NAME);
       const result = computeDiff(msg.repoData, col);
       figma.ui.postMessage({ type: "diff-result", result });
+    } else if (msg.type === "read-collection") {
+      // Push step 1: serialize the Figma collection and hand it to the UI.
+      const colData = readFigmaCollection();
+      figma.ui.postMessage({ type: "collection-data", result: colData });
     } else if (msg.type === "compute-pull-preview") {
       pendingPullData = msg.repoData;
       const preview = await computePullPreview(msg.repoData);

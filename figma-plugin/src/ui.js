@@ -84,8 +84,29 @@ async function ghFetch(repoPath) {
   return resp.json();
 }
 
+/* ── GitHub Contents API (raw JSON) ── */
+async function ghFetchMeta(repoPath, ref) {
+  if (!activePat) throw new Error('No PAT — enter it in PAT Settings');
+  const url = 'https://api.github.com/repos/' + REPO + '/contents/' + repoPath + (ref ? '?ref=' + ref : '');
+  const resp = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      'Authorization': 'Bearer ' + activePat,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => '');
+    if (resp.status === 403) throw new Error('PAT lacks required scope. Push needs Contents: Write + Pull Requests: Write. GitHub said: ' + body.slice(0, 120));
+    if (resp.status === 404) return null;
+    throw new Error('GitHub ' + resp.status + ' for ' + repoPath + (body ? ': ' + body.slice(0, 100) : ''));
+  }
+  return resp.json();
+}
+
 /* ── busy state (all interactive buttons) ── */
-const ALL_BTNS = ['sync-tokens','btn-diff','btn-pull','sync-text-styles','generate-foundations','generate-components','save-pat'];
+const ALL_BTNS = ['sync-tokens','btn-diff','btn-pull','btn-push','sync-text-styles','generate-foundations','generate-components','save-pat'];
 function setBusy(busy) {
   for (const id of ALL_BTNS) { const el = document.getElementById(id); if (el) el.disabled = busy; }
 }
@@ -311,6 +332,347 @@ function collectResolutions() {
 }
 
 /* ══════════════════════════════════════════════════════════
+   PUSH — source file utilities + GitHub write flow
+   ══════════════════════════════════════════════════════════ */
+
+const SOURCE_FILES = ['core','color-light','color-dark','components','components-dark','platform-web','platform-ios','platform-android'];
+const SOURCE_BASE  = 'packages/tokens/source/';
+
+// Each Figma mode → ordered list of source sets (highest-priority first).
+// The first set in this list that CONTAINS the token is the one we update.
+const MODE_SOURCE_PRIORITY = {
+  'Light · Web':     ['platform-web',     'components', 'color-light', 'core'],
+  'Dark · Web':      ['platform-web',     'components-dark', 'components', 'color-dark', 'core'],
+  'Light · iOS':     ['platform-ios',     'components', 'color-light', 'core'],
+  'Dark · iOS':      ['platform-ios',     'components-dark', 'components', 'color-dark', 'core'],
+  'Light · Android': ['platform-android', 'components', 'color-light', 'core'],
+  'Dark · Android':  ['platform-android', 'components-dark', 'components', 'color-dark', 'core'],
+};
+
+/** Flatten a nested W3C/Tokens-Studio JSON into a Map<"path/to/token", entry>. */
+function flattenTokens(obj) {
+  const result = new Map();
+  function walk(node, path) {
+    if (!node || typeof node !== 'object') return;
+    // Token leaf: has $value (W3C) or value (Tokens Studio)
+    if ('$value' in node || 'value' in node) { result.set(path, node); return; }
+    for (const [k, v] of Object.entries(node)) {
+      if (k.startsWith('$')) continue; // skip $description, $type at root
+      walk(v, path ? path + '/' + k : k);
+    }
+  }
+  walk(obj, '');
+  return result;
+}
+
+/** Return the $value or value from a source token entry. */
+function srcVal(entry) {
+  return ('$value' in entry) ? entry['$value'] : entry['value'];
+}
+
+/** Normalise a source value for comparison: lowercase, strip outer whitespace. */
+function normSrcVal(entry) {
+  return String(srcVal(entry)).trim().toLowerCase();
+}
+
+/**
+ * Convert a serialised Figma variable value into the source token entry format.
+ * Aliases: Figma uses slash paths → source uses dot paths inside {}.
+ * Everything else: raw value string or number.
+ */
+function figmaValToSrcEntry(figmaVal, existingEntry) {
+  const key = ('$value' in existingEntry) ? '$value' : 'value';
+  const updated = Object.assign({}, existingEntry);
+  if (figmaVal.alias) {
+    // Figma: "color/brand/500" → source: "{color.brand.500}"
+    updated[key] = '{' + figmaVal.alias.replace(/\//g, '.') + '}';
+  } else {
+    updated[key] = figmaVal.value;
+  }
+  return updated;
+}
+
+/** Compare a Figma value against a source entry, true if they represent the same token value. */
+function figmaValMatchesSrc(figmaVal, existingEntry) {
+  const current = normSrcVal(existingEntry);
+  if (figmaVal.alias) {
+    const expected = '{' + figmaVal.alias.replace(/\//g, '.') + '}';
+    return current === expected.toLowerCase();
+  }
+  // For colors, compare hex strings (already normalised by code.js)
+  return current === String(figmaVal.value).trim().toLowerCase();
+}
+
+/**
+ * Fetch all token source files from GitHub, returning:
+ *   { [filename]: { json, sha, path, flat: Map } | null }
+ * Includes the file SHA needed for the PUT operation.
+ */
+async function fetchSourceFilesWithMeta() {
+  const result = {};
+  await Promise.all(SOURCE_FILES.map(async (name) => {
+    const path = SOURCE_BASE + name + '.json';
+    const meta = await ghFetchMeta(path, BRANCH);
+    if (!meta) { result[name] = null; return; }
+    // GitHub encodes content as base64 with line breaks
+    const json = JSON.parse(atob(meta.content.replace(/\n/g, '')));
+    result[name] = { json, sha: meta.sha, path, flat: flattenTokens(json) };
+  }));
+  return result;
+}
+
+/**
+ * Diff the serialised Figma collection against the source files.
+ *
+ * Returns:
+ *   { [sourceFileName]: Map<tokenPath, { old, new, modes: string[] }> }
+ *
+ * Only tokens that ALREADY EXIST in the source are included (no new-token creation).
+ * A single Figma variable may map to multiple source files (e.g. color-light AND color-dark).
+ * Duplicate writes to the same file+path from different modes are merged.
+ */
+function computePushChanges(figmaCollection, sourceFiles) {
+  const changes = {}; // { filename: Map<path, { old, new, modes }> }
+
+  for (const fv of figmaCollection.variables) {
+    for (const [modeName, figmaVal] of Object.entries(fv.values)) {
+      const priority = MODE_SOURCE_PRIORITY[modeName];
+      if (!priority) continue;
+
+      // Find the highest-priority source file that defines this token
+      const srcFile = priority.find(f => sourceFiles[f] && sourceFiles[f].flat && sourceFiles[f].flat.has(fv.name));
+      if (!srcFile) continue;
+
+      const existingEntry = sourceFiles[srcFile].flat.get(fv.name);
+      if (figmaValMatchesSrc(figmaVal, existingEntry)) continue; // no change
+
+      const newEntry = figmaValToSrcEntry(figmaVal, existingEntry);
+
+      if (!changes[srcFile]) changes[srcFile] = new Map();
+      const existing = changes[srcFile].get(fv.name);
+      if (existing) {
+        // Same token already recorded for this file from another mode — merge modes list
+        existing.modes.push(modeName);
+      } else {
+        changes[srcFile].set(fv.name, { old: existingEntry, new: newEntry, modes: [modeName] });
+      }
+    }
+  }
+  return changes;
+}
+
+/**
+ * Deep-clone a JSON object and overwrite token values at the given paths.
+ * Uses the existing nested structure — does not create new keys.
+ */
+function applyChangesToJson(originalJson, changesMap) {
+  const updated = JSON.parse(JSON.stringify(originalJson));
+  for (const [tokenPath, change] of changesMap) {
+    const parts = tokenPath.split('/');
+    let node = updated;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!node[parts[i]] || typeof node[parts[i]] !== 'object') { node = null; break; }
+      node = node[parts[i]];
+    }
+    if (!node) continue;
+    const last = parts[parts.length - 1];
+    if (node[last] && typeof node[last] === 'object') {
+      Object.assign(node[last], change.new);
+    }
+  }
+  return updated;
+}
+
+/* ── GitHub write helpers ── */
+
+async function ghGetMainSha() {
+  const url = 'https://api.github.com/repos/' + REPO + '/git/ref/heads/' + BRANCH;
+  const resp = await fetch(url, {
+    headers: {
+      'Authorization': 'Bearer ' + activePat,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => '');
+    if (resp.status === 403) throw new Error('PAT lacks read scope to get branch ref. ' + body.slice(0, 120));
+    throw new Error('GitHub ' + resp.status + ' getting main ref: ' + body.slice(0, 100));
+  }
+  const data = await resp.json();
+  return data.object.sha;
+}
+
+async function ghCreateBranch(branchName, sha) {
+  const resp = await fetch('https://api.github.com/repos/' + REPO + '/git/refs', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + activePat,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+    body: JSON.stringify({ ref: 'refs/heads/' + branchName, sha }),
+  });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => '');
+    if (resp.status === 403) throw new Error('PAT lacks Contents: Write or Pull Requests: Write scope — cannot create branch. Response: ' + body.slice(0, 150));
+    throw new Error('GitHub ' + resp.status + ' creating branch: ' + body.slice(0, 100));
+  }
+  return resp.json();
+}
+
+async function ghPutFile(filePath, content, sha, branch, message) {
+  // btoa() only handles ASCII; use encodeURIComponent+unescape for unicode safety
+  const b64 = btoa(unescape(encodeURIComponent(content)));
+  const resp = await fetch('https://api.github.com/repos/' + REPO + '/contents/' + filePath, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + activePat,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+    body: JSON.stringify({ message, content: b64, sha, branch }),
+  });
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => '');
+    if (resp.status === 403) throw new Error('PAT lacks Contents: Write scope — cannot commit file. Response: ' + body.slice(0, 150));
+    throw new Error('GitHub ' + resp.status + ' committing ' + filePath + ': ' + body.slice(0, 100));
+  }
+  return resp.json();
+}
+
+async function ghCreatePR(branchName, title, body) {
+  const resp = await fetch('https://api.github.com/repos/' + REPO + '/pulls', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + activePat,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+    body: JSON.stringify({ title, head: branchName, base: BRANCH, body }),
+  });
+  if (!resp.ok) {
+    const body2 = await resp.text().catch(() => '');
+    if (resp.status === 403) throw new Error('PAT lacks Pull Requests: Write scope — cannot create PR. Response: ' + body2.slice(0, 150));
+    throw new Error('GitHub ' + resp.status + ' creating PR: ' + body2.slice(0, 100));
+  }
+  return resp.json();
+}
+
+/**
+ * Execute the full Push:
+ * 1. Create a timestamped branch off main
+ * 2. Commit each changed source file
+ * 3. Open a PR
+ */
+async function executePush(sourceFiles, changes) {
+  const now = new Date();
+  const ts = now.toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
+  const branch = 'figma/push-' + ts;
+
+  let totalTokens = 0;
+  for (const fc of Object.values(changes)) totalTokens += fc.size;
+  const fileNames = Object.keys(changes);
+
+  log('Getting main branch SHA…', 'muted');
+  const mainSha = await ghGetMainSha();
+
+  log('Creating branch ' + branch + '…', 'muted');
+  await ghCreateBranch(branch, mainSha);
+
+  for (const fname of fileNames) {
+    const fileChanges = changes[fname];
+    const srcFile = sourceFiles[fname];
+    const updatedJson = applyChangesToJson(srcFile.json, fileChanges);
+    const content = JSON.stringify(updatedJson, null, 2) + '\n';
+    const commitMsg = 'tokens(figma-push): ' + fileChanges.size + ' change' +
+      (fileChanges.size > 1 ? 's' : '') + ' in ' + fname + '.json';
+    log('Committing ' + fname + '.json (' + fileChanges.size + ' tokens)…', 'muted');
+    await ghPutFile(srcFile.path, content, srcFile.sha, branch, commitMsg);
+  }
+
+  const prBody = [
+    '## Figma → Source Token Push',
+    '',
+    '**' + totalTokens + ' token' + (totalTokens > 1 ? 's' : '') + ' changed** across ' +
+      fileNames.length + ' source file' + (fileNames.length > 1 ? 's' : '') + '.',
+    '',
+    '| Source file | Changed tokens |',
+    '|---|:---:|',
+    ...fileNames.map(f => '| `' + SOURCE_BASE + f + '.json` | ' + changes[f].size + ' |'),
+    '',
+    'After merging:',
+    '- Run `npm run tokens:build` to regenerate `tokens.figma-variables.json`',
+    '- Run `npm run tokens:check` to verify the build output',
+    '- Sync the new `tokens.figma-variables.json` back to Figma via **Sync tokens**',
+    '',
+    '> Generated by the Design System Sync Figma plugin on ' + now.toLocaleDateString() + '.',
+  ].join('\n');
+
+  const prTitle = 'tokens(figma-push): ' + totalTokens + ' token' +
+    (totalTokens > 1 ? 's' : '') + ' from Figma Foundations';
+  log('Opening PR…', 'muted');
+  const pr = await ghCreatePR(branch, prTitle, prBody);
+
+  return { pr, branch, totalTokens, fileNames };
+}
+
+/* ── Push rendering ── */
+
+function renderPushPreview(changes) {
+  let totalTokens = 0;
+  for (const fc of Object.values(changes)) totalTokens += fc.size;
+
+  if (totalTokens === 0) {
+    return '<div class="push-ok">✓ Figma variables match the source files — nothing to push.</div>' +
+      '<p style="font-size:11px;color:var(--fg-muted);margin:0">If you expected changes, make sure you\'ve synced first so the collection is up to date.</p>';
+  }
+
+  let html = '<div class="push-scope-note"><strong>' + totalTokens + ' token' +
+    (totalTokens > 1 ? 's' : '') + '</strong> will be written to ' +
+    Object.keys(changes).length + ' source file' +
+    (Object.keys(changes).length > 1 ? 's' : '') +
+    '. Only tokens that already exist in <code>packages/tokens/source/</code> are updated — new Figma variables are skipped.</div>';
+
+  for (const [fname, fileChanges] of Object.entries(changes)) {
+    html += '<div class="push-file-section">';
+    html += '<div class="push-file-title"><span class="push-file-badge">' + fileChanges.size + '</span>' + esc(fname) + '.json</div>';
+    let count = 0;
+    for (const [tokenPath, change] of fileChanges) {
+      if (count++ >= 40) { html += '<div class="diff-more">… ' + (fileChanges.size - 40) + ' more</div>'; break; }
+      const oldV = String(srcVal(change.old));
+      const newV = String(srcVal(change.new));
+      const isColor = /^#[0-9a-f]{6}/i.test(oldV) || /^#[0-9a-f]{6}/i.test(newV);
+      html += '<div class="diff-row">';
+      html += '<div class="var-name changed">' + esc(tokenPath) + '</div>';
+      html += '<div class="mode-change"><span class="mode-lbl">' +
+        esc(change.modes.map(m => m.replace(' · ', '·').replace('Light', 'L').replace('Dark', 'D')).join(', ')) +
+        '</span> ';
+      if (isColor) {
+        const oldHex = oldV.toLowerCase();
+        const newHex = newV.toLowerCase();
+        html += '<span class="val-old">' + renderSwatch(oldHex) + esc(oldV) + '</span>';
+        html += '<span class="val-arr">→</span>';
+        html += renderSwatch(newHex) + esc(newV);
+      } else {
+        html += '<span class="val-old"><code>' + esc(oldV) + '</code></span>';
+        html += '<span class="val-arr">→</span>';
+        html += '<code>' + esc(newV) + '</code>';
+      }
+      html += '</div></div>';
+    }
+    html += '</div>';
+  }
+  return html;
+}
+
+/* ── Push session state ── */
+let pushState = null; // { figmaCollection, sourceFiles, changes }
+
+/* ══════════════════════════════════════════════════════════
    ACTION HANDLERS
    ══════════════════════════════════════════════════════════ */
 
@@ -400,6 +762,51 @@ document.getElementById('close-diff').addEventListener('click', () => {
   setBusy(false);
 });
 
+/* ── Push button: ask code.js to read the Figma collection ── */
+document.getElementById('btn-push').addEventListener('click', () => {
+  setBusy(true);
+  log('Reading Figma variable collection…', 'muted');
+  parent.postMessage({ pluginMessage: { type: 'read-collection' } }, '*');
+});
+
+/* ── Push overlay: Cancel / Close ── */
+function closePushPanel() {
+  document.getElementById('push-panel').hidden = true;
+  pushState = null;
+  setBusy(false);
+}
+document.getElementById('close-push').addEventListener('click', closePushPanel);
+document.getElementById('push-cancel').addEventListener('click', closePushPanel);
+
+/* ── Push overlay: Confirm → execute the GitHub write flow ── */
+document.getElementById('push-confirm').addEventListener('click', async () => {
+  if (!pushState || !Object.keys(pushState.changes).length) {
+    closePushPanel();
+    return;
+  }
+  document.getElementById('push-confirm').disabled = true;
+  document.getElementById('push-cancel').disabled = true;
+  try {
+    const { pr, branch, totalTokens, fileNames } = await executePush(pushState.sourceFiles, pushState.changes);
+    document.getElementById('push-panel').hidden = true;
+    pushState = null;
+    log('PR opened: ' + pr.html_url, 'ok');
+    log('Branch: ' + branch + ' · ' + totalTokens + ' token' + (totalTokens > 1 ? 's' : '') +
+      ' in ' + fileNames.join(', '), 'ok');
+    // Show PR link in the body for easy copy
+    const prLinkHtml = '<div class="line ok">PR: <a class="pr-link" href="' + esc(pr.html_url) +
+      '" target="_blank">' + esc(pr.html_url) + '</a></div>';
+    const logEl = document.getElementById('log');
+    logEl.insertAdjacentHTML('beforeend', prLinkHtml);
+    logEl.scrollTop = logEl.scrollHeight;
+  } catch (e) {
+    log('Push failed: ' + e.message, 'err');
+  }
+  document.getElementById('push-confirm').disabled = false;
+  document.getElementById('push-cancel').disabled = false;
+  setBusy(false);
+});
+
 /* ══════════════════════════════════════════════════════════
    MESSAGE HANDLER
    ══════════════════════════════════════════════════════════ */
@@ -418,6 +825,44 @@ window.onmessage = (event) => {
       log('PAT saved to clientStorage', 'ok');
       document.getElementById('pat-settings').open = false;
       break;
+    case 'collection-data': {
+      // Push step 2: got Figma collection from code.js; fetch source files and compute diff.
+      const colResult = msg.result;
+      if (colResult.error) {
+        log('Push error: ' + colResult.error, 'err');
+        setBusy(false);
+        break;
+      }
+      (async () => {
+        try {
+          log('Fetching ' + SOURCE_FILES.length + ' source token files from GitHub…', 'muted');
+          const sourceFiles = await fetchSourceFilesWithMeta();
+          log('Computing changes…', 'muted');
+          const changes = computePushChanges(colResult, sourceFiles);
+          pushState = { figmaCollection: colResult, sourceFiles, changes };
+
+          document.getElementById('push-body').innerHTML = renderPushPreview(changes);
+          document.getElementById('push-panel').hidden = false;
+          document.getElementById('push-confirm').disabled = false;
+          document.getElementById('push-cancel').disabled = false;
+
+          let total = 0;
+          for (const fc of Object.values(changes)) total += fc.size;
+          const fileCount = Object.keys(changes).length;
+          if (total === 0) {
+            log('Push preview: Figma matches source — nothing to push', 'info');
+          } else {
+            log('Push preview: ' + total + ' token' + (total > 1 ? 's' : '') +
+              ' changed across ' + fileCount + ' file' + (fileCount > 1 ? 's' : ''), 'info');
+          }
+          setBusy(false);
+        } catch (e) {
+          log('Push preview failed: ' + e.message, 'err');
+          setBusy(false);
+        }
+      })();
+      break;
+    }
     case 'pull-preview': {
       const preview = msg.preview;
       pullPreviewCache = preview;
