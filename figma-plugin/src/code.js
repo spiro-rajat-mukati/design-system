@@ -1816,7 +1816,9 @@ figma.ui.onmessage = async (msg) => {
       uiLog("Unknown message: " + msg.type, "warn");
     }
   } catch (e) {
-    uiLog("Plugin error: " + (e && e.message ? e.message : String(e)), "err");
+    const msg2 = (e && e.message) ? e.message : String(e);
+    uiLog("Plugin error [" + (msg.type || "?") + "]: " + msg2, "err");
+    console.error("Figma plugin error:", e);
     uiDone();
   }
 };

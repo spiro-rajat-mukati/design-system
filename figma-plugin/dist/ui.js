@@ -1,3 +1,30 @@
+window.addEventListener("error", (e) => {
+  try {
+    const logEl2 = document.getElementById("log");
+    if (logEl2) {
+      const line = document.createElement("div");
+      line.className = "line err";
+      line.textContent = "Script error: " + (e.message || String(e));
+      logEl2.appendChild(line);
+      logEl2.scrollTop = logEl2.scrollHeight;
+    }
+  } catch (_) {
+  }
+});
+window.addEventListener("unhandledrejection", (e) => {
+  try {
+    const logEl2 = document.getElementById("log");
+    if (logEl2) {
+      const msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+      const line = document.createElement("div");
+      line.className = "line err";
+      line.textContent = "Unhandled error: " + msg;
+      logEl2.appendChild(line);
+      logEl2.scrollTop = logEl2.scrollHeight;
+    }
+  } catch (_) {
+  }
+});
 const REPO = "spiro-rajat-mukati/design-system";
 const BRANCH = "main";
 const SPECS = [
@@ -362,6 +389,8 @@ window.onmessage = (event) => {
     case "log":
       log(msg.text, msg.kind || "info");
       break;
+    // 'sync-done' is sent by uiDone() in code.js on success or error — always unblock UI.
+    case "done":
     case "sync-done":
     case "sync-text-styles-done":
     case "foundations-done":
