@@ -1382,6 +1382,161 @@ async function generateFoundations() {
 
 /* ---------- PAT — clientStorage ---------- */
 
+/* ============================================================
+   DIFF — compare repo JSON to the live "Design System" collection
+   ============================================================ */
+
+/** Repo JSON rgba/hex string → lowercase #rrggbb[aa] */
+function normalizeRepoColorStr(str) {
+  str = String(str || "").trim().toLowerCase();
+  if (str === "transparent") return "#00000000";
+  if (str.startsWith("#")) {
+    const h = str.slice(1);
+    if (h.length === 6) return str;
+    if (h.length === 8) return (h.slice(6) === "ff") ? "#" + h.slice(0, 6) : str;
+    return str;
+  }
+  const m = str.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/);
+  if (m) {
+    const r = Math.round(+m[1]).toString(16).padStart(2, "0");
+    const g = Math.round(+m[2]).toString(16).padStart(2, "0");
+    const b = Math.round(+m[3]).toString(16).padStart(2, "0");
+    const a = m[4] != null ? +m[4] : 1;
+    if (Math.abs(a - 1) < 0.004) return "#" + r + g + b;
+    return "#" + r + g + b + Math.round(a * 255).toString(16).padStart(2, "0");
+  }
+  return str;
+}
+
+/** Figma RGBA {r,g,b,a} (0–1 floats) → lowercase #rrggbb[aa] */
+function normalizeFigmaColorRGBA(rgba) {
+  if (!rgba || typeof rgba.r !== "number") return null;
+  const r = Math.round(rgba.r * 255).toString(16).padStart(2, "0");
+  const g = Math.round(rgba.g * 255).toString(16).padStart(2, "0");
+  const b = Math.round(rgba.b * 255).toString(16).padStart(2, "0");
+  const a = rgba.a != null ? rgba.a : 1;
+  if (Math.abs(a - 1) < 0.004) return "#" + r + g + b;
+  return "#" + r + g + b + Math.round(a * 255).toString(16).padStart(2, "0");
+}
+
+/** Figma value (any mode value) → comparable string. Aliases become "alias:<name>". */
+function normalizeFigmaValStr(raw, type) {
+  if (raw && typeof raw === "object" && raw.type === "VARIABLE_ALIAS") {
+    const t = figma.variables.getVariableById(raw.id);
+    return "alias:" + (t ? t.name : "?");
+  }
+  if (type === "COLOR") return normalizeFigmaColorRGBA(raw) || String(raw);
+  return String(raw != null ? raw : "");
+}
+
+/** Repo {value|alias} entry → comparable string. */
+function normalizeRepoValStr(entry, type) {
+  if (!entry) return "";
+  if (entry.alias) return "alias:" + entry.alias;
+  if (type === "COLOR") return normalizeRepoColorStr(entry.value);
+  return String(entry.value != null ? entry.value : "");
+}
+
+/** Human-readable display label for a Figma value. */
+function figmaValLabel(raw, type) {
+  if (raw && typeof raw === "object" && raw.type === "VARIABLE_ALIAS") {
+    const t = figma.variables.getVariableById(raw.id);
+    return "→ " + (t ? t.name : "?");
+  }
+  if (type === "COLOR") return normalizeFigmaColorRGBA(raw) || "?";
+  return String(raw != null ? raw : "—");
+}
+
+/** Human-readable display label for a repo value entry. */
+function repoValLabel(entry, type) {
+  if (!entry) return "—";
+  if (entry.alias) return "→ " + entry.alias;
+  if (type === "COLOR") return normalizeRepoColorStr(entry.value);
+  return String(entry.value != null ? entry.value : "—");
+}
+
+/**
+ * Diff the repo JSON against the live Figma "Design System" collection.
+ * Returns { modeMap, unmatchedFigmaModes, added, changed, removed } or { error }.
+ */
+function computeDiff(repoData, collection) {
+  if (!collection) {
+    return { error: "No '" + COLLECTION_NAME + "' Variable Collection found — run Sync Tokens first." };
+  }
+
+  // Mode mapping: repo mode name → figma modeId (by matching display names).
+  const figmaModeByName = new Map(collection.modes.map(m => [m.name, m.modeId]));
+  const modeMap = repoData.modes.map(rm => ({
+    repoId:  rm.id,
+    name:    rm.name,
+    figmaId: figmaModeByName.get(rm.name) || null,
+    matched: figmaModeByName.has(rm.name),
+  }));
+  const matchedNames = new Set(modeMap.filter(m => m.matched).map(m => m.name));
+  const unmatchedFigmaModes = collection.modes.filter(m => !matchedNames.has(m.name)).map(m => m.name);
+
+  // Index Figma variables in this collection.
+  const figmaByName = new Map();
+  for (const v of figma.variables.getLocalVariables()) {
+    if (v.variableCollectionId === collection.id) figmaByName.set(v.name, v);
+  }
+
+  const repoNames = new Set(repoData.variables.map(v => v.name));
+  const added = [], changed = [], removed = [];
+
+  // Added: in repo, not in Figma.
+  for (const rv of repoData.variables) {
+    if (figmaByName.has(rv.name)) continue;
+    const preview = {};
+    for (const mm of modeMap) {
+      if (!mm.matched) continue;
+      const e = rv.values[mm.repoId];
+      if (!e) continue;
+      const isColor = rv.type === "COLOR" && !e.alias;
+      preview[mm.name] = { label: repoValLabel(e, rv.type), isColor, hex: isColor ? normalizeRepoColorStr(e.value) : null };
+    }
+    added.push({ name: rv.name, type: rv.type, preview });
+  }
+
+  // Removed: in Figma, not in repo.
+  for (const [name, fv] of figmaByName) {
+    if (!repoNames.has(name)) removed.push({ name, type: fv.resolvedType });
+  }
+
+  // Changed: in both — compare per matched mode.
+  for (const rv of repoData.variables) {
+    const fv = figmaByName.get(rv.name);
+    if (!fv) continue;
+    const modeChanges = [];
+    for (const mm of modeMap) {
+      if (!mm.matched) continue;
+      const repoEntry = rv.values[mm.repoId];
+      const figmaRaw  = fv.valuesByMode[mm.figmaId];
+      if (!repoEntry || figmaRaw === undefined) continue;
+
+      const rStr = normalizeRepoValStr(repoEntry, rv.type);
+      const fStr = normalizeFigmaValStr(figmaRaw, rv.type);
+      if (rStr === fStr) continue;
+
+      const isAlias = !!(repoEntry.alias || (figmaRaw && figmaRaw.type === "VARIABLE_ALIAS"));
+      modeChanges.push({
+        modeName:    mm.name,
+        repoModeId:  mm.repoId,
+        figmaModeId: mm.figmaId,
+        figmaStr:    fStr,   // hex or "alias:…"
+        repoStr:     rStr,   // hex or "alias:…"
+        figmaLabel:  figmaValLabel(figmaRaw, rv.type),
+        repoLabel:   repoValLabel(repoEntry, rv.type),
+        isColor:     rv.type === "COLOR" && !isAlias,
+        isAlias,
+      });
+    }
+    if (modeChanges.length) changed.push({ name: rv.name, type: rv.type, modeChanges });
+  }
+
+  return { modeMap, unmatchedFigmaModes, added, changed, removed };
+}
+
 const PAT_KEY = "kijani.pat";
 
 /** Load the PAT from clientStorage on startup and send it to the UI. */
@@ -1398,7 +1553,11 @@ async function loadPat() {
 
 figma.ui.onmessage = async (msg) => {
   try {
-    if (msg.type === "get-pat") {
+    if (msg.type === "compute-diff") {
+      const col = figma.variables.getLocalVariableCollections().find(c => c.name === COLLECTION_NAME);
+      const result = computeDiff(msg.repoData, col);
+      figma.ui.postMessage({ type: "diff-result", result });
+    } else if (msg.type === "get-pat") {
       await loadPat();
     } else if (msg.type === "set-pat") {
       // msg.pat arrives from the UI — store it, then send it back so the UI
