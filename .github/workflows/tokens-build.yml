@@ -64,7 +64,12 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add packages/tokens/build/
+          git add packages/tokens/primitives.css \
+                  packages/tokens/semantics.css \
+                  packages/tokens/component-tokens.css \
+                  packages/tokens/tokens.ts \
+                  packages/tokens/tokens.native.ts \
+                  packages/tokens/tokens.figma-variables.json
           if git diff --cached --quiet; then
             echo "Build output already in sync — nothing to commit."
           else
