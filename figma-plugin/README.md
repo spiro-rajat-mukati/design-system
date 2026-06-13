@@ -1,50 +1,79 @@
 # Design System Sync — Figma plugin
 
-A custom Figma plugin that reads `tokens.figma-variables.json` and (soon) component specs from the GitHub repo and applies them to a Figma library file. Replaces Tokens Studio for our use case at zero cost.
+A custom Figma plugin that reads `tokens.figma-variables.json` and component specs from the GitHub repo and applies them to a Figma library file.
 
 ## Features
 
-- **Sync tokens** — fetches `src/tokens/tokens.figma-variables.json` from `main`, creates / updates the `Design System` Variable Collection with all 4 modes and 481 variables, resolves alias references.
-- **Generate components** (coming next) — reads `src/component-specs/*.json` and constructs Figma components with full variant matrices bound to Variables.
+- **Sync tokens** — fetches `packages/tokens/tokens.figma-variables.json` from `main`, creates/updates the `Design System` Variable Collection with all 6 modes (Web/iOS/Android × light/dark) and every variable, resolving alias references.
+- **Diff tokens** — compares the Figma variable collection against the repo JSON mode-by-mode, showing added/changed/removed with old→new values and colour swatches.
+- **Pull tokens** — applies repo values to Figma with 3-way conflict detection (Base / Figma / Repo), mode reconciliation (rename legacy compact/comfortable modes), and a conflict-resolver UI.
+- **Sync Text Styles** — creates/updates Figma Text Styles from the token set.
+- **Generate Foundations / components** — reads `packages/web/src/component-specs/*.json` and constructs Figma component frames.
 
-## Installing the plugin in Figma (one-time, dev mode)
+## Dev install (one-time, in Figma desktop)
 
-This plugin isn't published to the Figma plugin store — you install it locally as a development plugin. Anyone on the team who wants to run it does this once.
+1. `npm install && npm run plugin:build` from the repo root (or `npm run build` inside `figma-plugin/`).
+2. In **Figma desktop**, open your `Design System Library` file.
+3. **Plugins → Development → Import plugin from manifest…**
+4. Select `figma-plugin/manifest.json`.
+5. Run via **Plugins → Development → Design System Sync**.
 
-1. **Pull the repo locally** (you already have it at `~/Documents/design-system`).
-2. **In Figma desktop app**, open your `Design System Library` file.
-3. Top menu → **Plugins** → **Development** → **Import plugin from manifest…**
-4. Navigate to `~/Documents/design-system/figma-plugin/manifest.json` and select it.
-5. The plugin is now installed for your account. Run it via **Plugins** → **Development** → **Design System Sync**.
-
-If you don't see the **Development** submenu, you may need to enable plugin development in Figma → Preferences → "Allow plugin development."
+> If you don't see the **Development** submenu: Figma → Preferences → enable "Allow plugin development".
 
 ## Using the plugin
 
-1. Open your `Design System Library` file.
-2. Run **Plugins → Development → Design System Sync**.
-3. Click **Sync tokens from GitHub**.
-4. Watch the log. Expected output:
-   - "Created Variable Collection: Design System"
-   - "Added mode: Light · Compact" (+ 3 more)
-   - "Pass 1 complete: 481 variables created/updated"
-   - "Pass 2 complete: ~1288 alias bindings set"
-   - "Sync done."
-5. Open the Figma Variables panel (Design tab, with nothing selected, right sidebar) — you'll see the `Design System` collection with 4 mode columns and every variable filled in.
+1. Open PAT Settings (bottom of the plugin panel) and paste a GitHub fine-grained PAT with **Contents: Read** on `spiro-rajat-mukati/design-system`. Stored in Figma `clientStorage` — never committed.
+2. **Sync tokens from GitHub** — initial full sync, or after a token change on `main`.
+3. **Diff tokens vs GitHub** — inspect what has changed since last sync.
+4. **Pull tokens from GitHub → Figma** — preview and apply repo values with conflict resolution.
 
-Re-run the sync any time you push token changes to `main`. The plugin upserts by variable name, so existing bindings on components survive.
+Re-run sync any time you push token changes to `main`. The plugin upserts by variable name, so existing component bindings survive.
+
+## Building
+
+The plugin source lives in `src/`; the Figma-loadable output is in `dist/`. Figma's plugin runtime rejects ES2018+ syntax (object spread, optional chaining, etc.) when shipped un-transpiled, so the source is built with esbuild targeting ES2017.
+
+```
+# From repo root
+npm run plugin:build
+
+# From figma-plugin/
+npm run build       # one-shot
+npm run dev         # watch mode (rebuilds on save)
+```
+
+After building, `dist/code.js` and `dist/ui.html` + `dist/ui.js` are updated. These built files are committed so the plugin can be loaded without a separate build step.
+
+The build script (`build.mjs`) also runs a syntax guard — it exits with an error if any forbidden ES2018+ pattern is found in the output, so regressions are caught before they reach Figma.
+
+## File layout
+
+```
+figma-plugin/
+  src/
+    code.js         Plugin main thread (Figma API, no network)
+    ui.js           Plugin iframe script (fetch, no Figma API)
+    ui-shell.html   HTML template (references dist/ui.js)
+  dist/             Built output (committed; regenerated by npm run build)
+    code.js
+    ui.html
+    ui.js
+  build.mjs         esbuild build + syntax-guard script
+  manifest.json     Figma plugin manifest (points at dist/)
+  package.json
+```
 
 ## Troubleshooting
 
-- **"Bad payload — no variables array"** — the JSON URL didn't return valid data. Check the repo path / branch in `ui.html`.
-- **"Unresolved alias"** — a token references another token that doesn't exist. Usually means the JSON itself has a broken reference; fix in `src/tokens/source/*.json` and rebuild.
-- **"Type mismatch"** — you previously created a Variable with this name as a different type. Either rename the variable or delete it from Figma and re-sync.
-- **Network error** — Figma plugin network access is allow-listed. Only `raw.githubusercontent.com` is reachable. If you point at a different host, update `manifest.json`'s `networkAccess.allowedDomains`.
+| Error | Cause | Fix |
+|---|---|---|
+| "Bad payload — no variables array" | JSON parse failed | Check repo path / branch in `src/ui.js` |
+| "Unresolved alias" | Token references non-existent token | Fix in `packages/tokens/source/*.json` and rebuild tokens |
+| "Type mismatch" | Variable type changed in Figma vs repo | Delete the Figma variable and re-sync |
+| GitHub API 401/404 | PAT missing or wrong scope | Re-enter PAT in PAT Settings (needs Contents: Read) |
 
-## Development
+## Development notes
 
-Plain JavaScript — no build step. Edit `code.js` or `ui.html` and Figma picks up the changes on the next plugin run.
+`src/code.js` runs in Figma's main thread — has `figma.*` API, no `fetch`. `src/ui.js` runs in a sandboxed iframe — has `fetch`, no Figma API. They communicate via `parent.postMessage` / `figma.ui.onmessage`.
 
-`code.js` runs in Figma's main thread and has the `figma.*` API. `ui.html` runs in a sandboxed iframe — that's where the `fetch()` calls happen. They communicate via `postMessage`.
-
-To debug, open the plugin in Figma → top menu → **Plugins → Development → Show/Hide console**. `console.log` from both threads shows up there.
+Debug: **Plugins → Development → Show/Hide console** — logs from both threads appear there.
