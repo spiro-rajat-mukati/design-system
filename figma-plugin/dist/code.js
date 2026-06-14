@@ -710,10 +710,10 @@ async function syncTextStyles() {
   let created = 0, updated = 0, skipped = 0;
   for (const role of TYPOGRAPHY_ROLES) {
     const styleName = "Typography/" + roleDisplayName(role);
-    const sizeVar = varIndex.get("text/" + role + "/size");
-    const lineVar = varIndex.get("text/" + role + "/line");
-    const weightVar = varIndex.get("text/" + role + "/weight");
-    const familyVar = role === "code" ? varIndex.get("text/code/family") || varIndex.get("font-family/mono") : varIndex.get("font-family/sans");
+    const sizeVar = varIndex.get("text/web/" + role + "/size");
+    const lineVar = varIndex.get("text/web/" + role + "/line");
+    const weightVar = varIndex.get("text/web/" + role + "/weight");
+    const familyVar = role === "code" ? varIndex.get("text/web/code/family") || varIndex.get("font-family/mono") : varIndex.get("font-family/sans");
     if (!sizeVar || !weightVar || !familyVar) {
       uiLog("Skip " + styleName + " (missing Variables \u2014 re-run Sync tokens)", "warn");
       skipped += 1;

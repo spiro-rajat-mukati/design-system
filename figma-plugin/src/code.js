@@ -845,12 +845,12 @@ async function syncTextStyles() {
 
   for (const role of TYPOGRAPHY_ROLES) {
     const styleName = "Typography/" + roleDisplayName(role);
-    const sizeVar = varIndex.get("text/" + role + "/size");
-    const lineVar = varIndex.get("text/" + role + "/line");
-    const weightVar = varIndex.get("text/" + role + "/weight");
+    const sizeVar = varIndex.get("text/web/" + role + "/size");
+    const lineVar = varIndex.get("text/web/" + role + "/line");
+    const weightVar = varIndex.get("text/web/" + role + "/weight");
     // `code` role has its own fontFamily token (mono); everything else uses sans.
     const familyVar = role === "code"
-      ? (varIndex.get("text/code/family") || varIndex.get("font-family/mono"))
+      ? (varIndex.get("text/web/code/family") || varIndex.get("font-family/mono"))
       : varIndex.get("font-family/sans");
 
     if (!sizeVar || !weightVar || !familyVar) {

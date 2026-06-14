@@ -9776,6 +9776,12 @@
       "name": "text/mobile/body-lg-regular/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/normal"
+        },
+        "dark-web": {
+          "alias": "line-height/normal"
+        },
         "light-ios": {
           "alias": "line-height/normal"
         },
@@ -9794,6 +9800,12 @@
       "name": "text/mobile/body-lg-regular/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/300"
+        },
+        "dark-web": {
+          "alias": "font-size/300"
+        },
         "light-ios": {
           "alias": "font-size/300"
         },
@@ -9812,6 +9824,12 @@
       "name": "text/mobile/body-lg-regular/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/regular"
+        },
+        "dark-web": {
+          "alias": "font-weight/regular"
+        },
         "light-ios": {
           "alias": "font-weight/regular"
         },
@@ -9830,6 +9848,12 @@
       "name": "text/mobile/body-lg-semibold/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/normal"
+        },
+        "dark-web": {
+          "alias": "line-height/normal"
+        },
         "light-ios": {
           "alias": "line-height/normal"
         },
@@ -9848,6 +9872,12 @@
       "name": "text/mobile/body-lg-semibold/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/300"
+        },
+        "dark-web": {
+          "alias": "font-size/300"
+        },
         "light-ios": {
           "alias": "font-size/300"
         },
@@ -9866,6 +9896,12 @@
       "name": "text/mobile/body-lg-semibold/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -9884,6 +9920,12 @@
       "name": "text/mobile/body-md-regular/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/normal"
+        },
+        "dark-web": {
+          "alias": "line-height/normal"
+        },
         "light-ios": {
           "alias": "line-height/normal"
         },
@@ -9902,6 +9944,12 @@
       "name": "text/mobile/body-md-regular/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/200"
+        },
+        "dark-web": {
+          "alias": "font-size/200"
+        },
         "light-ios": {
           "alias": "font-size/200"
         },
@@ -9920,6 +9968,12 @@
       "name": "text/mobile/body-md-regular/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/regular"
+        },
+        "dark-web": {
+          "alias": "font-weight/regular"
+        },
         "light-ios": {
           "alias": "font-weight/regular"
         },
@@ -9938,6 +9992,12 @@
       "name": "text/mobile/body-md-semibold/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/normal"
+        },
+        "dark-web": {
+          "alias": "line-height/normal"
+        },
         "light-ios": {
           "alias": "line-height/normal"
         },
@@ -9956,6 +10016,12 @@
       "name": "text/mobile/body-md-semibold/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/200"
+        },
+        "dark-web": {
+          "alias": "font-size/200"
+        },
         "light-ios": {
           "alias": "font-size/200"
         },
@@ -9974,6 +10040,12 @@
       "name": "text/mobile/body-md-semibold/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -9992,6 +10064,12 @@
       "name": "text/mobile/body-sm-regular/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/normal"
+        },
+        "dark-web": {
+          "alias": "line-height/normal"
+        },
         "light-ios": {
           "alias": "line-height/normal"
         },
@@ -10010,6 +10088,12 @@
       "name": "text/mobile/body-sm-regular/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/100"
+        },
+        "dark-web": {
+          "alias": "font-size/100"
+        },
         "light-ios": {
           "alias": "font-size/100"
         },
@@ -10028,6 +10112,12 @@
       "name": "text/mobile/body-sm-regular/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/regular"
+        },
+        "dark-web": {
+          "alias": "font-weight/regular"
+        },
         "light-ios": {
           "alias": "font-weight/regular"
         },
@@ -10046,6 +10136,12 @@
       "name": "text/mobile/body-sm-semibold/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/normal"
+        },
+        "dark-web": {
+          "alias": "line-height/normal"
+        },
         "light-ios": {
           "alias": "line-height/normal"
         },
@@ -10064,6 +10160,12 @@
       "name": "text/mobile/body-sm-semibold/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/100"
+        },
+        "dark-web": {
+          "alias": "font-size/100"
+        },
         "light-ios": {
           "alias": "font-size/100"
         },
@@ -10082,6 +10184,12 @@
       "name": "text/mobile/body-sm-semibold/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -10100,6 +10208,12 @@
       "name": "text/mobile/caption/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/normal"
+        },
+        "dark-web": {
+          "alias": "line-height/normal"
+        },
         "light-ios": {
           "alias": "line-height/normal"
         },
@@ -10118,6 +10232,12 @@
       "name": "text/mobile/caption/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/50"
+        },
+        "dark-web": {
+          "alias": "font-size/50"
+        },
         "light-ios": {
           "alias": "font-size/50"
         },
@@ -10136,6 +10256,12 @@
       "name": "text/mobile/caption/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/regular"
+        },
+        "dark-web": {
+          "alias": "font-weight/regular"
+        },
         "light-ios": {
           "alias": "font-weight/regular"
         },
@@ -10154,6 +10280,12 @@
       "name": "text/mobile/headline/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/snug"
+        },
+        "dark-web": {
+          "alias": "line-height/snug"
+        },
         "light-ios": {
           "alias": "line-height/snug"
         },
@@ -10172,6 +10304,12 @@
       "name": "text/mobile/headline/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/300"
+        },
+        "dark-web": {
+          "alias": "font-size/300"
+        },
         "light-ios": {
           "alias": "font-size/300"
         },
@@ -10190,6 +10328,12 @@
       "name": "text/mobile/headline/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -10208,6 +10352,12 @@
       "name": "text/mobile/label/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/snug"
+        },
+        "dark-web": {
+          "alias": "line-height/snug"
+        },
         "light-ios": {
           "alias": "line-height/snug"
         },
@@ -10226,6 +10376,12 @@
       "name": "text/mobile/label/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/100"
+        },
+        "dark-web": {
+          "alias": "font-size/100"
+        },
         "light-ios": {
           "alias": "font-size/100"
         },
@@ -10244,6 +10400,12 @@
       "name": "text/mobile/label/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -10262,6 +10424,12 @@
       "name": "text/mobile/micro/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/normal"
+        },
+        "dark-web": {
+          "alias": "line-height/normal"
+        },
         "light-ios": {
           "alias": "line-height/normal"
         },
@@ -10280,6 +10448,12 @@
       "name": "text/mobile/micro/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/25"
+        },
+        "dark-web": {
+          "alias": "font-size/25"
+        },
         "light-ios": {
           "alias": "font-size/25"
         },
@@ -10298,6 +10472,12 @@
       "name": "text/mobile/micro/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/regular"
+        },
+        "dark-web": {
+          "alias": "font-weight/regular"
+        },
         "light-ios": {
           "alias": "font-weight/regular"
         },
@@ -10316,6 +10496,12 @@
       "name": "text/mobile/subhead-md/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/snug"
+        },
+        "dark-web": {
+          "alias": "line-height/snug"
+        },
         "light-ios": {
           "alias": "line-height/snug"
         },
@@ -10334,6 +10520,12 @@
       "name": "text/mobile/subhead-md/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/200"
+        },
+        "dark-web": {
+          "alias": "font-size/200"
+        },
         "light-ios": {
           "alias": "font-size/200"
         },
@@ -10352,6 +10544,12 @@
       "name": "text/mobile/subhead-md/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -10370,6 +10568,12 @@
       "name": "text/mobile/subhead-sm/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/snug"
+        },
+        "dark-web": {
+          "alias": "line-height/snug"
+        },
         "light-ios": {
           "alias": "line-height/snug"
         },
@@ -10388,6 +10592,12 @@
       "name": "text/mobile/subhead-sm/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/100"
+        },
+        "dark-web": {
+          "alias": "font-size/100"
+        },
         "light-ios": {
           "alias": "font-size/100"
         },
@@ -10406,6 +10616,12 @@
       "name": "text/mobile/subhead-sm/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -10424,6 +10640,12 @@
       "name": "text/mobile/title-lg/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/snug"
+        },
+        "dark-web": {
+          "alias": "line-height/snug"
+        },
         "light-ios": {
           "alias": "line-height/snug"
         },
@@ -10442,6 +10664,12 @@
       "name": "text/mobile/title-lg/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/700"
+        },
+        "dark-web": {
+          "alias": "font-size/700"
+        },
         "light-ios": {
           "alias": "font-size/700"
         },
@@ -10460,6 +10688,12 @@
       "name": "text/mobile/title-lg/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -10478,6 +10712,12 @@
       "name": "text/mobile/title-md/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/snug"
+        },
+        "dark-web": {
+          "alias": "line-height/snug"
+        },
         "light-ios": {
           "alias": "line-height/snug"
         },
@@ -10496,6 +10736,12 @@
       "name": "text/mobile/title-md/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/600"
+        },
+        "dark-web": {
+          "alias": "font-size/600"
+        },
         "light-ios": {
           "alias": "font-size/600"
         },
@@ -10514,6 +10760,12 @@
       "name": "text/mobile/title-md/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
@@ -10532,6 +10784,12 @@
       "name": "text/mobile/title-sm/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/snug"
+        },
+        "dark-web": {
+          "alias": "line-height/snug"
+        },
         "light-ios": {
           "alias": "line-height/snug"
         },
@@ -10550,6 +10808,12 @@
       "name": "text/mobile/title-sm/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/500"
+        },
+        "dark-web": {
+          "alias": "font-size/500"
+        },
         "light-ios": {
           "alias": "font-size/500"
         },
@@ -10568,6 +10832,12 @@
       "name": "text/mobile/title-sm/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/medium"
+        },
+        "dark-web": {
+          "alias": "font-weight/medium"
+        },
         "light-ios": {
           "alias": "font-weight/medium"
         },
@@ -10586,6 +10856,12 @@
       "name": "text/mobile/title-xl/line",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "line-height/tight"
+        },
+        "dark-web": {
+          "alias": "line-height/tight"
+        },
         "light-ios": {
           "alias": "line-height/tight"
         },
@@ -10604,6 +10880,12 @@
       "name": "text/mobile/title-xl/size",
       "type": "FLOAT",
       "values": {
+        "light-web": {
+          "alias": "font-size/800"
+        },
+        "dark-web": {
+          "alias": "font-size/800"
+        },
         "light-ios": {
           "alias": "font-size/800"
         },
@@ -10622,6 +10904,12 @@
       "name": "text/mobile/title-xl/weight",
       "type": "STRING",
       "values": {
+        "light-web": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-web": {
+          "alias": "font-weight/semibold"
+        },
         "light-ios": {
           "alias": "font-weight/semibold"
         },
