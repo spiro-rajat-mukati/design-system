@@ -160,9 +160,9 @@ export const Typography: Story = {
             <div style={{ width: 120, fontFamily: "var(--font-family-mono)", fontSize: 12, color: "var(--color-text-tertiary)" }}>{role}</div>
             <div
               style={{
-                fontSize: `var(--text-${role}-size)`,
-                lineHeight: `var(--text-${role}-line)`,
-                fontWeight: `var(--text-${role}-weight)`,
+                fontSize: `var(--text-web-${role}-size)`,
+                lineHeight: `var(--text-web-${role}-line)`,
+                fontWeight: `var(--text-web-${role}-weight)`,
                 letterSpacing: role === "overline" ? "var(--letter-spacing-wider)" : undefined,
                 fontFamily: role === "code" ? "var(--font-family-mono)" : "var(--font-family-sans)",
               }}

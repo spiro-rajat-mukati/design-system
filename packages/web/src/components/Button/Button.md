@@ -42,7 +42,7 @@ All other native `<button>` attributes pass through. Refs forwarded to the under
 | Token | Maps to |
 |---|---|
 | `--button-radius` | `--radius-md` |
-| `--button-font-weight` | `--text-label-m-weight` |
+| `--button-font-weight` | `--text-web-label-m-weight` |
 | `--button-primary-bg` | `--color-action-primary-bg` |
 | `--button-primary-bg-hover` | `--color-action-primary-bg-hover` |
 | `--button-primary-bg-active` | `--color-action-primary-bg-active` |

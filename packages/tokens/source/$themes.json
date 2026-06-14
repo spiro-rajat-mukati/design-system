@@ -5,6 +5,7 @@
     "group": "Theme",
     "selectedTokenSets": {
       "core": "source",
+      "text-web": "enabled",
       "color-light": "enabled",
       "components": "enabled",
       "platform-web": "enabled"
@@ -16,6 +17,7 @@
     "group": "Theme",
     "selectedTokenSets": {
       "core": "source",
+      "text-web": "enabled",
       "color-dark": "enabled",
       "components": "enabled",
       "components-dark": "enabled",
@@ -28,6 +30,7 @@
     "group": "Platform",
     "selectedTokenSets": {
       "core": "source",
+      "text-mobile": "enabled",
       "color-light": "enabled",
       "components": "enabled",
       "platform-ios": "enabled"
@@ -39,6 +42,7 @@
     "group": "Platform",
     "selectedTokenSets": {
       "core": "source",
+      "text-mobile": "enabled",
       "color-dark": "enabled",
       "components": "enabled",
       "components-dark": "enabled",
@@ -51,6 +55,7 @@
     "group": "Platform",
     "selectedTokenSets": {
       "core": "source",
+      "text-mobile": "enabled",
       "color-light": "enabled",
       "components": "enabled",
       "platform-android": "enabled"
@@ -62,6 +67,7 @@
     "group": "Platform",
     "selectedTokenSets": {
       "core": "source",
+      "text-mobile": "enabled",
       "color-dark": "enabled",
       "components": "enabled",
       "components-dark": "enabled",

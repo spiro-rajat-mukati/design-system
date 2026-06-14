@@ -6,7 +6,7 @@
   --button-radius: var(--radius-md);
   --button-border-width: var(--border-width-1);
   --button-font-family: var(--font-family-sans);
-  --button-font-weight: var(--text-label-m-weight);
+  --button-font-weight: var(--text-web-label-m-weight);
   --button-letter-spacing: var(--letter-spacing-normal);
   --button-icon-gap: var(--space-2);
   --button-transition: background-color var(--duration-base) var(--ease-in-out), color var(--duration-base) var(--ease-in-out), border-color var(--duration-base) var(--ease-in-out), box-shadow var(--duration-fast) var(--ease-out);
@@ -67,13 +67,13 @@
 
   /* ---------- field ---------- */
   --field-label-color: var(--color-text-primary);
-  --field-label-size: var(--text-label-m-size);
-  --field-label-weight: var(--text-label-m-weight);
-  --field-label-line: var(--text-label-m-line);
+  --field-label-size: var(--text-web-label-m-size);
+  --field-label-weight: var(--text-web-label-m-weight);
+  --field-label-line: var(--text-web-label-m-line);
   --field-label-gap: var(--space-2);
   --field-helper-color: var(--color-text-tertiary);
-  --field-helper-size: var(--text-caption-size);
-  --field-helper-line: var(--text-caption-line);
+  --field-helper-size: var(--text-web-caption-size);
+  --field-helper-line: var(--text-web-caption-line);
   --field-error-color: var(--color-text-danger);
   --field-success-color: var(--color-text-success);
   --field-required-color: var(--color-text-danger);
@@ -94,8 +94,8 @@
   --input-radius: var(--radius-md);
   --input-border-width: var(--border-width-1);
   --input-font-family: var(--font-family-sans);
-  --input-font-size: var(--text-body-s-size);
-  --input-line-height: var(--text-body-s-line);
+  --input-font-size: var(--text-web-body-s-size);
+  --input-line-height: var(--text-web-body-s-line);
   --input-transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   --input-focus-ring: 0 0 0 3px rgba(60, 97, 221, 0.20);
   --input-focus-ring-error: 0 0 0 3px rgba(220, 38, 38, 0.20);

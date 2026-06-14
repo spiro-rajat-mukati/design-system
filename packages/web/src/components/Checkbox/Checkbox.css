@@ -5,8 +5,8 @@
   cursor: pointer;
   color: var(--checkbox-label-color);
   font-family: var(--font-family-sans);
-  font-size: var(--text-body-s-size);
-  line-height: var(--text-body-s-line);
+  font-size: var(--text-web-body-s-size);
+  line-height: var(--text-web-body-s-line);
 }
 .ds-checkbox--disabled { cursor: not-allowed; opacity: var(--opacity-60); }
 

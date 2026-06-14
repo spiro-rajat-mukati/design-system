@@ -1,6 +1,8 @@
 {
   "tokenSetOrder": [
     "core",
+    "text-web",
+    "text-mobile",
     "color-light",
     "color-dark",
     "components",
