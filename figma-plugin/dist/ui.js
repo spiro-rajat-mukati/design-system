@@ -101,7 +101,7 @@ async function ghFetchMeta(repoPath, ref) {
   }
   return resp.json();
 }
-const ALL_BTNS = ["sync-tokens", "btn-diff", "btn-pull", "btn-push", "sync-text-styles", "generate-foundations", "generate-components", "save-pat"];
+const ALL_BTNS = ["sync-tokens", "btn-diff", "btn-pull", "btn-push", "sync-text-styles", "ensure-text-styles", "generate-foundations", "generate-components", "save-pat"];
 function setBusy(busy) {
   for (const id of ALL_BTNS) {
     const el = document.getElementById(id);
@@ -713,6 +713,86 @@ function renderPushPreview(changes) {
   return html;
 }
 let pushState = null;
+let ensureTsPreviewData = null;
+function renderEnsureTextStylesPreview(preview) {
+  if (preview.error) return '<div class="panel-error">' + esc(preview.error) + "</div>";
+  const s = preview.summary;
+  let html = '<div class="ets-summary">';
+  if (s.create > 0) html += '<span class="pill added">' + s.create + " to create</span>";
+  if (s.update > 0) html += '<span class="pill changed">' + s.update + " to update</span>";
+  if (s.alreadyCorrect > 0) html += '<span class="pill ok">' + s.alreadyCorrect + " already correct</span>";
+  if (s.skippedMissing > 0) html += '<span class="pill removed">' + s.skippedMissing + " skipped (missing vars)</span>";
+  if (s.create === 0 && s.update === 0 && s.skippedMissing === 0) {
+    html += '<span class="pill ok">\u2713 All styles already bound correctly</span>';
+  }
+  html += "</div>";
+  if (preview.rows.length > 0) {
+    html += '<table class="ets-table"><thead><tr><th>Action</th><th>Style</th><th>Variables (Foundations)</th></tr></thead><tbody>';
+    for (let i = 0; i < preview.rows.length; i++) {
+      const row = preview.rows[i];
+      const cls = row.action === "create" ? "create" : row.action === "update" ? "update" : "correct";
+      const lbl = row.action === "already-correct" ? "\u2713 correct" : row.action;
+      const vn = row.varNames;
+      html += "<tr>";
+      html += '<td><span class="ets-badge ' + cls + '">' + esc(lbl) + "</span></td>";
+      html += '<td class="ets-style">' + esc(row.styleName) + "</td>";
+      html += "<td>";
+      html += '<div class="ets-var">size \u2192 ' + esc(vn.size) + "</div>";
+      html += '<div class="ets-var">line \u2192 ' + esc(vn.line) + "</div>";
+      html += '<div class="ets-var">weight \u2192 ' + esc(vn.weight) + "</div>";
+      html += '<div class="ets-var">family \u2192 ' + esc(vn.family) + "</div>";
+      if (vn.spacing) html += '<div class="ets-var">spacing \u2192 ' + esc(vn.spacing) + " <em>(literal)</em></div>";
+      html += "</td>";
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+  }
+  if (preview.missingVars && preview.missingVars.length > 0) {
+    html += '<div class="ets-missing"><strong>' + preview.missingVars.length + " role" + (preview.missingVars.length > 1 ? "s" : "") + " skipped \u2014 vars not in library:</strong>";
+    for (let j = 0; j < preview.missingVars.length; j++) {
+      const mv = preview.missingVars[j];
+      html += "<div>" + esc(mv.styleName) + ": " + mv.missing.map(function(m) {
+        return esc(m);
+      }).join(", ") + "</div>";
+    }
+    html += "</div>";
+  }
+  return html;
+}
+function closeEnsureTsPanel() {
+  document.getElementById("ensure-ts-panel").hidden = true;
+  ensureTsPreviewData = null;
+  document.getElementById("ensure-ts-apply").disabled = true;
+  document.getElementById("ensure-ts-preview-btn").disabled = false;
+  document.getElementById("ensure-ts-cancel").disabled = false;
+  document.getElementById("ensure-ts-preview-area").innerHTML = '<p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Preview</strong> to check existing styles and show what will change. Foundations must be enabled as a library in this file.</p>';
+  setBusy(false);
+}
+document.getElementById("ensure-text-styles").addEventListener("click", function() {
+  document.getElementById("ensure-ts-panel").hidden = false;
+  setBusy(true);
+  parent.postMessage({ pluginMessage: { type: "get-file-info" } }, "*");
+});
+document.getElementById("close-ensure-ts").addEventListener("click", closeEnsureTsPanel);
+document.getElementById("ensure-ts-cancel").addEventListener("click", closeEnsureTsPanel);
+document.getElementById("ensure-ts-preview-btn").addEventListener("click", function() {
+  const platform = document.querySelector('[name="ets-platform"]:checked').value;
+  document.getElementById("ensure-ts-preview-area").innerHTML = '<div class="line muted">Computing preview\u2026</div>';
+  document.getElementById("ensure-ts-apply").disabled = true;
+  ensureTsPreviewData = null;
+  setBusy(true);
+  parent.postMessage({ pluginMessage: { type: "ensure-text-styles-preview", platform } }, "*");
+});
+document.getElementById("ensure-ts-apply").addEventListener("click", function() {
+  if (!ensureTsPreviewData) return;
+  const platform = document.querySelector('[name="ets-platform"]:checked').value;
+  document.getElementById("ensure-ts-apply").disabled = true;
+  document.getElementById("ensure-ts-preview-btn").disabled = true;
+  document.getElementById("ensure-ts-cancel").disabled = true;
+  log("Applying Text Styles for " + platform + "\u2026", "muted");
+  setBusy(true);
+  parent.postMessage({ pluginMessage: { type: "ensure-text-styles-apply", platform } }, "*");
+});
 document.getElementById("sync-tokens").addEventListener("click", async () => {
   setBusy(true);
   log("Fetching tokens via GitHub API\u2026", "muted");
@@ -925,6 +1005,38 @@ window.onmessage = (event) => {
       setBusy(false);
       break;
     }
+    case "file-info": {
+      const isMobile = /mobile/i.test(msg.fileName || "");
+      document.getElementById(isMobile ? "ets-mobile" : "ets-web").checked = true;
+      setBusy(false);
+      break;
+    }
+    case "ensure-ts-preview-result": {
+      const prev = msg.preview;
+      ensureTsPreviewData = prev;
+      document.getElementById("ensure-ts-preview-area").innerHTML = renderEnsureTextStylesPreview(prev);
+      if (!prev.error && (prev.summary.create > 0 || prev.summary.update > 0)) {
+        document.getElementById("ensure-ts-apply").disabled = false;
+      }
+      if (prev.fileName) {
+        const isMobile2 = /mobile/i.test(prev.fileName);
+        document.getElementById(isMobile2 ? "ets-mobile" : "ets-web").checked = true;
+      }
+      setBusy(false);
+      break;
+    }
+    case "ensure-text-styles-done":
+      document.getElementById("ensure-ts-panel").hidden = true;
+      ensureTsPreviewData = null;
+      log(
+        "Ensure Text Styles: " + (msg.created || 0) + " created, " + (msg.updated || 0) + " updated, " + (msg.skipped || 0) + " already-correct" + (msg.failures > 0 ? ", " + msg.failures + " failed" : ""),
+        msg.failures > 0 ? "warn" : "ok"
+      );
+      document.getElementById("ensure-ts-apply").disabled = true;
+      document.getElementById("ensure-ts-preview-btn").disabled = false;
+      document.getElementById("ensure-ts-cancel").disabled = false;
+      setBusy(false);
+      break;
     case "log":
       log(msg.text, msg.kind || "info");
       break;

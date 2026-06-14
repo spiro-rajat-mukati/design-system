@@ -127,6 +127,23 @@
   .push-scope-note strong { color:var(--fg); }
   .pr-link { display:inline-block; margin-top:8px; font-size:11px; color:var(--action-bg); text-decoration:underline; word-break:break-all; }
   .push-ok { color:var(--success); font-size:12px; padding:16px 0; }
+
+  /* Ensure Text Styles overlay */
+  .ets-platform { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .ets-plabel { font-size:10px; font-weight:600; color:var(--fg-muted); text-transform:uppercase; letter-spacing:.05em; }
+  .ets-radio { display:flex; align-items:center; gap:4px; cursor:pointer; font-size:12px; }
+  .ets-summary { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+  .ets-table { width:100%; border-collapse:collapse; font-size:11px; }
+  .ets-table th { text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); padding:4px 6px 6px; border-bottom:2px solid var(--border); }
+  .ets-table td { padding:5px 6px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .ets-table tr:last-child td { border-bottom:none; }
+  .ets-badge { display:inline-block; padding:1px 7px; border-radius:9999px; font-size:10px; font-weight:600; white-space:nowrap; }
+  .ets-badge.create  { background:var(--added-bg);   color:var(--added-fg); }
+  .ets-badge.update  { background:var(--changed-bg); color:var(--changed-fg); }
+  .ets-badge.correct { background:var(--bg-sunken);  color:var(--fg-muted); }
+  .ets-style { font-family:ui-monospace,monospace; font-size:10px; word-break:break-word; }
+  .ets-var   { font-family:ui-monospace,monospace; font-size:9px; color:var(--fg-muted); line-height:1.6; }
+  .ets-missing { border-radius:6px; padding:8px 10px; margin-top:8px; color:var(--removed-fg); font-size:11px; background:var(--removed-bg); }
 </style>
 </head>
 <body>
@@ -149,7 +166,8 @@
   <button id="btn-push" class="secondary">Push Figma → GitHub (create PR)</button>
 
   <div class="group-label">Styles &amp; components</div>
-  <button id="sync-text-styles" class="secondary">Sync Text Styles</button>
+  <button id="sync-text-styles" class="secondary">Sync Text Styles (Foundations)</button>
+  <button id="ensure-text-styles" class="secondary">Ensure Text Styles (Web / Mobile)</button>
   <button id="generate-foundations" class="secondary">Generate Foundations pages</button>
   <button id="generate-components" class="secondary">Generate components</button>
 </div>
@@ -208,6 +226,29 @@
   <div class="ov-body" id="diff-body"><!-- populated by renderDiff() --></div>
 </div>
 
+
+<!-- ═══════════ ENSURE TEXT STYLES OVERLAY ═══════════ -->
+<div id="ensure-ts-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">Ensure Text Styles</span>
+    <button class="ov-close" id="close-ensure-ts" title="Close">✕</button>
+  </div>
+  <div class="ov-body" id="ensure-ts-body">
+    <div class="ets-platform">
+      <span class="ets-plabel">Platform:</span>
+      <label class="ets-radio"><input type="radio" name="ets-platform" id="ets-web" value="web" checked /> Web (18 roles)</label>
+      <label class="ets-radio"><input type="radio" name="ets-platform" id="ets-mobile" value="mobile" /> Mobile (16 roles)</label>
+    </div>
+    <div id="ensure-ts-preview-area">
+      <p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Preview</strong> to check existing styles and show what will change. Foundations must be enabled as a library in this file.</p>
+    </div>
+  </div>
+  <div class="ov-footer">
+    <button class="secondary" id="ensure-ts-cancel">Cancel</button>
+    <button class="secondary" id="ensure-ts-preview-btn">Preview</button>
+    <button id="ensure-ts-apply" disabled>Apply</button>
+  </div>
+</div>
 
 <script>
 window.addEventListener("error", (e) => {
@@ -313,7 +354,7 @@ async function ghFetchMeta(repoPath, ref) {
   }
   return resp.json();
 }
-const ALL_BTNS = ["sync-tokens", "btn-diff", "btn-pull", "btn-push", "sync-text-styles", "generate-foundations", "generate-components", "save-pat"];
+const ALL_BTNS = ["sync-tokens", "btn-diff", "btn-pull", "btn-push", "sync-text-styles", "ensure-text-styles", "generate-foundations", "generate-components", "save-pat"];
 function setBusy(busy) {
   for (const id of ALL_BTNS) {
     const el = document.getElementById(id);
@@ -925,6 +966,86 @@ function renderPushPreview(changes) {
   return html;
 }
 let pushState = null;
+let ensureTsPreviewData = null;
+function renderEnsureTextStylesPreview(preview) {
+  if (preview.error) return '<div class="panel-error">' + esc(preview.error) + "</div>";
+  const s = preview.summary;
+  let html = '<div class="ets-summary">';
+  if (s.create > 0) html += '<span class="pill added">' + s.create + " to create</span>";
+  if (s.update > 0) html += '<span class="pill changed">' + s.update + " to update</span>";
+  if (s.alreadyCorrect > 0) html += '<span class="pill ok">' + s.alreadyCorrect + " already correct</span>";
+  if (s.skippedMissing > 0) html += '<span class="pill removed">' + s.skippedMissing + " skipped (missing vars)</span>";
+  if (s.create === 0 && s.update === 0 && s.skippedMissing === 0) {
+    html += '<span class="pill ok">\u2713 All styles already bound correctly</span>';
+  }
+  html += "</div>";
+  if (preview.rows.length > 0) {
+    html += '<table class="ets-table"><thead><tr><th>Action</th><th>Style</th><th>Variables (Foundations)</th></tr></thead><tbody>';
+    for (let i = 0; i < preview.rows.length; i++) {
+      const row = preview.rows[i];
+      const cls = row.action === "create" ? "create" : row.action === "update" ? "update" : "correct";
+      const lbl = row.action === "already-correct" ? "\u2713 correct" : row.action;
+      const vn = row.varNames;
+      html += "<tr>";
+      html += '<td><span class="ets-badge ' + cls + '">' + esc(lbl) + "</span></td>";
+      html += '<td class="ets-style">' + esc(row.styleName) + "</td>";
+      html += "<td>";
+      html += '<div class="ets-var">size \u2192 ' + esc(vn.size) + "</div>";
+      html += '<div class="ets-var">line \u2192 ' + esc(vn.line) + "</div>";
+      html += '<div class="ets-var">weight \u2192 ' + esc(vn.weight) + "</div>";
+      html += '<div class="ets-var">family \u2192 ' + esc(vn.family) + "</div>";
+      if (vn.spacing) html += '<div class="ets-var">spacing \u2192 ' + esc(vn.spacing) + " <em>(literal)</em></div>";
+      html += "</td>";
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+  }
+  if (preview.missingVars && preview.missingVars.length > 0) {
+    html += '<div class="ets-missing"><strong>' + preview.missingVars.length + " role" + (preview.missingVars.length > 1 ? "s" : "") + " skipped \u2014 vars not in library:</strong>";
+    for (let j = 0; j < preview.missingVars.length; j++) {
+      const mv = preview.missingVars[j];
+      html += "<div>" + esc(mv.styleName) + ": " + mv.missing.map(function(m) {
+        return esc(m);
+      }).join(", ") + "</div>";
+    }
+    html += "</div>";
+  }
+  return html;
+}
+function closeEnsureTsPanel() {
+  document.getElementById("ensure-ts-panel").hidden = true;
+  ensureTsPreviewData = null;
+  document.getElementById("ensure-ts-apply").disabled = true;
+  document.getElementById("ensure-ts-preview-btn").disabled = false;
+  document.getElementById("ensure-ts-cancel").disabled = false;
+  document.getElementById("ensure-ts-preview-area").innerHTML = '<p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Preview</strong> to check existing styles and show what will change. Foundations must be enabled as a library in this file.</p>';
+  setBusy(false);
+}
+document.getElementById("ensure-text-styles").addEventListener("click", function() {
+  document.getElementById("ensure-ts-panel").hidden = false;
+  setBusy(true);
+  parent.postMessage({ pluginMessage: { type: "get-file-info" } }, "*");
+});
+document.getElementById("close-ensure-ts").addEventListener("click", closeEnsureTsPanel);
+document.getElementById("ensure-ts-cancel").addEventListener("click", closeEnsureTsPanel);
+document.getElementById("ensure-ts-preview-btn").addEventListener("click", function() {
+  const platform = document.querySelector('[name="ets-platform"]:checked').value;
+  document.getElementById("ensure-ts-preview-area").innerHTML = '<div class="line muted">Computing preview\u2026</div>';
+  document.getElementById("ensure-ts-apply").disabled = true;
+  ensureTsPreviewData = null;
+  setBusy(true);
+  parent.postMessage({ pluginMessage: { type: "ensure-text-styles-preview", platform } }, "*");
+});
+document.getElementById("ensure-ts-apply").addEventListener("click", function() {
+  if (!ensureTsPreviewData) return;
+  const platform = document.querySelector('[name="ets-platform"]:checked').value;
+  document.getElementById("ensure-ts-apply").disabled = true;
+  document.getElementById("ensure-ts-preview-btn").disabled = true;
+  document.getElementById("ensure-ts-cancel").disabled = true;
+  log("Applying Text Styles for " + platform + "\u2026", "muted");
+  setBusy(true);
+  parent.postMessage({ pluginMessage: { type: "ensure-text-styles-apply", platform } }, "*");
+});
 document.getElementById("sync-tokens").addEventListener("click", async () => {
   setBusy(true);
   log("Fetching tokens via GitHub API\u2026", "muted");
@@ -1137,6 +1258,38 @@ window.onmessage = (event) => {
       setBusy(false);
       break;
     }
+    case "file-info": {
+      const isMobile = /mobile/i.test(msg.fileName || "");
+      document.getElementById(isMobile ? "ets-mobile" : "ets-web").checked = true;
+      setBusy(false);
+      break;
+    }
+    case "ensure-ts-preview-result": {
+      const prev = msg.preview;
+      ensureTsPreviewData = prev;
+      document.getElementById("ensure-ts-preview-area").innerHTML = renderEnsureTextStylesPreview(prev);
+      if (!prev.error && (prev.summary.create > 0 || prev.summary.update > 0)) {
+        document.getElementById("ensure-ts-apply").disabled = false;
+      }
+      if (prev.fileName) {
+        const isMobile2 = /mobile/i.test(prev.fileName);
+        document.getElementById(isMobile2 ? "ets-mobile" : "ets-web").checked = true;
+      }
+      setBusy(false);
+      break;
+    }
+    case "ensure-text-styles-done":
+      document.getElementById("ensure-ts-panel").hidden = true;
+      ensureTsPreviewData = null;
+      log(
+        "Ensure Text Styles: " + (msg.created || 0) + " created, " + (msg.updated || 0) + " updated, " + (msg.skipped || 0) + " already-correct" + (msg.failures > 0 ? ", " + msg.failures + " failed" : ""),
+        msg.failures > 0 ? "warn" : "ok"
+      );
+      document.getElementById("ensure-ts-apply").disabled = true;
+      document.getElementById("ensure-ts-preview-btn").disabled = false;
+      document.getElementById("ensure-ts-cancel").disabled = false;
+      setBusy(false);
+      break;
     case "log":
       log(msg.text, msg.kind || "info");
       break;
