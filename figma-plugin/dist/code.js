@@ -1203,12 +1203,20 @@ function normalizeFigmaValStr(raw, type) {
     return "alias:" + (t ? t.name : "?");
   }
   if (type === "COLOR") return normalizeFigmaColorRGBA(raw) || String(raw);
+  if (type === "FLOAT") {
+    const n = typeof raw === "number" ? raw : parseFloat(String(raw));
+    return isFinite(n) ? String(Math.fround(n)) : String(raw != null ? raw : "");
+  }
   return String(raw != null ? raw : "");
 }
 function normalizeRepoValStr(entry, type) {
   if (!entry) return "";
   if (entry.alias) return "alias:" + entry.alias;
   if (type === "COLOR") return normalizeRepoColorStr(entry.value);
+  if (type === "FLOAT") {
+    const n = typeof entry.value === "number" ? entry.value : parseFloat(String(entry.value));
+    return isFinite(n) ? String(Math.fround(n)) : String(entry.value != null ? entry.value : "");
+  }
   return String(entry.value != null ? entry.value : "");
 }
 function figmaValLabel(raw, type) {
