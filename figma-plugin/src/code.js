@@ -642,7 +642,7 @@ async function buildText(spec, ctx, varIndex) {
     // Variable's numeric value (our line-height tokens hold 110, 125, 150…).
     const lineNum = resolveLiteral(spec.lineHeight, ctx, varIndex);
     if (lineNum != null) {
-      try { text.lineHeight = { value: lineNum, unit: "PERCENT" }; } catch (e) {}
+      try { text.lineHeight = { value: lineNum, unit: "PIXELS" }; } catch (e) {}
     }
     tryBindRange("lineHeight", spec.lineHeight);
   }
@@ -929,7 +929,7 @@ async function syncTextStyles() {
     if (lineVar) {
       const lineNum = resolveVariableValue(lineVar);
       if (typeof lineNum === "number") {
-        try { textStyle.lineHeight = { value: lineNum, unit: "PERCENT" }; } catch (e) {}
+        try { textStyle.lineHeight = { value: lineNum, unit: "PIXELS" }; } catch (e) {}
       }
     }
 
@@ -1631,7 +1631,7 @@ async function applyEnsureTextStyles(platform) {
     // Set literal props first (establishes unit context for lineHeight PERCENT)
     try { existingStyle.fontName  = { family: family, style: styleStr }; } catch (e) {}
     try { existingStyle.fontSize  = sizePx; } catch (e) {}
-    try { existingStyle.lineHeight = { value: lineNum, unit: "PERCENT" }; } catch (e) {}
+    try { existingStyle.lineHeight = { value: lineNum, unit: "PIXELS" }; } catch (e) {}
 
     // letterSpacing for overline: STRING var can't bind as FLOAT — apply literal
     if (spacingImported) {

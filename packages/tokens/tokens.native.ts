@@ -331,93 +331,93 @@ export const themes = {
     "web": {
       "display-l": {
         "size": "48px",
-        "line": "1.1",
+        "line": "53",
         "weight": "600"
       },
       "display-m": {
         "size": "36px",
-        "line": "1.1",
+        "line": "40",
         "weight": "600"
       },
       "display-s": {
         "size": "30px",
-        "line": "1.1",
+        "line": "33",
         "weight": "600"
       },
       "heading-1": {
         "size": "30px",
-        "line": "1.25",
+        "line": "38",
         "weight": "600"
       },
       "heading-2": {
         "size": "24px",
-        "line": "1.25",
+        "line": "30",
         "weight": "600"
       },
       "heading-3": {
         "size": "20px",
-        "line": "1.25",
+        "line": "25",
         "weight": "600"
       },
       "heading-4": {
         "size": "18px",
-        "line": "1.25",
+        "line": "23",
         "weight": "600"
       },
       "heading-5": {
         "size": "16px",
-        "line": "1.25",
+        "line": "20",
         "weight": "600"
       },
       "heading-6": {
         "size": "14px",
-        "line": "1.25",
+        "line": "18",
         "weight": "600"
       },
       "body-l": {
         "size": "18px",
-        "line": "1.5",
+        "line": "27",
         "weight": "400"
       },
       "body-m": {
         "size": "16px",
-        "line": "1.5",
+        "line": "24",
         "weight": "400"
       },
       "body-s": {
         "size": "14px",
-        "line": "1.5",
+        "line": "21",
         "weight": "400"
       },
       "label-l": {
         "size": "16px",
-        "line": "1.25",
+        "line": "20",
         "weight": "500"
       },
       "label-m": {
         "size": "14px",
-        "line": "1.25",
+        "line": "18",
         "weight": "500"
       },
       "label-s": {
         "size": "12px",
-        "line": "1.25",
+        "line": "15",
         "weight": "500"
       },
       "caption": {
         "size": "12px",
-        "line": "1.5",
+        "line": "18",
         "weight": "400"
       },
       "code": {
         "size": "14px",
-        "line": "1.5",
+        "line": "21",
         "weight": "400",
         "family": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
       },
       "overline": {
         "size": "11px",
-        "line": "1.25",
+        "line": "14",
         "weight": "600",
         "spacing": "0.08em"
       }
@@ -425,82 +425,82 @@ export const themes = {
     "mobile": {
       "title-xl": {
         "size": "36px",
-        "line": "1.1",
+        "line": "40",
         "weight": "600"
       },
       "title-lg": {
         "size": "30px",
-        "line": "1.25",
+        "line": "38",
         "weight": "600"
       },
       "title-md": {
         "size": "24px",
-        "line": "1.25",
+        "line": "30",
         "weight": "600"
       },
       "title-sm": {
         "size": "20px",
-        "line": "1.25",
+        "line": "25",
         "weight": "500"
       },
       "headline": {
         "size": "16px",
-        "line": "1.25",
+        "line": "20",
         "weight": "600"
       },
       "body-lg-regular": {
         "size": "16px",
-        "line": "1.5",
+        "line": "24",
         "weight": "400"
       },
       "body-lg-semibold": {
         "size": "16px",
-        "line": "1.5",
+        "line": "24",
         "weight": "600"
       },
       "body-md-regular": {
         "size": "14px",
-        "line": "1.5",
+        "line": "21",
         "weight": "400"
       },
       "body-md-semibold": {
         "size": "14px",
-        "line": "1.5",
+        "line": "21",
         "weight": "600"
       },
       "body-sm-regular": {
         "size": "12px",
-        "line": "1.5",
+        "line": "18",
         "weight": "400"
       },
       "body-sm-semibold": {
         "size": "12px",
-        "line": "1.5",
+        "line": "18",
         "weight": "600"
       },
       "subhead-md": {
         "size": "14px",
-        "line": "1.25",
+        "line": "18",
         "weight": "600"
       },
       "subhead-sm": {
         "size": "12px",
-        "line": "1.25",
+        "line": "15",
         "weight": "600"
       },
       "label": {
         "size": "12px",
-        "line": "1.25",
+        "line": "15",
         "weight": "600"
       },
       "caption": {
         "size": "11px",
-        "line": "1.5",
+        "line": "17",
         "weight": "400"
       },
       "micro": {
         "size": "10px",
-        "line": "1.5",
+        "line": "15",
         "weight": "400"
       }
     }
@@ -1135,93 +1135,93 @@ export const themes = {
     "web": {
       "display-l": {
         "size": "48px",
-        "line": "1.1",
+        "line": "53",
         "weight": "600"
       },
       "display-m": {
         "size": "36px",
-        "line": "1.1",
+        "line": "40",
         "weight": "600"
       },
       "display-s": {
         "size": "30px",
-        "line": "1.1",
+        "line": "33",
         "weight": "600"
       },
       "heading-1": {
         "size": "30px",
-        "line": "1.25",
+        "line": "38",
         "weight": "600"
       },
       "heading-2": {
         "size": "24px",
-        "line": "1.25",
+        "line": "30",
         "weight": "600"
       },
       "heading-3": {
         "size": "20px",
-        "line": "1.25",
+        "line": "25",
         "weight": "600"
       },
       "heading-4": {
         "size": "18px",
-        "line": "1.25",
+        "line": "23",
         "weight": "600"
       },
       "heading-5": {
         "size": "16px",
-        "line": "1.25",
+        "line": "20",
         "weight": "600"
       },
       "heading-6": {
         "size": "14px",
-        "line": "1.25",
+        "line": "18",
         "weight": "600"
       },
       "body-l": {
         "size": "18px",
-        "line": "1.5",
+        "line": "27",
         "weight": "400"
       },
       "body-m": {
         "size": "16px",
-        "line": "1.5",
+        "line": "24",
         "weight": "400"
       },
       "body-s": {
         "size": "14px",
-        "line": "1.5",
+        "line": "21",
         "weight": "400"
       },
       "label-l": {
         "size": "16px",
-        "line": "1.25",
+        "line": "20",
         "weight": "500"
       },
       "label-m": {
         "size": "14px",
-        "line": "1.25",
+        "line": "18",
         "weight": "500"
       },
       "label-s": {
         "size": "12px",
-        "line": "1.25",
+        "line": "15",
         "weight": "500"
       },
       "caption": {
         "size": "12px",
-        "line": "1.5",
+        "line": "18",
         "weight": "400"
       },
       "code": {
         "size": "14px",
-        "line": "1.5",
+        "line": "21",
         "weight": "400",
         "family": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
       },
       "overline": {
         "size": "11px",
-        "line": "1.25",
+        "line": "14",
         "weight": "600",
         "spacing": "0.08em"
       }
@@ -1229,82 +1229,82 @@ export const themes = {
     "mobile": {
       "title-xl": {
         "size": "36px",
-        "line": "1.1",
+        "line": "40",
         "weight": "600"
       },
       "title-lg": {
         "size": "30px",
-        "line": "1.25",
+        "line": "38",
         "weight": "600"
       },
       "title-md": {
         "size": "24px",
-        "line": "1.25",
+        "line": "30",
         "weight": "600"
       },
       "title-sm": {
         "size": "20px",
-        "line": "1.25",
+        "line": "25",
         "weight": "500"
       },
       "headline": {
         "size": "16px",
-        "line": "1.25",
+        "line": "20",
         "weight": "600"
       },
       "body-lg-regular": {
         "size": "16px",
-        "line": "1.5",
+        "line": "24",
         "weight": "400"
       },
       "body-lg-semibold": {
         "size": "16px",
-        "line": "1.5",
+        "line": "24",
         "weight": "600"
       },
       "body-md-regular": {
         "size": "14px",
-        "line": "1.5",
+        "line": "21",
         "weight": "400"
       },
       "body-md-semibold": {
         "size": "14px",
-        "line": "1.5",
+        "line": "21",
         "weight": "600"
       },
       "body-sm-regular": {
         "size": "12px",
-        "line": "1.5",
+        "line": "18",
         "weight": "400"
       },
       "body-sm-semibold": {
         "size": "12px",
-        "line": "1.5",
+        "line": "18",
         "weight": "600"
       },
       "subhead-md": {
         "size": "14px",
-        "line": "1.25",
+        "line": "18",
         "weight": "600"
       },
       "subhead-sm": {
         "size": "12px",
-        "line": "1.25",
+        "line": "15",
         "weight": "600"
       },
       "label": {
         "size": "12px",
-        "line": "1.25",
+        "line": "15",
         "weight": "600"
       },
       "caption": {
         "size": "11px",
-        "line": "1.5",
+        "line": "17",
         "weight": "400"
       },
       "micro": {
         "size": "10px",
-        "line": "1.5",
+        "line": "15",
         "weight": "400"
       }
     }

@@ -577,7 +577,7 @@ async function buildText(spec, ctx, varIndex) {
     const lineNum = resolveLiteral(spec.lineHeight, ctx, varIndex);
     if (lineNum != null) {
       try {
-        text.lineHeight = { value: lineNum, unit: "PERCENT" };
+        text.lineHeight = { value: lineNum, unit: "PIXELS" };
       } catch (e) {
       }
     }
@@ -818,7 +818,7 @@ async function syncTextStyles() {
       const lineNum = resolveVariableValue(lineVar);
       if (typeof lineNum === "number") {
         try {
-          textStyle.lineHeight = { value: lineNum, unit: "PERCENT" };
+          textStyle.lineHeight = { value: lineNum, unit: "PIXELS" };
         } catch (e) {
         }
       }
@@ -1420,7 +1420,7 @@ async function applyEnsureTextStyles(platform) {
     } catch (e) {
     }
     try {
-      existingStyle.lineHeight = { value: lineNum, unit: "PERCENT" };
+      existingStyle.lineHeight = { value: lineNum, unit: "PIXELS" };
     } catch (e) {
     }
     if (spacingImported) {
