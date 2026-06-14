@@ -19,6 +19,82 @@ var __spreadValues = (a, b) => {
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 figma.showUI(__html__, { width: 360, height: 520, themeColors: true });
 const COLLECTION_NAME = "Design System";
+const WEB_ROLES = [
+  "display-l",
+  "display-m",
+  "display-s",
+  "heading-1",
+  "heading-2",
+  "heading-3",
+  "heading-4",
+  "heading-5",
+  "heading-6",
+  "body-l",
+  "body-m",
+  "body-s",
+  "label-l",
+  "label-m",
+  "label-s",
+  "caption",
+  "code",
+  "overline"
+];
+const MOBILE_ROLES = [
+  "title-xl",
+  "title-lg",
+  "title-md",
+  "title-sm",
+  "headline",
+  "body-lg-regular",
+  "body-lg-semibold",
+  "body-md-regular",
+  "body-md-semibold",
+  "body-sm-regular",
+  "body-sm-semibold",
+  "subhead-md",
+  "subhead-sm",
+  "label",
+  "caption",
+  "micro"
+];
+const WEB_STYLE_NAMES = {
+  "display-l": "Web/Display/Large",
+  "display-m": "Web/Display/Medium",
+  "display-s": "Web/Display/Small",
+  "heading-1": "Web/Heading/1",
+  "heading-2": "Web/Heading/2",
+  "heading-3": "Web/Heading/3",
+  "heading-4": "Web/Heading/4",
+  "heading-5": "Web/Heading/5",
+  "heading-6": "Web/Heading/6",
+  "body-l": "Web/Body/Large",
+  "body-m": "Web/Body/Medium",
+  "body-s": "Web/Body/Small",
+  "label-l": "Web/Label/Large",
+  "label-m": "Web/Label/Medium",
+  "label-s": "Web/Label/Small",
+  "caption": "Web/Caption",
+  "code": "Web/Code",
+  "overline": "Web/Overline"
+};
+const MOBILE_STYLE_NAMES = {
+  "title-xl": "Mobile/Title/XL",
+  "title-lg": "Mobile/Title/Large",
+  "title-md": "Mobile/Title/Medium",
+  "title-sm": "Mobile/Title/Small",
+  "headline": "Mobile/Headline",
+  "body-lg-regular": "Mobile/Body/Large/Regular",
+  "body-lg-semibold": "Mobile/Body/Large/Semibold",
+  "body-md-regular": "Mobile/Body/Medium/Regular",
+  "body-md-semibold": "Mobile/Body/Medium/Semibold",
+  "body-sm-regular": "Mobile/Body/Small/Regular",
+  "body-sm-semibold": "Mobile/Body/Small/Semibold",
+  "subhead-md": "Mobile/Subhead/Medium",
+  "subhead-sm": "Mobile/Subhead/Small",
+  "label": "Mobile/Label",
+  "caption": "Mobile/Caption",
+  "micro": "Mobile/Micro"
+};
 const FONT_FAMILIES = ["Inter", "Menlo", "Georgia"];
 const FONT_STYLES = ["Regular", "Medium", "Semi Bold", "Bold"];
 const fontsReady = Promise.all(
@@ -1168,6 +1244,231 @@ async function generateFoundations() {
   uiLog("Foundations done.", "ok");
   figma.ui.postMessage({ type: "foundations-done" });
 }
+async function findLibraryVars() {
+  if (!figma.teamLibrary || typeof figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync !== "function") {
+    return { error: "Team library API not available \u2014 reload Figma and retry." };
+  }
+  let collections;
+  try {
+    collections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
+  } catch (e) {
+    return { error: "Could not read enabled libraries: " + e.message };
+  }
+  const dsCol = collections.find(function(c) {
+    return c.name === COLLECTION_NAME;
+  });
+  if (!dsCol) {
+    return { error: "'" + COLLECTION_NAME + "' not found in this file's enabled libraries. Go to Resources \u2192 Libraries and enable the Foundations file." };
+  }
+  let libVars;
+  try {
+    libVars = await figma.teamLibrary.getVariablesInLibraryCollectionAsync(dsCol.key);
+  } catch (e) {
+    return { error: "Could not load Foundations variables: " + e.message };
+  }
+  const byName = /* @__PURE__ */ new Map();
+  for (const lv of libVars) byName.set(lv.name, lv);
+  return { byName };
+}
+function roleVarNames(platform, role) {
+  const prefix = "text/" + platform + "/" + role;
+  return {
+    size: prefix + "/size",
+    line: prefix + "/line",
+    weight: prefix + "/weight",
+    family: role === "code" ? "font-family/mono" : "font-family/sans",
+    spacing: role === "overline" ? prefix + "/spacing" : null
+  };
+}
+async function computeEnsureTextStylesPreview(platform) {
+  const roles = platform === "web" ? WEB_ROLES : MOBILE_ROLES;
+  const styleNames = platform === "web" ? WEB_STYLE_NAMES : MOBILE_STYLE_NAMES;
+  const libResult = await findLibraryVars();
+  if (libResult.error) return { error: libResult.error };
+  const byName = libResult.byName;
+  const existingStyles = figma.getLocalTextStyles();
+  const styleByName = new Map(existingStyles.map(function(s) {
+    return [s.name, s];
+  }));
+  const rows = [];
+  const missingVars = [];
+  for (const role of roles) {
+    const styleName = styleNames[role];
+    const vn = roleVarNames(platform, role);
+    if (!byName.has(vn.size) || !byName.has(vn.weight) || !byName.has(vn.family)) {
+      const missing = [];
+      if (!byName.has(vn.size)) missing.push(vn.size);
+      if (!byName.has(vn.weight)) missing.push(vn.weight);
+      if (!byName.has(vn.family)) missing.push(vn.family);
+      missingVars.push({ styleName, missing });
+      continue;
+    }
+    const existing = styleByName.get(styleName) || null;
+    let action = "create";
+    if (existing) {
+      const bv = existing.boundVariables;
+      const bvFs = bv && bv["fontSize"];
+      if (bvFs) {
+        const bound = figma.variables.getVariableById(bvFs.id);
+        action = bound && bound.name === vn.size ? "already-correct" : "update";
+      } else {
+        action = "update";
+      }
+    }
+    rows.push({ role, styleName, action, varNames: vn });
+  }
+  const summary = { create: 0, update: 0, alreadyCorrect: 0, skippedMissing: missingVars.length };
+  for (const row of rows) {
+    if (row.action === "create") summary.create++;
+    else if (row.action === "update") summary.update++;
+    else if (row.action === "already-correct") summary.alreadyCorrect++;
+  }
+  return {
+    platform,
+    rows,
+    missingVars,
+    summary,
+    fileName: figma.root.name
+  };
+}
+async function applyEnsureTextStyles(platform) {
+  const roles = platform === "web" ? WEB_ROLES : MOBILE_ROLES;
+  const styleNames = platform === "web" ? WEB_STYLE_NAMES : MOBILE_STYLE_NAMES;
+  const libResult = await findLibraryVars();
+  if (libResult.error) {
+    uiLog(libResult.error, "err");
+    figma.ui.postMessage({ type: "ensure-text-styles-done", created: 0, updated: 0, skipped: 0, failures: 0 });
+    return;
+  }
+  const byName = libResult.byName;
+  const existingStyles = figma.getLocalTextStyles();
+  const styleByName = new Map(existingStyles.map(function(s) {
+    return [s.name, s];
+  }));
+  let created = 0, updated = 0, skipped = 0, failures = 0;
+  for (const role of roles) {
+    const styleName = styleNames[role];
+    const vn = roleVarNames(platform, role);
+    const libSizeVar = byName.get(vn.size) || null;
+    const libLineVar = byName.get(vn.line) || null;
+    const libWeightVar = byName.get(vn.weight) || null;
+    const libFamilyVar = byName.get(vn.family) || null;
+    const libSpacingVar = vn.spacing ? byName.get(vn.spacing) || null : null;
+    if (!libSizeVar || !libWeightVar || !libFamilyVar) {
+      uiLog("Skip " + styleName + " \u2014 missing Foundations vars", "warn");
+      failures++;
+      continue;
+    }
+    let existingStyle = styleByName.get(styleName) || null;
+    if (existingStyle) {
+      const bv = existingStyle.boundVariables;
+      const bvFs = bv && bv["fontSize"];
+      if (bvFs) {
+        const bound = figma.variables.getVariableById(bvFs.id);
+        if (bound && bound.name === vn.size) {
+          skipped++;
+          continue;
+        }
+      }
+    }
+    let sizeImported, lineImported, weightImported, familyImported, spacingImported;
+    try {
+      sizeImported = await figma.variables.importVariableByKeyAsync(libSizeVar.key);
+      weightImported = await figma.variables.importVariableByKeyAsync(libWeightVar.key);
+      familyImported = await figma.variables.importVariableByKeyAsync(libFamilyVar.key);
+      if (libLineVar) lineImported = await figma.variables.importVariableByKeyAsync(libLineVar.key);
+      if (libSpacingVar) spacingImported = await figma.variables.importVariableByKeyAsync(libSpacingVar.key);
+    } catch (e) {
+      uiLog("Import failed for " + styleName + ": " + e.message, "warn");
+      failures++;
+      continue;
+    }
+    let family = "Inter";
+    let styleStr = "Regular";
+    let sizePx = 14;
+    let lineNum = 125;
+    const fr = resolveVariableValue(familyImported);
+    if (typeof fr === "string" && fr.length > 0) family = fr;
+    const wr = resolveVariableValue(weightImported);
+    if (typeof wr === "string" && wr.length > 0) styleStr = wr;
+    const sr = resolveVariableValue(sizeImported);
+    if (typeof sr === "number" && isFinite(sr)) sizePx = sr;
+    if (lineImported) {
+      const lr = resolveVariableValue(lineImported);
+      if (typeof lr === "number" && isFinite(lr)) lineNum = lr;
+    }
+    await figma.loadFontAsync({ family, style: styleStr }).catch(function() {
+    });
+    const isNew = !existingStyle;
+    if (!existingStyle) {
+      try {
+        existingStyle = figma.createTextStyle();
+        existingStyle.name = styleName;
+        styleByName.set(styleName, existingStyle);
+      } catch (e) {
+        uiLog("Cannot create style " + styleName + ": " + e.message, "err");
+        failures++;
+        continue;
+      }
+    }
+    try {
+      existingStyle.fontName = { family, style: styleStr };
+    } catch (e) {
+    }
+    try {
+      existingStyle.fontSize = sizePx;
+    } catch (e) {
+    }
+    try {
+      existingStyle.lineHeight = { value: lineNum, unit: "PERCENT" };
+    } catch (e) {
+    }
+    if (spacingImported) {
+      const spacingVal = resolveVariableValue(spacingImported);
+      if (typeof spacingVal === "string" && spacingVal.endsWith("em")) {
+        const n = parseFloat(spacingVal);
+        if (isFinite(n)) try {
+          existingStyle.letterSpacing = { value: n * 100, unit: "PERCENT" };
+        } catch (e) {
+        }
+      }
+    }
+    try {
+      existingStyle.setBoundVariable("fontFamily", familyImported);
+    } catch (e) {
+      uiLog("  \xB7 " + styleName + " fontFamily: " + e.message, "warn");
+    }
+    try {
+      existingStyle.setBoundVariable("fontStyle", weightImported);
+    } catch (e) {
+      uiLog("  \xB7 " + styleName + " fontStyle: " + e.message, "warn");
+    }
+    try {
+      existingStyle.setBoundVariable("fontSize", sizeImported);
+    } catch (e) {
+      uiLog("  \xB7 " + styleName + " fontSize: " + e.message, "warn");
+    }
+    if (lineImported) {
+      try {
+        existingStyle.setBoundVariable("lineHeight", lineImported);
+      } catch (e) {
+        uiLog("  \xB7 " + styleName + " lineHeight: " + e.message, "warn");
+      }
+    }
+    if (isNew) {
+      created++;
+      uiLog("  \xB7 Created: " + styleName, "ok");
+    } else {
+      updated++;
+      uiLog("  \xB7 Updated: " + styleName, "ok");
+    }
+  }
+  uiLog(
+    "Done \u2014 " + created + " created, " + updated + " updated, " + skipped + " already-correct" + (failures > 0 ? ", " + failures + " failed" : ""),
+    failures > 0 ? "warn" : "ok"
+  );
+  figma.ui.postMessage({ type: "ensure-text-styles-done", created, updated, skipped, failures });
+}
 function normalizeRepoColorStr(str) {
   str = String(str || "").trim().toLowerCase();
   if (str === "transparent") return "#00000000";
@@ -1564,6 +1865,14 @@ figma.ui.onmessage = async (msg) => {
     } else if (msg.type === "set-pat") {
       await figma.clientStorage.setAsync(PAT_KEY, msg.pat);
       figma.ui.postMessage({ type: "pat-saved", pat: msg.pat });
+    } else if (msg.type === "get-file-info") {
+      figma.ui.postMessage({ type: "file-info", fileName: figma.root.name });
+    } else if (msg.type === "ensure-text-styles-preview") {
+      const preview = await computeEnsureTextStylesPreview(msg.platform);
+      figma.ui.postMessage({ type: "ensure-ts-preview-result", preview });
+    } else if (msg.type === "ensure-text-styles-apply") {
+      await fontsReady;
+      await applyEnsureTextStyles(msg.platform);
     } else if (msg.type === "sync-tokens") {
       await fontsReady;
       syncTokens(msg.data);

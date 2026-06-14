@@ -127,6 +127,23 @@
   .push-scope-note strong { color:var(--fg); }
   .pr-link { display:inline-block; margin-top:8px; font-size:11px; color:var(--action-bg); text-decoration:underline; word-break:break-all; }
   .push-ok { color:var(--success); font-size:12px; padding:16px 0; }
+
+  /* Ensure Text Styles overlay */
+  .ets-platform { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .ets-plabel { font-size:10px; font-weight:600; color:var(--fg-muted); text-transform:uppercase; letter-spacing:.05em; }
+  .ets-radio { display:flex; align-items:center; gap:4px; cursor:pointer; font-size:12px; }
+  .ets-summary { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+  .ets-table { width:100%; border-collapse:collapse; font-size:11px; }
+  .ets-table th { text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); padding:4px 6px 6px; border-bottom:2px solid var(--border); }
+  .ets-table td { padding:5px 6px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .ets-table tr:last-child td { border-bottom:none; }
+  .ets-badge { display:inline-block; padding:1px 7px; border-radius:9999px; font-size:10px; font-weight:600; white-space:nowrap; }
+  .ets-badge.create  { background:var(--added-bg);   color:var(--added-fg); }
+  .ets-badge.update  { background:var(--changed-bg); color:var(--changed-fg); }
+  .ets-badge.correct { background:var(--bg-sunken);  color:var(--fg-muted); }
+  .ets-style { font-family:ui-monospace,monospace; font-size:10px; word-break:break-word; }
+  .ets-var   { font-family:ui-monospace,monospace; font-size:9px; color:var(--fg-muted); line-height:1.6; }
+  .ets-missing { border-radius:6px; padding:8px 10px; margin-top:8px; color:var(--removed-fg); font-size:11px; background:var(--removed-bg); }
 </style>
 </head>
 <body>
@@ -149,7 +166,8 @@
   <button id="btn-push" class="secondary">Push Figma → GitHub (create PR)</button>
 
   <div class="group-label">Styles &amp; components</div>
-  <button id="sync-text-styles" class="secondary">Sync Text Styles</button>
+  <button id="sync-text-styles" class="secondary">Sync Text Styles (Foundations)</button>
+  <button id="ensure-text-styles" class="secondary">Ensure Text Styles (Web / Mobile)</button>
   <button id="generate-foundations" class="secondary">Generate Foundations pages</button>
   <button id="generate-components" class="secondary">Generate components</button>
 </div>
@@ -208,6 +226,29 @@
   <div class="ov-body" id="diff-body"><!-- populated by renderDiff() --></div>
 </div>
 
+
+<!-- ═══════════ ENSURE TEXT STYLES OVERLAY ═══════════ -->
+<div id="ensure-ts-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">Ensure Text Styles</span>
+    <button class="ov-close" id="close-ensure-ts" title="Close">✕</button>
+  </div>
+  <div class="ov-body" id="ensure-ts-body">
+    <div class="ets-platform">
+      <span class="ets-plabel">Platform:</span>
+      <label class="ets-radio"><input type="radio" name="ets-platform" id="ets-web" value="web" checked /> Web (18 roles)</label>
+      <label class="ets-radio"><input type="radio" name="ets-platform" id="ets-mobile" value="mobile" /> Mobile (16 roles)</label>
+    </div>
+    <div id="ensure-ts-preview-area">
+      <p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Preview</strong> to check existing styles and show what will change. Foundations must be enabled as a library in this file.</p>
+    </div>
+  </div>
+  <div class="ov-footer">
+    <button class="secondary" id="ensure-ts-cancel">Cancel</button>
+    <button class="secondary" id="ensure-ts-preview-btn">Preview</button>
+    <button id="ensure-ts-apply" disabled>Apply</button>
+  </div>
+</div>
 
 <script src="ui.js"></script>
 </body>

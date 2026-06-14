@@ -10,6 +10,54 @@ figma.showUI(__html__, { width: 360, height: 520, themeColors: true });
 
 const COLLECTION_NAME = "Design System";
 
+/* ── Ensure Text Styles — role tables ── */
+
+const WEB_ROLES = [
+  "display-l", "display-m", "display-s",
+  "heading-1", "heading-2", "heading-3", "heading-4", "heading-5", "heading-6",
+  "body-l", "body-m", "body-s",
+  "label-l", "label-m", "label-s",
+  "caption", "code", "overline",
+];
+
+const MOBILE_ROLES = [
+  "title-xl", "title-lg", "title-md", "title-sm",
+  "headline",
+  "body-lg-regular", "body-lg-semibold",
+  "body-md-regular", "body-md-semibold",
+  "body-sm-regular", "body-sm-semibold",
+  "subhead-md", "subhead-sm",
+  "label", "caption", "micro",
+];
+
+const WEB_STYLE_NAMES = {
+  "display-l": "Web/Display/Large",  "display-m": "Web/Display/Medium", "display-s": "Web/Display/Small",
+  "heading-1": "Web/Heading/1",      "heading-2": "Web/Heading/2",      "heading-3": "Web/Heading/3",
+  "heading-4": "Web/Heading/4",      "heading-5": "Web/Heading/5",      "heading-6": "Web/Heading/6",
+  "body-l":    "Web/Body/Large",     "body-m":    "Web/Body/Medium",    "body-s":    "Web/Body/Small",
+  "label-l":   "Web/Label/Large",    "label-m":   "Web/Label/Medium",   "label-s":   "Web/Label/Small",
+  "caption":   "Web/Caption",        "code":      "Web/Code",           "overline":  "Web/Overline",
+};
+
+const MOBILE_STYLE_NAMES = {
+  "title-xl":         "Mobile/Title/XL",
+  "title-lg":         "Mobile/Title/Large",
+  "title-md":         "Mobile/Title/Medium",
+  "title-sm":         "Mobile/Title/Small",
+  "headline":         "Mobile/Headline",
+  "body-lg-regular":  "Mobile/Body/Large/Regular",
+  "body-lg-semibold": "Mobile/Body/Large/Semibold",
+  "body-md-regular":  "Mobile/Body/Medium/Regular",
+  "body-md-semibold": "Mobile/Body/Medium/Semibold",
+  "body-sm-regular":  "Mobile/Body/Small/Regular",
+  "body-sm-semibold": "Mobile/Body/Small/Semibold",
+  "subhead-md":       "Mobile/Subhead/Medium",
+  "subhead-sm":       "Mobile/Subhead/Small",
+  "label":            "Mobile/Label",
+  "caption":          "Mobile/Caption",
+  "micro":            "Mobile/Micro",
+};
+
 /** Pre-load every (family, style) combo our STRING variables might set as a
  *  fontFamily / fontStyle value. Figma's setValueForMode validates that the
  *  font is loaded before accepting the string, so this needs to run *before*
@@ -1383,6 +1431,238 @@ async function generateFoundations() {
 /* ---------- PAT — clientStorage ---------- */
 
 /* ============================================================
+   ENSURE TEXT STYLES
+   Imports Foundations published semantic vars into the active
+   (Web or Mobile) file and binds each Text Style sub-property.
+   ============================================================ */
+
+/** Find the "Design System" collection in available team libraries.
+ *  Returns { byName: Map<varName, LibraryVariable> } or { error }. */
+async function findLibraryVars() {
+  if (!figma.teamLibrary || typeof figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync !== "function") {
+    return { error: "Team library API not available — reload Figma and retry." };
+  }
+  let collections;
+  try {
+    collections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
+  } catch (e) {
+    return { error: "Could not read enabled libraries: " + e.message };
+  }
+  const dsCol = collections.find(function(c) { return c.name === COLLECTION_NAME; });
+  if (!dsCol) {
+    return { error: "'" + COLLECTION_NAME + "' not found in this file's enabled libraries. Go to Resources → Libraries and enable the Foundations file." };
+  }
+  let libVars;
+  try {
+    libVars = await figma.teamLibrary.getVariablesInLibraryCollectionAsync(dsCol.key);
+  } catch (e) {
+    return { error: "Could not load Foundations variables: " + e.message };
+  }
+  const byName = new Map();
+  for (const lv of libVars) byName.set(lv.name, lv);
+  return { byName: byName };
+}
+
+/** Return the canonical variable names for one role on a given platform. */
+function roleVarNames(platform, role) {
+  const prefix = "text/" + platform + "/" + role;
+  return {
+    size:    prefix + "/size",
+    line:    prefix + "/line",
+    weight:  prefix + "/weight",
+    family:  (role === "code") ? "font-family/mono" : "font-family/sans",
+    spacing: (role === "overline") ? (prefix + "/spacing") : null,
+  };
+}
+
+async function computeEnsureTextStylesPreview(platform) {
+  const roles      = platform === "web" ? WEB_ROLES      : MOBILE_ROLES;
+  const styleNames = platform === "web" ? WEB_STYLE_NAMES : MOBILE_STYLE_NAMES;
+
+  const libResult = await findLibraryVars();
+  if (libResult.error) return { error: libResult.error };
+  const byName = libResult.byName;
+
+  const existingStyles = figma.getLocalTextStyles();
+  const styleByName = new Map(existingStyles.map(function(s) { return [s.name, s]; }));
+
+  const rows = [];
+  const missingVars = [];
+
+  for (const role of roles) {
+    const styleName = styleNames[role];
+    const vn = roleVarNames(platform, role);
+
+    if (!byName.has(vn.size) || !byName.has(vn.weight) || !byName.has(vn.family)) {
+      const missing = [];
+      if (!byName.has(vn.size))   missing.push(vn.size);
+      if (!byName.has(vn.weight)) missing.push(vn.weight);
+      if (!byName.has(vn.family)) missing.push(vn.family);
+      missingVars.push({ styleName: styleName, missing: missing });
+      continue;
+    }
+
+    const existing = styleByName.get(styleName) || null;
+    let action = "create";
+    if (existing) {
+      const bv   = existing.boundVariables;
+      const bvFs = bv && bv["fontSize"];
+      if (bvFs) {
+        const bound = figma.variables.getVariableById(bvFs.id);
+        action = (bound && bound.name === vn.size) ? "already-correct" : "update";
+      } else {
+        action = "update";
+      }
+    }
+
+    rows.push({ role: role, styleName: styleName, action: action, varNames: vn });
+  }
+
+  const summary = { create: 0, update: 0, alreadyCorrect: 0, skippedMissing: missingVars.length };
+  for (const row of rows) {
+    if      (row.action === "create")          summary.create++;
+    else if (row.action === "update")          summary.update++;
+    else if (row.action === "already-correct") summary.alreadyCorrect++;
+  }
+
+  return {
+    platform:    platform,
+    rows:        rows,
+    missingVars: missingVars,
+    summary:     summary,
+    fileName:    figma.root.name,
+  };
+}
+
+async function applyEnsureTextStyles(platform) {
+  const roles      = platform === "web" ? WEB_ROLES      : MOBILE_ROLES;
+  const styleNames = platform === "web" ? WEB_STYLE_NAMES : MOBILE_STYLE_NAMES;
+
+  const libResult = await findLibraryVars();
+  if (libResult.error) {
+    uiLog(libResult.error, "err");
+    figma.ui.postMessage({ type: "ensure-text-styles-done", created: 0, updated: 0, skipped: 0, failures: 0 });
+    return;
+  }
+  const byName = libResult.byName;
+
+  const existingStyles = figma.getLocalTextStyles();
+  const styleByName = new Map(existingStyles.map(function(s) { return [s.name, s]; }));
+
+  let created = 0, updated = 0, skipped = 0, failures = 0;
+
+  for (const role of roles) {
+    const styleName = styleNames[role];
+    const vn        = roleVarNames(platform, role);
+
+    const libSizeVar    = byName.get(vn.size)    || null;
+    const libLineVar    = byName.get(vn.line)    || null;
+    const libWeightVar  = byName.get(vn.weight)  || null;
+    const libFamilyVar  = byName.get(vn.family)  || null;
+    const libSpacingVar = vn.spacing ? (byName.get(vn.spacing) || null) : null;
+
+    if (!libSizeVar || !libWeightVar || !libFamilyVar) {
+      uiLog("Skip " + styleName + " — missing Foundations vars", "warn");
+      failures++;
+      continue;
+    }
+
+    // Idempotency: if already bound to the right size var, skip
+    let existingStyle = styleByName.get(styleName) || null;
+    if (existingStyle) {
+      const bv   = existingStyle.boundVariables;
+      const bvFs = bv && bv["fontSize"];
+      if (bvFs) {
+        const bound = figma.variables.getVariableById(bvFs.id);
+        if (bound && bound.name === vn.size) { skipped++; continue; }
+      }
+    }
+
+    // Import from Foundations library
+    let sizeImported, lineImported, weightImported, familyImported, spacingImported;
+    try {
+      sizeImported   = await figma.variables.importVariableByKeyAsync(libSizeVar.key);
+      weightImported = await figma.variables.importVariableByKeyAsync(libWeightVar.key);
+      familyImported = await figma.variables.importVariableByKeyAsync(libFamilyVar.key);
+      if (libLineVar)    lineImported    = await figma.variables.importVariableByKeyAsync(libLineVar.key);
+      if (libSpacingVar) spacingImported = await figma.variables.importVariableByKeyAsync(libSpacingVar.key);
+    } catch (e) {
+      uiLog("Import failed for " + styleName + ": " + e.message, "warn");
+      failures++;
+      continue;
+    }
+
+    // Resolve literal values for fontName / fontSize / lineHeight (set before binding)
+    let family   = "Inter";
+    let styleStr = "Regular";
+    let sizePx   = 14;
+    let lineNum  = 125;
+
+    const fr = resolveVariableValue(familyImported);
+    if (typeof fr === "string" && fr.length > 0) family = fr;
+
+    const wr = resolveVariableValue(weightImported);
+    if (typeof wr === "string" && wr.length > 0) styleStr = wr;
+
+    const sr = resolveVariableValue(sizeImported);
+    if (typeof sr === "number" && isFinite(sr)) sizePx = sr;
+
+    if (lineImported) {
+      const lr = resolveVariableValue(lineImported);
+      if (typeof lr === "number" && isFinite(lr)) lineNum = lr;
+    }
+
+    await figma.loadFontAsync({ family: family, style: styleStr }).catch(function() {});
+
+    // Create or get style
+    const isNew = !existingStyle;
+    if (!existingStyle) {
+      try {
+        existingStyle = figma.createTextStyle();
+        existingStyle.name = styleName;
+        styleByName.set(styleName, existingStyle);
+      } catch (e) {
+        uiLog("Cannot create style " + styleName + ": " + e.message, "err");
+        failures++;
+        continue;
+      }
+    }
+
+    // Set literal props first (establishes unit context for lineHeight PERCENT)
+    try { existingStyle.fontName  = { family: family, style: styleStr }; } catch (e) {}
+    try { existingStyle.fontSize  = sizePx; } catch (e) {}
+    try { existingStyle.lineHeight = { value: lineNum, unit: "PERCENT" }; } catch (e) {}
+
+    // letterSpacing for overline: STRING var can't bind as FLOAT — apply literal
+    if (spacingImported) {
+      const spacingVal = resolveVariableValue(spacingImported);
+      if (typeof spacingVal === "string" && spacingVal.endsWith("em")) {
+        const n = parseFloat(spacingVal);
+        if (isFinite(n)) try { existingStyle.letterSpacing = { value: n * 100, unit: "PERCENT" }; } catch (e) {}
+      }
+    }
+
+    // Bind variables
+    try { existingStyle.setBoundVariable("fontFamily", familyImported); } catch (e) { uiLog("  · " + styleName + " fontFamily: " + e.message, "warn"); }
+    try { existingStyle.setBoundVariable("fontStyle",  weightImported); } catch (e) { uiLog("  · " + styleName + " fontStyle: "  + e.message, "warn"); }
+    try { existingStyle.setBoundVariable("fontSize",   sizeImported);   } catch (e) { uiLog("  · " + styleName + " fontSize: "   + e.message, "warn"); }
+    if (lineImported) {
+      try { existingStyle.setBoundVariable("lineHeight", lineImported); } catch (e) { uiLog("  · " + styleName + " lineHeight: " + e.message, "warn"); }
+    }
+
+    if (isNew) { created++; uiLog("  · Created: " + styleName, "ok"); }
+    else       { updated++; uiLog("  · Updated: " + styleName, "ok"); }
+  }
+
+  uiLog(
+    "Done — " + created + " created, " + updated + " updated, " + skipped + " already-correct" +
+    (failures > 0 ? ", " + failures + " failed" : ""),
+    failures > 0 ? "warn" : "ok"
+  );
+  figma.ui.postMessage({ type: "ensure-text-styles-done", created: created, updated: updated, skipped: skipped, failures: failures });
+}
+
+/* ============================================================
    DIFF — compare repo JSON to the live "Design System" collection
    ============================================================ */
 
@@ -1884,6 +2164,14 @@ figma.ui.onmessage = async (msg) => {
       // can update activePat and the status indicator.
       await figma.clientStorage.setAsync(PAT_KEY, msg.pat);
       figma.ui.postMessage({ type: "pat-saved", pat: msg.pat });
+    } else if (msg.type === "get-file-info") {
+      figma.ui.postMessage({ type: "file-info", fileName: figma.root.name });
+    } else if (msg.type === "ensure-text-styles-preview") {
+      const preview = await computeEnsureTextStylesPreview(msg.platform);
+      figma.ui.postMessage({ type: "ensure-ts-preview-result", preview: preview });
+    } else if (msg.type === "ensure-text-styles-apply") {
+      await fontsReady;
+      await applyEnsureTextStyles(msg.platform);
     } else if (msg.type === "sync-tokens") {
       await fontsReady;
       syncTokens(msg.data);
