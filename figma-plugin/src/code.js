@@ -1426,6 +1426,12 @@ function normalizeFigmaValStr(raw, type) {
     return "alias:" + (t ? t.name : "?");
   }
   if (type === "COLOR") return normalizeFigmaColorRGBA(raw) || String(raw);
+  if (type === "FLOAT") {
+    // Figma stores FLOAT variables as IEEE 754 float32. Apply Math.fround so the
+    // comparison is stable: Math.fround(0.10000000149011612) === Math.fround(0.1).
+    const n = typeof raw === "number" ? raw : parseFloat(String(raw));
+    return isFinite(n) ? String(Math.fround(n)) : String(raw != null ? raw : "");
+  }
   return String(raw != null ? raw : "");
 }
 
@@ -1434,6 +1440,11 @@ function normalizeRepoValStr(entry, type) {
   if (!entry) return "";
   if (entry.alias) return "alias:" + entry.alias;
   if (type === "COLOR") return normalizeRepoColorStr(entry.value);
+  if (type === "FLOAT") {
+    // Apply Math.fround to match Figma's float32 precision (mirrors normalizeFigmaValStr).
+    const n = typeof entry.value === "number" ? entry.value : parseFloat(String(entry.value));
+    return isFinite(n) ? String(Math.fround(n)) : String(entry.value != null ? entry.value : "");
+  }
   return String(entry.value != null ? entry.value : "");
 }
 

@@ -306,8 +306,8 @@ for (const name of FILES_TO_CHECK) {
 // Test B: single-value change touches exactly 1 line in core.json
 {
   const text = readFileSync(join(srcDir, "core.json"), "utf8");
-  const TEST_PATH = "color/brand/500";
-  const TEST_OLD = { "$value": "#5277E2", "$type": "color" };
+  const TEST_PATH = "color/brand/700";
+  const TEST_OLD = { "$value": "#3C61DD", "$type": "color" };
   const TEST_NEW = { "$value": "#abcdef", "$type": "color" };
   const changesMap = new Map([[TEST_PATH, { old: TEST_OLD, new: TEST_NEW, modes: ["Light · Web"] }]]);
 
@@ -357,6 +357,132 @@ for (const name of FILES_TO_CHECK) {
   console.log("  " + (valueUnchanged ? "✓" : "✗") + "  $value line is untouched");
 }
 
-const grandTotal = failures + byteFailures;
+// ─── Diff no-op guard ─────────────────────────────────────────────────────────
+// Replicate normalizeFigmaValStr / normalizeRepoValStr from src/code.js
+// (the fixed FLOAT-aware versions). For every non-alias token in
+// tokens.figma-variables.json, simulate what Figma would hand back and
+// assert the two normalized strings are equal — i.e. Diff on an unchanged
+// collection reports ZERO changes.
+
+const tokensJsonPath = join(__dirname, "../../packages/tokens/tokens.figma-variables.json");
+let diffFailures = 0;
+
+function normRepoColorStrDiff(str) {
+  str = String(str || "").trim().toLowerCase();
+  if (str === "transparent") return "#00000000";
+  if (str.startsWith("#")) {
+    const h = str.slice(1);
+    if (h.length === 6) return str;
+    if (h.length === 8) return (h.slice(6) === "ff") ? "#" + h.slice(0, 6) : str;
+    return str;
+  }
+  const m = str.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/);
+  if (m) {
+    const r = Math.round(+m[1]).toString(16).padStart(2, "0");
+    const g = Math.round(+m[2]).toString(16).padStart(2, "0");
+    const b = Math.round(+m[3]).toString(16).padStart(2, "0");
+    const a = m[4] != null ? +m[4] : 1;
+    if (Math.abs(a - 1) < 0.004) return "#" + r + g + b;
+    return "#" + r + g + b + Math.round(a * 255).toString(16).padStart(2, "0");
+  }
+  return str;
+}
+
+function normRepoValStrDiff(entry, type) {
+  if (!entry || entry.alias) return null;
+  if (type === "COLOR") return normRepoColorStrDiff(entry.value);
+  if (type === "FLOAT") {
+    const n = typeof entry.value === "number" ? entry.value : parseFloat(String(entry.value));
+    return isFinite(n) ? String(Math.fround(n)) : null;
+  }
+  return String(entry.value != null ? entry.value : "");
+}
+
+// Simulate what Figma returns when reading a stored variable value back out.
+// FLOAT: Figma returns an IEEE 754 float32 (apply Math.fround)
+// COLOR: any color string → RGBA 0–1 floats (Figma's internal format) → hex6/8
+//        mirrors normalizeFigmaColorRGBA in code.js
+// STRING: pass through
+function simulateFigmaReturn(value, type) {
+  if (type === "FLOAT") {
+    const n = typeof value === "number" ? value : parseFloat(String(value));
+    return isFinite(n) ? Math.fround(n) : value;
+  }
+  if (type === "COLOR") {
+    const s = String(value).trim().toLowerCase();
+    let r, g, b, a;
+    if (s === "transparent") {
+      r = 0; g = 0; b = 0; a = 0;
+    } else if (s.startsWith("#")) {
+      const h = s.slice(1);
+      if (h.length === 6) {
+        r = parseInt(h.slice(0,2), 16) / 255; g = parseInt(h.slice(2,4), 16) / 255;
+        b = parseInt(h.slice(4,6), 16) / 255; a = 1;
+      } else if (h.length === 8) {
+        r = parseInt(h.slice(0,2), 16) / 255; g = parseInt(h.slice(2,4), 16) / 255;
+        b = parseInt(h.slice(4,6), 16) / 255; a = parseInt(h.slice(6,8), 16) / 255;
+      } else return s;
+    } else {
+      const m = s.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/);
+      if (!m) return s;
+      r = parseFloat(m[1]) / 255; g = parseFloat(m[2]) / 255;
+      b = parseFloat(m[3]) / 255; a = m[4] !== undefined ? parseFloat(m[4]) : 1;
+    }
+    const rh = Math.round(r * 255).toString(16).padStart(2, "0");
+    const gh = Math.round(g * 255).toString(16).padStart(2, "0");
+    const bh = Math.round(b * 255).toString(16).padStart(2, "0");
+    const ah = Math.round(a * 255);
+    return "#" + rh + gh + bh + (ah < 255 ? ah.toString(16).padStart(2, "0") : "");
+  }
+  return String(value);
+}
+
+function normFigmaValStrDiff(figmaRaw, type) {
+  if (type === "COLOR") return typeof figmaRaw === "string" ? figmaRaw : String(figmaRaw);
+  if (type === "FLOAT") {
+    const n = typeof figmaRaw === "number" ? figmaRaw : parseFloat(String(figmaRaw));
+    return isFinite(n) ? String(Math.fround(n)) : null;
+  }
+  return String(figmaRaw != null ? figmaRaw : "");
+}
+
+console.log("\nDiff no-op guard (tokens.figma-variables.json)");
+try {
+  const figmaVars = JSON.parse(readFileSync(tokensJsonPath, "utf8"));
+  let diffTotal = 0;
+  let diffMismatches = 0;
+  const diffFailLines = [];
+
+  for (const v of figmaVars.variables) {
+    for (const [modeId, entry] of Object.entries(v.values)) {
+      if (entry.alias) continue;
+      diffTotal++;
+      const rStr = normRepoValStrDiff(entry, v.type);
+      if (rStr === null) continue;
+      const figmaRaw = simulateFigmaReturn(entry.value, v.type);
+      const fStr = normFigmaValStrDiff(figmaRaw, v.type);
+      if (fStr === null) continue;
+      if (rStr !== fStr) {
+        diffMismatches++;
+        diffFailures++;
+        diffFailLines.push("    [" + v.type + "] " + v.name + " @" + modeId +
+          "\n      repo=" + rStr + "\n      figma=" + fStr);
+      }
+    }
+  }
+
+  if (diffFailLines.length > 0) {
+    console.error("\nDiff mismatches:");
+    diffFailLines.slice(0, 20).forEach(l => console.error(l));
+    if (diffFailLines.length > 20) console.error("  ... and " + (diffFailLines.length - 20) + " more");
+  }
+  console.log("  " + (diffMismatches === 0 ? "✓" : "✗") + "  " + diffTotal +
+    " non-alias values checked: " + diffMismatches + " false diff(s)");
+} catch (e) {
+  diffFailures++;
+  console.error("  ✗  Could not run Diff no-op guard: " + e.message);
+}
+
+const grandTotal = failures + byteFailures + diffFailures;
 console.log("\n" + (grandTotal === 0 ? "All checks passed." : grandTotal + " check(s) failed.") + "\n");
 if (grandTotal > 0) process.exit(1);
