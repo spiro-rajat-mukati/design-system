@@ -7325,126 +7325,6 @@
       }
     },
     {
-      "name": "line-height/loose",
-      "type": "FLOAT",
-      "values": {
-        "light-web": {
-          "value": 200
-        },
-        "dark-web": {
-          "value": 200
-        },
-        "light-ios": {
-          "value": 200
-        },
-        "dark-ios": {
-          "value": 200
-        },
-        "light-android": {
-          "value": 200
-        },
-        "dark-android": {
-          "value": 200
-        }
-      }
-    },
-    {
-      "name": "line-height/normal",
-      "type": "FLOAT",
-      "values": {
-        "light-web": {
-          "value": 150
-        },
-        "dark-web": {
-          "value": 150
-        },
-        "light-ios": {
-          "value": 150
-        },
-        "dark-ios": {
-          "value": 150
-        },
-        "light-android": {
-          "value": 150
-        },
-        "dark-android": {
-          "value": 150
-        }
-      }
-    },
-    {
-      "name": "line-height/relaxed",
-      "type": "FLOAT",
-      "values": {
-        "light-web": {
-          "value": 162.5
-        },
-        "dark-web": {
-          "value": 162.5
-        },
-        "light-ios": {
-          "value": 162.5
-        },
-        "dark-ios": {
-          "value": 162.5
-        },
-        "light-android": {
-          "value": 162.5
-        },
-        "dark-android": {
-          "value": 162.5
-        }
-      }
-    },
-    {
-      "name": "line-height/snug",
-      "type": "FLOAT",
-      "values": {
-        "light-web": {
-          "value": 125
-        },
-        "dark-web": {
-          "value": 125
-        },
-        "light-ios": {
-          "value": 125
-        },
-        "dark-ios": {
-          "value": 125
-        },
-        "light-android": {
-          "value": 125
-        },
-        "dark-android": {
-          "value": 125
-        }
-      }
-    },
-    {
-      "name": "line-height/tight",
-      "type": "FLOAT",
-      "values": {
-        "light-web": {
-          "value": 110
-        },
-        "dark-web": {
-          "value": 110
-        },
-        "light-ios": {
-          "value": 110
-        },
-        "dark-ios": {
-          "value": 110
-        },
-        "light-android": {
-          "value": 110
-        },
-        "dark-android": {
-          "value": 110
-        }
-      }
-    },
-    {
       "name": "numeric/stepper-bg",
       "type": "COLOR",
       "values": {
@@ -9777,22 +9657,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 24
         }
       }
     },
@@ -9849,22 +9729,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 24
         }
       }
     },
@@ -9921,22 +9801,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 21
         }
       }
     },
@@ -9993,22 +9873,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 21
         }
       }
     },
@@ -10065,22 +9945,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 18
         }
       }
     },
@@ -10137,22 +10017,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 18
         }
       }
     },
@@ -10209,22 +10089,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 17
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 17
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 17
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 17
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 17
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 17
         }
       }
     },
@@ -10281,22 +10161,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 20
         }
       }
     },
@@ -10353,22 +10233,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 15
         }
       }
     },
@@ -10425,22 +10305,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 15
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 15
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 15
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 15
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 15
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 15
         }
       }
     },
@@ -10497,22 +10377,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 18
         }
       }
     },
@@ -10569,22 +10449,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 15
         }
       }
     },
@@ -10641,22 +10521,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 38
         }
       }
     },
@@ -10713,22 +10593,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 30
         }
       }
     },
@@ -10785,22 +10665,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 25
         }
       }
     },
@@ -10857,22 +10737,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "dark-web": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "light-ios": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "dark-ios": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "light-android": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "dark-android": {
-          "alias": "line-height/tight"
+          "value": 40
         }
       }
     },
@@ -10929,22 +10809,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 27
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 27
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 27
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 27
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 27
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 27
         }
       }
     },
@@ -11001,22 +10881,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 24
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 24
         }
       }
     },
@@ -11073,22 +10953,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 21
         }
       }
     },
@@ -11145,22 +11025,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 18
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 18
         }
       }
     },
@@ -11241,22 +11121,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-web": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "light-ios": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-ios": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "light-android": {
-          "alias": "line-height/normal"
+          "value": 21
         },
         "dark-android": {
-          "alias": "line-height/normal"
+          "value": 21
         }
       }
     },
@@ -11313,22 +11193,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/tight"
+          "value": 53
         },
         "dark-web": {
-          "alias": "line-height/tight"
+          "value": 53
         },
         "light-ios": {
-          "alias": "line-height/tight"
+          "value": 53
         },
         "dark-ios": {
-          "alias": "line-height/tight"
+          "value": 53
         },
         "light-android": {
-          "alias": "line-height/tight"
+          "value": 53
         },
         "dark-android": {
-          "alias": "line-height/tight"
+          "value": 53
         }
       }
     },
@@ -11385,22 +11265,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "dark-web": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "light-ios": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "dark-ios": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "light-android": {
-          "alias": "line-height/tight"
+          "value": 40
         },
         "dark-android": {
-          "alias": "line-height/tight"
+          "value": 40
         }
       }
     },
@@ -11457,22 +11337,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/tight"
+          "value": 33
         },
         "dark-web": {
-          "alias": "line-height/tight"
+          "value": 33
         },
         "light-ios": {
-          "alias": "line-height/tight"
+          "value": 33
         },
         "dark-ios": {
-          "alias": "line-height/tight"
+          "value": 33
         },
         "light-android": {
-          "alias": "line-height/tight"
+          "value": 33
         },
         "dark-android": {
-          "alias": "line-height/tight"
+          "value": 33
         }
       }
     },
@@ -11529,22 +11409,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 38
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 38
         }
       }
     },
@@ -11601,22 +11481,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 30
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 30
         }
       }
     },
@@ -11673,22 +11553,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 25
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 25
         }
       }
     },
@@ -11745,22 +11625,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 23
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 23
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 23
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 23
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 23
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 23
         }
       }
     },
@@ -11817,22 +11697,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 20
         }
       }
     },
@@ -11889,22 +11769,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 18
         }
       }
     },
@@ -11961,22 +11841,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 20
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 20
         }
       }
     },
@@ -12033,22 +11913,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 18
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 18
         }
       }
     },
@@ -12105,22 +11985,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 15
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 15
         }
       }
     },
@@ -12177,22 +12057,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "line-height/snug"
+          "value": 14
         },
         "dark-web": {
-          "alias": "line-height/snug"
+          "value": 14
         },
         "light-ios": {
-          "alias": "line-height/snug"
+          "value": 14
         },
         "dark-ios": {
-          "alias": "line-height/snug"
+          "value": 14
         },
         "light-android": {
-          "alias": "line-height/snug"
+          "value": 14
         },
         "dark-android": {
-          "alias": "line-height/snug"
+          "value": 14
         }
       }
     },

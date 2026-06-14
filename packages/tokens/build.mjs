@@ -346,6 +346,48 @@ export function resolveToken(
   writeFileSync(join(OUT, "tokens.ts"), out);
 }
 
+/* ---------- line-height helpers (Figma + RN px computation) ---------- */
+
+/** Walk {ref} chains in a token lookup to a raw float.
+ *  Strips any "px" suffix (e.g. "14px" → 14). Never uses the
+ *  design-system.figma-value override — we always want the natural
+ *  $value so that ratios like "1.25" stay as 1.25, not 125. */
+function resolveLiteralFloat(dotPath, lookup) {
+  const node = lookup.get(dotPath);
+  if (!node) return null;
+  const v = node.$value;
+  if (typeof v === "string") {
+    const ref = v.match(/^\{([^}]+)\}$/);
+    if (ref) return resolveLiteralFloat(ref[1], lookup);
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  if (typeof v === "number") return v;
+  return null;
+}
+
+/** For a text.NS.ROLE.line token path return Math.round(sizePixels × ratio).
+ *  Returns null when the path doesn't match the expected shape or refs fail. */
+function computeLineHeightPx(dotPath, lookup) {
+  const parts = dotPath.split(".");
+  if (parts.length < 4 || parts[parts.length - 1] !== "line") return null;
+  const sizePath = parts.slice(0, -1).concat("size").join(".");
+  const sizePx = resolveLiteralFloat(sizePath, lookup);
+  if (sizePx == null) return null;
+  const lineNode = lookup.get(dotPath);
+  if (!lineNode) return null;
+  const lineVal = lineNode.$value;
+  let ratio = null;
+  if (typeof lineVal === "string") {
+    const ref = lineVal.match(/^\{([^}]+)\}$/);
+    ratio = ref ? resolveLiteralFloat(ref[1], lookup) : parseFloat(lineVal);
+  } else if (typeof lineVal === "number") {
+    ratio = lineVal;
+  }
+  if (!Number.isFinite(ratio)) return null;
+  return Math.round(sizePx * ratio);
+}
+
 /* ---------- emit tokens.figma-variables.json ---------- */
 
 /** Map our $type values to Figma's Variable resolvedType. Composite types
@@ -430,6 +472,12 @@ function emitFigmaVariablesJSON() {
 
   const variables = [];
   for (const path of [...allPaths].sort()) {
+    // Figma line-height variables are px-only (FLOAT); unitless ratio primitives
+    // (tight=1.1, snug=1.25…) are meaningless as px values. Skip them here —
+    // they remain in CSS output only. Semantic text/NS/ROLE/line tokens below
+    // are emitted as computed px instead.
+    if (/^line-height\./.test(path)) continue;
+
     // Type comes from the first mode that has the node — types are consistent
     // across modes for a given token.
     let firstNode = null;
@@ -441,12 +489,21 @@ function emitFigmaVariablesJSON() {
     const type = figmaType(firstNode.$type);
     if (!type) continue;
 
+    // text.NS.ROLE.line → emit computed px (round(size × ratio)) rather than
+    // an alias to the ratio primitive. Figma requires FLOAT px for lineHeight.
+    const isTextLine = /^text\.[^.]+\.[^.]+\.line$/.test(path);
+
     const valuesByMode = {};
     for (const m of modes) {
       const n = m.lookup.get(path);
       if (!n) continue;
-      const val = figmaValueFor(n, type);
-      if (val) valuesByMode[m.id] = val;
+      if (isTextLine) {
+        const px = computeLineHeightPx(path, m.lookup);
+        if (px != null) valuesByMode[m.id] = { value: px };
+      } else {
+        const val = figmaValueFor(n, type);
+        if (val) valuesByMode[m.id] = val;
+      }
     }
     if (Object.keys(valuesByMode).length === 0) continue;
 
@@ -481,7 +538,14 @@ function emitNativeTS() {
         cursor[path[i]] ??= {};
         cursor = cursor[path[i]];
       }
-      cursor[path[path.length - 1]] = resolveRefs(formatValue(node), lookup, "literal");
+      const key = path[path.length - 1];
+      // text.NS.ROLE.line → computed px. RN's lineHeight is pixels, not a ratio.
+      if (path.length === 4 && path[0] === "text" && key === "line") {
+        const px = computeLineHeightPx(path.join("."), lookup);
+        cursor[key] = px != null ? String(px) : resolveRefs(formatValue(node), lookup, "literal");
+      } else {
+        cursor[key] = resolveRefs(formatValue(node), lookup, "literal");
+      }
     });
     return obj;
   };
