@@ -96,6 +96,7 @@ Structural changes — forking/detaching a published component, breaking a compo
 - `docs/ai/roles/pm.md` — product manager guide
 - `docs/ai/roles/designer.md` — designer guide
 - `docs/ai/roles/developer.md` — developer guide
+- `docs/ai/decisions.md` — decisions & lessons log (why it's built this way + gotchas)
 
 ---
 
