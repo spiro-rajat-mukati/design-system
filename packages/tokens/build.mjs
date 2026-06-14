@@ -128,8 +128,8 @@ const platformIOS     = sets["platform-ios"]     || {};
 const platformAndroid = sets["platform-android"] || {};
 
 const figmaModes = [
-  { id: "light-web",     name: "Light · Web",     tree: merge(lightTree,       platformWeb) },
-  { id: "dark-web",      name: "Dark · Web",       tree: merge(darkTree,        platformWeb) },
+  { id: "light-web",     name: "Light · Web",     tree: merge(mobileLightTree, platformWeb) },
+  { id: "dark-web",      name: "Dark · Web",       tree: merge(mobileDarkTree,  platformWeb) },
   { id: "light-ios",     name: "Light · iOS",      tree: merge(mobileLightTree, platformIOS) },
   { id: "dark-ios",      name: "Dark · iOS",       tree: merge(mobileDarkTree,  platformIOS) },
   { id: "light-android", name: "Light · Android",  tree: merge(mobileLightTree, platformAndroid) },
