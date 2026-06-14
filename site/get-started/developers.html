@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For developers · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="get-started">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <h1>For developers</h1>
+      <p class="lead">
+        16 React components with full accessibility and light / dark mode support.
+        Tokens flow from a single JSON source to CSS, TypeScript, and React Native.
+      </p>
+
+      <ol class="steps">
+
+        <li>
+          <h3>Install the package</h3>
+          <p>The package isn't published to npm yet — install from the GitHub repo directly:</p>
+<pre><code>npm install rajatspiro/design-system</code></pre>
+          <p class="small">Once we publish to npm, this becomes <code>npm install @kijani/design-system</code>. Until then, you can also clone the repo and link locally.</p>
+        </li>
+
+        <li>
+          <h3>Import the token CSS</h3>
+          <p>In your app's entry file (e.g. <code>main.tsx</code>):</p>
+<pre><code>import "design-system/src/tokens/primitives.css";
+import "design-system/src/tokens/semantics.css";
+import "design-system/src/tokens/component-tokens.css";</code></pre>
+          <p>That gives you every CSS custom property — primitives, semantics, and component tokens. Components later in the page consume only the component tokens.</p>
+        </li>
+
+        <li>
+          <h3>Use a component</h3>
+<pre><code>import { Button } from "design-system";
+
+export default function Page() {
+  return (
+    &lt;Button variant="primary" size="md"&gt;
+      Save changes
+    &lt;/Button&gt;
+  );
+}</code></pre>
+          <p>All components export from the package root. TypeScript types are bundled — autocomplete works out of the box.</p>
+        </li>
+
+        <li>
+          <h3>Enable theming</h3>
+          <p>Set the theme attribute on your <code>&lt;html&gt;</code> element:</p>
+<pre><code>document.documentElement.setAttribute("data-theme", "dark");</code></pre>
+          <p>Or use the <code>setTheme()</code> helper:</p>
+<pre><code>import { setTheme } from "design-system";
+setTheme("dark");</code></pre>
+        </li>
+
+        <li>
+          <h3>Use the TypeScript token map (for React Native or non-CSS consumers)</h3>
+<pre><code>import { tokens, resolveToken } from "design-system";
+
+// Pick a value at the current theme.
+const buttonHeight = resolveToken("--button-height-md", "light");
+// → "44px"</code></pre>
+        </li>
+
+        <li>
+          <h3>View the live component reference</h3>
+          <p>
+            Every component has a Storybook page with all variants, states, and a
+            controls panel for experimentation:
+          </p>
+          <p><a class="btn btn--secondary" href="https://main--689e1fa86b32f2c00f0eda7e.chromatic.com" target="_blank" rel="noopener">Open Storybook ↗</a></p>
+        </li>
+
+      </ol>
+
+      <hr class="divider" />
+
+      <h2>Conventions worth knowing</h2>
+
+      <h3>Composition over configuration</h3>
+      <p>
+        Components like Field accept slots (children) rather than long prop lists.
+        <code>&lt;Field label="..."&gt;&lt;TextInput /&gt;&lt;/Field&gt;</code> beats
+        <code>&lt;FieldWithInput label="..." inputValue="..." inputType="..."/&gt;</code>.
+      </p>
+
+      <h3>Logical CSS properties</h3>
+      <p>
+        Component CSS uses <code>padding-inline-start</code> etc., not
+        <code>padding-left</code>. Drop your app inside <code>&lt;html dir="rtl"&gt;</code> — no
+        component changes needed.
+      </p>
+
+      <h3>Hover guards</h3>
+      <p>
+        Every <code>:hover</code> rule in component CSS is wrapped in
+        <code>@media (hover: hover)</code> so touch devices don't get stuck hover states.
+      </p>
+
+      <h3>Reduced motion</h3>
+      <p>
+        <code>@media (prefers-reduced-motion: reduce)</code> collapses every motion duration
+        token to <code>0ms</code>. Components inherit this without opt-in.
+      </p>
+
+      <h3>Where to file requests</h3>
+      <p>
+        Bug or new component? <a href="https://github.com/rajatspiro/design-system/issues" target="_blank" rel="noopener">Open an issue</a>.
+        Token tweak (e.g. tweaking a colour value)? Open a PR against
+        <code>src/tokens/source/*.json</code> — both leads review.
+      </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

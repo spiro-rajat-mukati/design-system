@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Design-to-dev pipeline · Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI</span>
+      <h1>Design-to-dev pipeline.</h1>
+      <p class="lead">
+        How an idea becomes shipped, production-ready code at Kijani — and where AI
+        plugs in at each stage. This is the workflow every Kijani project follows,
+        regardless of who started it.
+      </p>
+
+      <p>
+        The canonical version of this workflow lives in the repository at
+        <code>docs/ai/pipeline.md</code> — the same file AI agents read when they
+        join a session. This page mirrors it for humans.
+      </p>
+
+      <hr class="divider" />
+
+      <h2>The seven stages</h2>
+      <p class="lead">
+        Each stage names the human owner, what the AI is reading, the deliverable,
+        and the gate to the next stage.
+      </p>
+
+      <ol class="steps">
+        <li>
+          <h3>Intent</h3>
+          <p>
+            <strong>Owner:</strong> PM. <strong>AI reads:</strong> role guide for PMs, prompt library.
+            <strong>Deliverable:</strong> one-pager (problem · user · success).
+            <strong>Gate:</strong> sharp enough that a designer can sketch without follow-up.
+          </p>
+        </li>
+        <li>
+          <h3>Shape</h3>
+          <p>
+            <strong>Owner:</strong> PM + designer. <strong>AI reads:</strong> prompt library, Lovable / Cowork templates.
+            <strong>Deliverable:</strong> low-fi flow.
+            <strong>Gate:</strong> testable on the team before pixels.
+          </p>
+        </li>
+        <li>
+          <h3>Design</h3>
+          <p>
+            <strong>Owner:</strong> designer. <strong>AI reads:</strong> component usage, token usage, designer role guide.
+            <strong>Deliverable:</strong> Figma frames built entirely from Kijani library, all modes + states covered.
+            <strong>Gate:</strong> zero detached instances, zero hardcoded values.
+          </p>
+        </li>
+        <li>
+          <h3>Spec</h3>
+          <p>
+            <strong>Owner:</strong> designer (with AI assistance). <strong>AI reads:</strong> component usage, quality bar.
+            <strong>Deliverable:</strong> written spec listing components, prop values, states, accessibility intent.
+            <strong>Gate:</strong> concrete enough that a dev can build without guessing.
+          </p>
+        </li>
+        <li>
+          <h3>Build</h3>
+          <p>
+            <strong>Owner:</strong> developer + Claude Code. <strong>AI reads:</strong> the whole <code>docs/ai/</code> tree, existing component code, token files.
+            <strong>Deliverable:</strong> PR with code + stories + tests + Chromatic snapshot.
+            <strong>Gate:</strong> quality-bar checklist passes end-to-end.
+          </p>
+        </li>
+        <li>
+          <h3>Review</h3>
+          <p>
+            <strong>Owner:</strong> design + eng leads jointly. <strong>AI reads:</strong> quality bar, <code>/review</code> + <code>/security-review</code> slash commands.
+            <strong>Deliverable:</strong> approval (or RFC if scope grew).
+            <strong>Gate:</strong> both leads sign off; Chromatic baseline updated.
+          </p>
+        </li>
+        <li>
+          <h3>Ship + observe</h3>
+          <p>
+            <strong>Owner:</strong> developer. <strong>AI reads:</strong> changelog template.
+            <strong>Deliverable:</strong> release notes, version bump.
+            <strong>Gate:</strong> visible in Storybook + showcase site within 24 hours.
+          </p>
+        </li>
+      </ol>
+
+      <hr class="divider" />
+
+      <h2>Where AI plugs in (cheat sheet)</h2>
+      <p>
+        <em>Full version, including the per-stage tool / strength / human-needs table, lives in
+        <code>docs/ai/pipeline.md</code>.</em>
+      </p>
+
+      <h2>Anti-patterns</h2>
+      <ul>
+        <li>Skipping the Spec stage — AI builds against vibes and ships subtle drift.</li>
+        <li>Treating Design as optional because "we have AI" — without a library-clean Figma file, there's no source of truth.</li>
+        <li>Generating Build code without reading the component-usage contract first.</li>
+        <li>Approving a Review because the diff "looks fine" — unintended Chromatic changes mean the build isn't ready.</li>
+      </ul>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

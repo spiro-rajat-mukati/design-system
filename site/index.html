@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kijani Design System</title>
+  <meta name="description" content="The visual language and component library powering Kijani products." />
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="home">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <section class="hero">
+      <span class="hero__eyebrow">Kijani · Design System · v0.5</span>
+      <h1>One system.<br />Every surface.</h1>
+      <p class="lead">
+        The visual language, tokens, and component library powering Kijani products
+        across web and mobile. Built so designers and developers can ship faster, together.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn--primary" href="/get-started/">Get started <span class="arrow">↗</span></a>
+        <a class="btn btn--secondary" href="https://main--689e1fa86b32f2c00f0eda7e.chromatic.com" target="_blank" rel="noopener">View Storybook</a>
+      </div>
+    </section>
+
+    <!-- Kijani family: the three systems -->
+    <section class="site-content" style="padding-top: 32px;">
+      <span class="section-eyebrow">The Kijani family</span>
+      <h2>Three systems.<br/>One shared language.</h2>
+      <p class="lead">
+        Kijani spans the surfaces our products live on. The web library is live today;
+        mobile and platform extend the same tokens, components, and conventions to
+        every other place we ship.
+      </p>
+
+      <div class="persona-grid">
+
+        <a class="persona-card" href="/design-system/">
+          <div class="persona-card__num">001 · Kijani Web · Live</div>
+          <div class="persona-card__illustration">
+            <!-- Browser window -->
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+              <rect x="8" y="14" width="48" height="36" rx="3"/>
+              <path d="M8 22 L56 22"/>
+              <circle cx="14" cy="18" r="1.2"/>
+              <circle cx="19" cy="18" r="1.2"/>
+              <circle cx="24" cy="18" r="1.2"/>
+              <rect x="14" y="28" width="20" height="3" rx="1"/>
+              <rect x="14" y="36" width="32" height="3" rx="1"/>
+              <rect x="14" y="42" width="14" height="3" rx="1"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Kijani Web</h3>
+          <p class="persona-card__desc">
+            481 tokens and 16 React components powering every browser-based product
+            surface today. Light and dark modes built in.
+          </p>
+        </a>
+
+        <div class="persona-card">
+          <div class="persona-card__num">002 · Kijani Mobile · Coming soon</div>
+          <div class="persona-card__illustration">
+            <!-- Phone -->
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+              <rect x="20" y="8" width="24" height="48" rx="4"/>
+              <path d="M28 12 L36 12"/>
+              <circle cx="32" cy="52" r="1.6"/>
+              <rect x="24" y="18" width="16" height="3" rx="1"/>
+              <rect x="24" y="26" width="11" height="3" rx="1"/>
+              <rect x="24" y="34" width="16" height="3" rx="1"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Kijani Mobile</h3>
+          <p class="persona-card__desc">
+            React Native components and platform-aware tokens for iOS and Android
+            surfaces. In design.
+          </p>
+        </div>
+
+        <div class="persona-card">
+          <div class="persona-card__num">003 · Kijani Platform · Coming soon</div>
+          <div class="persona-card__illustration">
+            <!-- Stacked layers -->
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M12 22 L32 12 L52 22 L32 32 Z"/>
+              <path d="M12 32 L32 22 L52 32 L32 42 Z"/>
+              <path d="M12 42 L32 32 L52 42 L32 52 Z"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Kijani Platform</h3>
+          <p class="persona-card__desc">
+            Density-shifted variants and admin-grade patterns for internal tooling
+            and operator dashboards.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Bento grid: what's inside -->
+    <section class="bento">
+
+      <!-- Big dark feature card -->
+      <a class="bento-card bento-card--wide bento-card--dark" href="/get-started/">
+        <div class="bento-card__header">
+          <h2 class="bento-card__title bento-card__title--large">Tokens.<br/>Components.<br/>Modes.</h2>
+          <span class="bento-card__arrow">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+        </div>
+        <div class="bento-card__meta">
+          One source on GitHub. Generates CSS, TypeScript, and Figma Variables. Light and dark, both covered.
+        </div>
+        <div class="bento-card__illustration" style="min-height: 180px;">
+          <!-- Wireframe iso cubes -->
+          <svg viewBox="0 0 320 180" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+            <!-- Back cube -->
+            <path d="M210 30 L260 60 L260 110 L210 80 Z"/>
+            <path d="M160 60 L210 30 L260 60 L210 90 Z"/>
+            <path d="M160 60 L210 90 L210 140 L160 110 Z"/>
+            <!-- Middle cube -->
+            <path d="M120 70 L170 100 L170 150 L120 120 Z"/>
+            <path d="M70 100 L120 70 L170 100 L120 130 Z"/>
+            <path d="M70 100 L120 130 L120 180 L70 150 Z"/>
+          </svg>
+        </div>
+      </a>
+
+      <!-- Foundations -->
+      <a class="bento-card" href="/design-system/foundations/">
+        <div class="bento-card__header">
+          <h3 class="bento-card__title">Foundations</h3>
+          <span class="bento-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+        </div>
+        <div class="bento-card__meta">
+          Color, type, spacing, motion. The shared values everything else is made of.
+        </div>
+        <div class="bento-card__illustration">
+          <!-- Stacked rings (palette feel) -->
+          <svg viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.2">
+            <ellipse cx="100" cy="40" rx="80" ry="14"/>
+            <ellipse cx="100" cy="55" rx="80" ry="14"/>
+            <ellipse cx="100" cy="70" rx="80" ry="14"/>
+            <ellipse cx="100" cy="85" rx="80" ry="14"/>
+          </svg>
+        </div>
+      </a>
+
+      <!-- Components -->
+      <a class="bento-card" href="/design-system/components/">
+        <div class="bento-card__header">
+          <h3 class="bento-card__title">Components</h3>
+          <span class="bento-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+        </div>
+        <div class="bento-card__meta">
+          16 production-ready components, each with full accessibility and dark mode.
+        </div>
+        <div class="bento-card__chips">
+          <span class="bento-card__chip">Button</span>
+          <span class="bento-card__chip">Field</span>
+          <span class="bento-card__chip">Toast</span>
+          <span class="bento-card__chip">Tabs</span>
+          <span class="bento-card__chip">Select</span>
+          <span class="bento-card__chip">+11 more</span>
+        </div>
+      </a>
+
+      <!-- Patterns -->
+      <a class="bento-card" href="/design-system/patterns/">
+        <div class="bento-card__header">
+          <h3 class="bento-card__title">Patterns</h3>
+          <span class="bento-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+        </div>
+        <div class="bento-card__meta">
+          Composition recipes for common UI. Coming next.
+        </div>
+        <div class="bento-card__illustration">
+          <!-- Dot grid -->
+          <svg viewBox="0 0 180 100" fill="currentColor">
+            <g>
+              <circle cx="20" cy="20" r="3"/><circle cx="50" cy="20" r="3"/><circle cx="80" cy="20" r="3"/><circle cx="110" cy="20" r="3"/><circle cx="140" cy="20" r="3"/><circle cx="160" cy="20" r="3"/>
+              <circle cx="20" cy="50" r="3"/><circle cx="50" cy="50" r="3"/><circle cx="80" cy="50" r="3"/><circle cx="110" cy="50" r="3"/><circle cx="140" cy="50" r="3"/><circle cx="160" cy="50" r="3"/>
+              <circle cx="20" cy="80" r="3"/><circle cx="50" cy="80" r="3"/><circle cx="80" cy="80" r="3"/><circle cx="110" cy="80" r="3"/><circle cx="140" cy="80" r="3"/><circle cx="160" cy="80" r="3"/>
+            </g>
+          </svg>
+        </div>
+      </a>
+
+      <!-- Resources -->
+      <a class="bento-card bento-card--wide" href="/resources/">
+        <div class="bento-card__header">
+          <h3 class="bento-card__title">Resources — GitHub, Storybook, Figma library, the plugin, contribution flow.</h3>
+          <span class="bento-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+        </div>
+        <div class="bento-card__meta">
+          Everything you need to consume the system and contribute back to it.
+        </div>
+      </a>
+
+    </section>
+
+    <!-- Built for AI -->
+    <section class="ai-section">
+      <span class="section-eyebrow">Built for AI</span>
+      <h2>The system any AI agent already understands.</h2>
+      <p class="lead">
+        Tokens are machine-readable JSON. Components ship with TypeScript types and
+        declarative specs. Whether you're a PM prompting Lovable, a designer in Figma,
+        or a developer pair-programming with Claude Code — the system speaks the same
+        language as the tools you use.
+      </p>
+
+      <div class="ai-tools-grid">
+
+        <a class="ai-tool-card" href="/built-for-ai/#lovable">
+          <span class="ai-tool-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+          <div class="ai-tool-card__logo">L</div>
+          <h3 class="ai-tool-card__name">Lovable</h3>
+          <p class="ai-tool-card__desc">
+            Prompt-to-app builder. PMs and designers ship real product surfaces by
+            describing what they want — and Lovable assembles it from this system's
+            components.
+          </p>
+          <span class="ai-tool-card__cta">Connect Lovable →</span>
+        </a>
+
+        <a class="ai-tool-card" href="/built-for-ai/#claude-code">
+          <span class="ai-tool-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+          <div class="ai-tool-card__logo">C</div>
+          <h3 class="ai-tool-card__name">Claude Code</h3>
+          <p class="ai-tool-card__desc">
+            CLI pair-programmer. Reads the component specs and token contracts directly
+            from this repo and writes code that respects them.
+          </p>
+          <span class="ai-tool-card__cta">Connect Claude Code →</span>
+        </a>
+
+        <a class="ai-tool-card" href="/built-for-ai/#antigravity">
+          <span class="ai-tool-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+          <div class="ai-tool-card__logo">A</div>
+          <h3 class="ai-tool-card__name">Antigravity</h3>
+          <p class="ai-tool-card__desc">
+            Agentic IDE that operates across files, terminals, and browsers. Build
+            entire features against the system without leaving the agent.
+          </p>
+          <span class="ai-tool-card__cta">Connect Antigravity →</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- Get started by role -->
+    <section class="site-content" style="padding-top: 32px;">
+      <span class="section-eyebrow">Get started</span>
+      <h2>Built for everyone<br/>who ships product.</h2>
+      <p class="lead">
+        Three short guides depending on what you do. Pick whichever fits
+        and you'll be productive in about five minutes.
+      </p>
+
+      <div class="persona-grid">
+
+        <a class="persona-card" href="/get-started/designers/">
+          <div class="persona-card__num">001 · For designers</div>
+          <div class="persona-card__illustration">
+            <!-- Concentric squares -->
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="8" y="8" width="48" height="48" rx="4"/>
+              <rect x="18" y="18" width="28" height="28" rx="3"/>
+              <rect x="26" y="26" width="12" height="12" rx="2"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Open the Figma library</h3>
+          <p class="persona-card__desc">
+            Variable-bound components, Text Styles, and ready-made Foundations pages.
+          </p>
+        </a>
+
+        <a class="persona-card" href="/get-started/developers/">
+          <div class="persona-card__num">002 · For developers</div>
+          <div class="persona-card__illustration">
+            <!-- Brackets -->
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 14 L8 32 L20 50"/>
+              <path d="M44 14 L56 32 L44 50"/>
+              <path d="M36 12 L28 52"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Install the package</h3>
+          <p class="persona-card__desc">
+            React components, CSS-variable tokens, TypeScript map for RN — one install.
+          </p>
+        </a>
+
+        <a class="persona-card" href="/get-started/pms/">
+          <div class="persona-card__num">003 · For product</div>
+          <div class="persona-card__illustration">
+            <!-- Triangle of nodes -->
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="32" cy="14" r="4"/>
+              <circle cx="14" cy="48" r="4"/>
+              <circle cx="50" cy="48" r="4"/>
+              <path d="M32 18 L14 44"/>
+              <path d="M32 18 L50 44"/>
+              <path d="M18 48 L46 48"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Understand the system</h3>
+          <p class="persona-card__desc">
+            Why we built it, what it gives the team, how to request what isn't here.
+          </p>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- Latest blogs -->
+    <section class="site-content">
+      <span class="section-eyebrow">From the blog</span>
+      <h2>Latest writing.</h2>
+      <p class="lead">
+        Process notes, decisions, and lessons from building the system. Updated when
+        there's something worth sharing — not before.
+      </p>
+
+      <div class="blog-grid">
+
+        <a class="blog-card" href="/blog/figma-plugin-vs-tokens-studio/">
+          <span class="blog-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+          <div>
+            <div class="blog-card__meta">
+              <span>Engineering</span>
+              <span class="blog-card__meta-dot"></span>
+              <span>May 11, 2026</span>
+            </div>
+            <h3 class="blog-card__title">Why we built a custom Figma plugin instead of paying for Tokens Studio</h3>
+            <p class="blog-card__excerpt">
+              The math on €10/month per designer adds up. Here's the trade-off we
+              made and how the plugin handles tokens, Text Styles, and components in
+              one place.
+            </p>
+          </div>
+          <div class="blog-card__footer">
+            <span>6 min read</span>
+            <span class="blog-card__cta">Read →</span>
+          </div>
+        </a>
+
+        <a class="blog-card" href="/blog/tokens-to-figma-variables/">
+          <span class="blog-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+          <div>
+            <div class="blog-card__meta">
+              <span>Foundations</span>
+              <span class="blog-card__meta-dot"></span>
+              <span>May 4, 2026</span>
+            </div>
+            <h3 class="blog-card__title">How 481 tokens flow from W3C JSON to Figma Variables</h3>
+            <p class="blog-card__excerpt">
+              A walkthrough of the three-tier model, the build pipeline, and why we
+              author tokens as JSON and generate everything else.
+            </p>
+          </div>
+          <div class="blog-card__footer">
+            <span>8 min read</span>
+            <span class="blog-card__cta">Read →</span>
+          </div>
+        </a>
+
+        <a class="blog-card" href="/blog/designing-for-ai-agents/">
+          <span class="blog-card__arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </span>
+          <div>
+            <div class="blog-card__meta">
+              <span>AI</span>
+              <span class="blog-card__meta-dot"></span>
+              <span>April 27, 2026</span>
+            </div>
+            <h3 class="blog-card__title">Designing a system that AI agents can actually use</h3>
+            <p class="blog-card__excerpt">
+              Five conventions we adopted so Lovable, Claude Code, and Antigravity
+              produce work that matches the system — not generic UI.
+            </p>
+          </div>
+          <div class="blog-card__footer">
+            <span>5 min read</span>
+            <span class="blog-card__cta">Read →</span>
+          </div>
+        </a>
+
+      </div>
+
+      <p style="margin-top: 32px;">
+        <a href="/blog/">See all posts →</a>
+      </p>
+    </section>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

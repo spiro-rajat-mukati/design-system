@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Patterns · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="design-system">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+        <span class="section-eyebrow">Patterns</span>
+        <h1>Composition<br/>recipes.</h1>
+        <p class="lead">
+          How to combine components into common UI — headers, empty states, dialogs,
+          and form layouts. We're cataloguing the patterns Kijani uses across products
+          and will publish them here.
+        </p>
+
+        <div class="placeholder">
+          <h2>Patterns library — coming next</h2>
+          <p>
+            Patterns are recipes for composition, not new components. They document
+            the recommended way to assemble what's already in the library to solve a
+            specific UX problem.
+          </p>
+        </div>
+
+        <h2>What this layer will contain</h2>
+        <p>Once the patterns library lands, expect entries like:</p>
+        <ul>
+          <li><strong>Page header</strong> — title + subtitle + right-aligned actions</li>
+          <li><strong>Empty state</strong> — illustration + message + primary action</li>
+          <li><strong>Form layout</strong> — vertical Fields with primary / secondary action footer</li>
+          <li><strong>Filter bar</strong> — search + dropdowns + active-filter chips</li>
+          <li><strong>Pagination</strong> — page navigation with size summary</li>
+          <li><strong>Section header</strong> — repeated within a page</li>
+          <li><strong>Modal / Dialog</strong> — overlay with focus trap and action footer</li>
+          <li><strong>List item</strong> — leading visual / title / meta / trailing action</li>
+        </ul>
+
+        <h2>What to do until then</h2>
+        <p>
+          Use the components directly. When you find yourself composing the same group
+          three times across surfaces, propose it as a Pattern via the
+          <a href="https://github.com/rajatspiro/design-system/issues" target="_blank" rel="noopener">RFC template</a>.
+          That's how the patterns layer earns its content — proven repetition, not
+          speculation.
+        </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

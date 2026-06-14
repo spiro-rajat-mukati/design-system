@@ -23,7 +23,7 @@ Before generating anything, read CLAUDE.md and follow:
 Hard constraints:
 - Use Kijani components, not raw HTML controls.
 - Use Kijani tokens, never hardcoded visual values.
-- Every change must work in light, dark, compact, comfortable modes.
+- Every change must work in light and dark modes (mobile: light/dark × platform).
 - Accessibility violations are build errors, not follow-ups.
 ```
 
@@ -60,10 +60,10 @@ Task: add a new variant `[variant-name]` to the `[ComponentName]` component.
 
 Constraints:
 - The variant must be expressed through existing tokens; do not introduce new tokens unless I confirm.
-- The Storybook story must cover all four modes (light/dark/compact/comfortable).
+- The Storybook story must cover light and dark modes.
 - Visual regression: include a Chromatic-safe snapshot.
 
-Reference: the existing variants in src/components/[ComponentName]/.
+Reference: the existing variants in packages/web/src/components/[ComponentName]/.
 ```
 
 ### 3 — "Turn this Figma frame into a spec"

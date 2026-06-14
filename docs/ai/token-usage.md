@@ -47,16 +47,16 @@ _Short paragraph: never use `left` / `right` properties. Use logical (`inline-st
 _Two-step process:_
 
 1. Argue for a semantic, not a primitive. New primitives are very rare. New semantics happen most weeks.
-2. File a PR against `src/tokens/source/` — never against the generated build files. The build pipeline regenerates everything else (CSS variables, TypeScript types, Figma Variables) from source.
+2. File a PR against `packages/tokens/source/` — never against the generated build files. The build pipeline regenerates everything else (CSS variables, TypeScript types, Figma Variables) from source.
 
 ## How the build pipeline uses tokens
 
-_Short paragraph: `src/tokens/source/*.json` is the source. The build emits CSS variables (consumed by components), TypeScript declarations (consumed by RN and type-checking), and `tokens.figma-variables.json` (consumed by the Figma plugin). Never hand-edit generated files — CI will reject the PR._
+_Short paragraph: `packages/tokens/source/*.json` is the source. The build emits CSS variables (consumed by components), TypeScript declarations (consumed by RN and type-checking), and `tokens.figma-variables.json` (consumed by the Figma plugin). Never hand-edit generated files — CI will reject the PR._
 
 ## How AI agents should query token availability
 
 _Quick recipe:_
 
-- "What's the semantic token for danger background?" → grep `src/tokens/source/semantic/` for `bg.danger`.
-- "Is there a token for shadow-elevated?" → grep `src/tokens/source/semantic/shadow.json`.
+- "What's the semantic token for danger background?" → grep `packages/tokens/source/color-light.json` for `bg.danger`.
+- "Is there a token for shadow-elevated?" → grep `packages/tokens/source/core.json` for `shadow-elevated`.
 - If nothing matches, the token doesn't exist yet. Don't invent one in CSS; propose it.

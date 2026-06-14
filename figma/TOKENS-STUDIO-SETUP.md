@@ -1,5 +1,7 @@
 # Tokens Studio — connecting Figma to this repo
 
+> ⚠️ **Superseded (2026-06-14) — historical reference only.** This manual Tokens Studio flow is no longer how we sync. The repo now ships a custom **DesignSync** plugin under `figma-plugin/` that does two-way, auto-merged token sync (push / pull / diff) — see `docs/ai/sync-plugin-plan.md`. Don't follow the steps below for new setup; the themes/modes listed here are also out of date (current modes are light/dark × web/iOS/Android — no compact/comfortable).
+
 This is the one-time setup. Follow it once per Figma file that consumes the design system. After it's done, every merge to `main` flows tokens into Figma Variables automatically.
 
 ## Prereqs
@@ -30,18 +32,17 @@ Inside the plugin:
    - **Personal Access Token** — paste the token from prereqs
    - **Repository** — `<your-github-org>/design-system`
    - **Branch** — `main`
-   - **File path** — `src/tokens/source` *(folder — Tokens Studio will read every `*.json` inside)*
+   - **File path** — `packages/tokens/source` *(folder — Tokens Studio will read every `*.json` inside)*
    - **Base URL** — leave empty
 3. Save. The plugin verifies the connection and reads `$metadata.json` to discover the sets.
 
 ### 3. Pull the tokens
 
-Click **Pull from GitHub** (cloud-down icon). All eight token sets appear in the left sidebar:
+Click **Pull from GitHub** (cloud-down icon). All seven token sets appear in the left sidebar:
 
 - core
 - color-light / color-dark
 - components / components-dark
-- density-comfortable
 - platform-{web,ios,android}
 
 ### 4. Verify the themes
@@ -71,13 +72,13 @@ This is the moment Tokens Studio Pro earns its keep.
 Tokens are now in Figma. **Designers must not edit Variable values directly in Figma's panel** — those edits are local to the file and won't survive the next push. Two safeguards:
 
 - Set the Variable Collection to **Read only** for everyone except library admins (Figma's collection settings).
-- Document that the only place to author tokens is `src/tokens/source/*.json`. Any change goes through a PR.
+- Document that the only place to author tokens is `packages/tokens/source/*.json`. Any change goes through a PR.
 
 ## Ongoing workflow
 
 ### When you change a token in code
 
-1. Edit `src/tokens/source/*.json`.
+1. Edit `packages/tokens/source/*.json`.
 2. Open a PR. CI runs `tokens:check`. Reviewers approve.
 3. Merge to `main`.
 4. In Figma, anyone using the library opens Tokens Studio and clicks **Pull from GitHub** → **Apply to Figma Variables**. Updated values flow into the Variable Collection. Library users get the change on next refresh.
@@ -109,4 +110,4 @@ This is the "designers can author tokens too" path. They never need to write cod
 
 - Tokens Studio docs: https://tokens.studio/docs
 - Figma Variables docs: https://help.figma.com/hc/en-us/articles/15145852043927
-- Our authoring contract: [`../src/tokens/source/README.md`](../src/tokens/source/README.md)
+- Our authoring contract: [`../packages/tokens/source/README.md`](../packages/tokens/source/README.md)

@@ -8,11 +8,15 @@ Humans should read it too — it's the single shortest description of how we wor
 
 ## 1. What this repo is
 
-_Short paragraph: Kijani is the design system powering every Kijani product. The repo holds three things — the source of truth tokens (W3C JSON), the React component library, and the Figma sync plugin. Storybook publishes via Chromatic. The showcase site under `site/` is the human-facing landing surface._
+Kijani is the design system powering every Kijani product. It's an **npm-workspaces monorepo** holding one shared foundation and two component libraries that consume it:
+
+- **`packages/tokens`** (`@kijani/tokens`) — the source-of-truth design tokens (Tokens Studio multi-file sets, DTCG `$value`/`$type` shape) plus the zero-dependency `build.mjs` that compiles them to every target.
+- **`packages/web`** (`@kijani/web`) — the React + CSS-variables component library.
+- **`packages/mobile`** (`@kijani/mobile`) — the React Native (Expo) component library; runtime theming via `ThemeProvider`/`useTheme()` because RN can't use CSS variables.
+
+Two more surfaces: **`figma-plugin/`** is the DesignSync plugin that keeps Figma variables and the token source in two-way sync (push / pull / diff, via auto-merged PRs), and **`site/`** is the human-facing showcase. Storybook publishes via Chromatic.
 
 ## 2. Golden rules (non-negotiable)
-
-_Numbered list, ~8 items. Each one line. Examples to flesh out later:_
 
 1. Never hardcode a colour, spacing, radius, font-size, or shadow value. Always use a token.
 2. Never compose UI from raw HTML if a Kijani component covers the case.
@@ -31,55 +35,52 @@ This repo is currently run **solo by the owner, with Claude Code driving executi
 - **Per unit of work, run the full loop yourself:** build + test + lint → commit → push → open a PR → squash-merge it → delete the branch → sync `main`. One focused PR per component/unit.
 - **Keep the gates green:** every change must pass the web build and `npm run tokens:check`; never hand-edit generated token files.
 - **Only stop to ask the owner for** a genuine product/design decision or ambiguity, or a failure you can't resolve. Surface those clearly; never guess on direction.
-- Current plan + locked decisions live in `docs/ai/mobile-library-plan.md`.
 
-_Solo-mode note: this intentionally lets the agent merge its own PRs. The lead-review expectation in §7 applies once the team grows._
+The master roadmap — (1) the mobile component library, then (2) the two-way Figma↔GitHub sync plugin — **shipped in v1**. Build history and the deferred P2 backlog live in `docs/ai/mobile-library-plan.md` and `docs/ai/sync-plugin-plan.md`.
+
+This solo mode intentionally lets the agent merge its own PRs. The lead-review expectation in §7 applies once the team grows.
 
 ## 3. How to start a task (the 60-second orientation)
 
-_Three bullet decision tree:_
-
-- **Editing a component / adding a variant** → read `docs/ai/component-usage.md` + `docs/ai/quality-bar.md` before touching code.
+- **Editing a component / adding a variant** → read `docs/ai/component-usage.md` + `docs/ai/quality-bar.md` before touching code. Web lives in `packages/web/src/components/`, mobile in `packages/mobile/src/components/`.
 - **Generating a new screen from a prompt or Figma** → read `docs/ai/pipeline.md` + `docs/ai/component-usage.md`.
-- **Token-level change** → read `docs/ai/token-usage.md` first; token edits go through the build pipeline, not the consumer.
+- **Token-level change** → read `docs/ai/token-usage.md` first; edit `packages/tokens/source/` only and let `build.mjs` regenerate — never touch the consumer or the generated files.
 
 ## 4. File map (where things live)
 
-_Table-style summary:_
-
 | Path | What's there |
 |---|---|
-| `src/tokens/source/` | W3C-format token JSON (the source of truth) |
-| `src/tokens/build/` | **Generated.** Never hand-edit. |
-| `src/components/` | React component library |
-| `figma-plugin/` | Custom plugin that syncs tokens, Text Styles, components to Figma |
+| `packages/tokens/source/` | Tokens Studio token sets (DTCG `$value`/`$type`) — the source of truth |
+| `packages/tokens/build/` | **Generated** outputs (CSS vars, `tokens.ts`, `tokens.native.ts`, Figma-variables JSON). Never hand-edit. |
+| `packages/tokens/build.mjs` | Zero-dep build that compiles source → all targets |
+| `packages/web/src/components/` | React + CSS-variables component library (`@kijani/web`) |
+| `packages/mobile/src/components/` | React Native / Expo component library (`@kijani/mobile`) |
+| `figma-plugin/` | DesignSync plugin — two-way Figma↔GitHub token sync |
 | `site/` | Showcase + docs site (static HTML, no build) |
 | `docs/ai/` | Deep-dive guides for AI usage |
 | `.storybook/` | Storybook config |
+| `.github/workflows/` | CI — token validate/build + Chromatic |
 
 ## 5. Pipeline at a glance
 
-_One-line summary of `docs/ai/pipeline.md`:_
-
-`Idea → spec → Figma frames → component selection → Claude Code build → review → Chromatic snapshot → ship`. Each stage names who is responsible and what the AI is reading at that stage. Full version: `docs/ai/pipeline.md`.
+`Idea → spec → Figma frames → component selection → Claude Code build → review → Chromatic snapshot → ship`. Each stage names who is responsible and what the AI is reading at that stage. Token changes can also flow Figma → repo through the DesignSync plugin. Full version: `docs/ai/pipeline.md`.
 
 ## 6. Quality bar (what "production-ready" means here)
 
-_Bullet list, ~6 items. Full version in `docs/ai/quality-bar.md`:_
-
 - Passes axe-core with zero violations.
-- Renders correctly in all 4 mode combinations.
+- Renders correctly in light and dark (web); light/dark × platform for mobile.
 - Has a Storybook story + Chromatic-approved snapshot.
 - Has unit tests for behaviour (not snapshots).
 - Bundle impact noted in the PR description.
 - No `any`, no `@ts-ignore`, no `// eslint-disable` without justification.
 
+Full version: `docs/ai/quality-bar.md`.
+
 ## 7. Escalation and ownership
 
-_Two paragraphs:_
+The system is **owned by Rajat (rajat.mukati@spironet.com)**, who runs it solo with Claude Code executing. While solo, the agent ships and merges its own PRs (see the operating mode above); the bar is the green gates, not a second reviewer. Escalate to the owner only for genuine product/design decisions, ambiguous direction, or a failure you can't resolve — surface those clearly rather than guessing.
 
-- _Who owns the system, when to ask vs. when to ship, RFC template location._
-- _Slack channel, GitHub label conventions, design + eng lead sign-off rules._
+Structural changes — forking/detaching a published component, breaking a component API, changing a token tier or the build pipeline — go through a short **RFC** (`docs/ai/rfc-template.md`) rather than a silent edit. Once the team grows, RFCs and any token- or API-level PR require design + eng lead sign-off before merge, and the auto-merge allowance is removed.
 
 ## 8. Index of guides
 
@@ -88,10 +89,13 @@ _Two paragraphs:_
 - `docs/ai/token-usage.md` — token tier rules
 - `docs/ai/prompting.md` — prompt library
 - `docs/ai/quality-bar.md` — production-readiness checklist
+- `docs/ai/rfc-template.md` — RFC template for structural changes
+- `docs/ai/mobile-library-plan.md` — mobile library build history + backlog
+- `docs/ai/sync-plugin-plan.md` — DesignSync plugin build history + backlog
 - `docs/ai/roles/pm.md` — product manager guide
 - `docs/ai/roles/designer.md` — designer guide
 - `docs/ai/roles/developer.md` — developer guide
 
 ---
 
-_Last reviewed: TODO · Owned by: design + eng leads · RFC template: `docs/ai/rfc-template.md` (TODO)_
+_Last reviewed: 2026-06-14 · Owned by: Rajat (solo; design + eng leads once the team grows) · RFC template: `docs/ai/rfc-template.md`_

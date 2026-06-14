@@ -1,6 +1,6 @@
 # Token sources
 
-This folder is **the only place tokens are authored.** The CSS files in `src/tokens/*.css` and `src/tokens/tokens.ts` are generated artifacts — never edit them directly. The CI guard (`tokens:check`) will reject any PR that hand-edits a generated file.
+This folder is **the only place tokens are authored.** The CSS and TS files in `packages/tokens/` are generated artifacts — never edit them directly. The CI guard (`tokens:check`) will reject any PR that hand-edits a generated file.
 
 ## Files
 
@@ -37,10 +37,14 @@ The build runs automatically before `start`, `build`, `storybook`, and `build-st
 
 ## Outputs (do not edit by hand)
 
-- `src/tokens/primitives.css` — primitives in `:root`.
-- `src/tokens/semantics.css` — light semantics in `:root`, dark overrides in `[data-theme="dark"]`.
-- `src/tokens/component-tokens.css` — components in `:root`, plus a `[data-theme="dark"]` override block.
-- `src/tokens/tokens.ts` — flat maps per `theme` (light/dark) for React Native and other JS consumers.
+All six files live directly in `packages/tokens/` (not in a subdirectory).
+
+- `packages/tokens/primitives.css` — primitives in `:root`.
+- `packages/tokens/semantics.css` — light semantics in `:root`, dark overrides in `[data-theme="dark"]`.
+- `packages/tokens/component-tokens.css` — components in `:root`, plus a `[data-theme="dark"]` override block.
+- `packages/tokens/tokens.ts` — flat token maps per theme (light/dark) for JS consumers.
+- `packages/tokens/tokens.native.ts` — fully-resolved nested theme objects for React Native (no CSS variables).
+- `packages/tokens/tokens.figma-variables.json` — Figma Variables import payload (6 modes: Web/iOS/Android × Light/Dark).
 
 ## Figma sync
 

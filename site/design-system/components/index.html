@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Components · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="design-system">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+        <span class="section-eyebrow">Components</span>
+        <h1>Sixteen, ready<br/>to ship.</h1>
+        <p class="lead">
+          Sixteen production-ready React components, each with full accessibility, light mode,
+          and dark mode. Per-component documentation will live here.
+        </p>
+
+        <div class="placeholder">
+          <h2>Per-component pages — coming soon</h2>
+          <p>
+            Until each component's reference page is written, every component is
+            interactively documented in Storybook with all variants, states, and a controls
+            panel.
+          </p>
+          <p style="margin-top: 24px;">
+            <a class="btn btn--primary" href="https://main--689e1fa86b32f2c00f0eda7e.chromatic.com" target="_blank" rel="noopener">Open Storybook ↗</a>
+          </p>
+        </div>
+
+        <h2>What's available now</h2>
+
+        <h3>Inputs</h3>
+        <ul>
+          <li>Field — label / helper / error wrapper</li>
+          <li>TextInput</li>
+          <li>NumericInput</li>
+          <li>Textarea</li>
+          <li>Radio + RadioGroup</li>
+          <li>Checkbox + CheckboxGroup</li>
+        </ul>
+
+        <h3>Actions</h3>
+        <ul>
+          <li>Button</li>
+          <li>ButtonGroup</li>
+        </ul>
+
+        <h3>Feedback</h3>
+        <ul>
+          <li>Toast</li>
+          <li>ProgressBar (linear + circular)</li>
+        </ul>
+
+        <h3>Labels</h3>
+        <ul>
+          <li>Badge — passive labels</li>
+          <li>Tag — interactive labels</li>
+        </ul>
+
+        <h3>Navigation</h3>
+        <ul>
+          <li>Tabs (underline / pill / segmented / enclosed)</li>
+        </ul>
+
+        <h3>Selection</h3>
+        <ul>
+          <li>Select</li>
+          <li>MultiSelect</li>
+          <li>Menu</li>
+        </ul>
+
+        <hr class="divider" />
+
+        <h2>Planned content for each component</h2>
+        <p>When per-component pages ship, each one will include:</p>
+        <ul>
+          <li>Anatomy diagram</li>
+          <li>Interactive playground (Storybook embed)</li>
+          <li>API table — every prop, type, default</li>
+          <li>Variants × states matrix</li>
+          <li>Accessibility notes — keyboard, ARIA, screen reader behaviour</li>
+          <li>Do / Don't with examples</li>
+          <li>Tokens consumed</li>
+          <li>Links to source on GitHub and Figma component</li>
+        </ul>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

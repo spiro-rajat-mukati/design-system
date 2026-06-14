@@ -10,7 +10,7 @@ The `Spec` column points at the markdown contract in code. The Figma component m
 > - Use **Boolean variant properties** for things that toggle (`disabled`, `loading`, `iconOnly`, `fullWidth`, `clearable`).
 > - Use **Instance Swap** for slot content (icons, leading/trailing affixes).
 > - Bind every fill, stroke, border-radius, padding (when supported), font, and effect to a Variable.
-> - Show the component **at compact density** by default; the Density Mode flip will shift sizes automatically once Variables are bound to dimension tokens.
+> - Show the component **at the default size** by default; sizes shift automatically once Variables are bound to dimension tokens.
 
 ---
 
@@ -24,7 +24,7 @@ The `Spec` column points at the markdown contract in code. The Figma component m
 
 Bind: `--button-{variant}-{bg|fg|border}` per variant + state. Heights and paddings come from `--button-height-{size}` / `--button-padding-inline-{size}`.
 
-Spec: [`../src/components/Button/Button.md`](../src/components/Button/Button.md)
+Spec: [`../packages/web/src/components/Button/Button.md`](../packages/web/src/components/Button/Button.md)
 
 ## 2. ButtonGroup
 
@@ -32,7 +32,7 @@ Spec: [`../src/components/Button/Button.md`](../src/components/Button/Button.md)
 - No variant properties of its own — it's a layout pattern.
 - Document the rule: child Buttons share variant + size; first/last get rounded outer corners.
 
-Spec: [`../src/components/ButtonGroup/ButtonGroup.md`](../src/components/ButtonGroup/ButtonGroup.md)
+Spec: [`../packages/web/src/components/ButtonGroup/ButtonGroup.md`](../packages/web/src/components/ButtonGroup/ButtonGroup.md)
 
 ## 3. Field
 
@@ -43,7 +43,7 @@ Spec: [`../src/components/ButtonGroup/ButtonGroup.md`](../src/components/ButtonG
 
 Bind: `--field-label-*`, `--field-helper-*`, `--field-error-*`, `--field-success-*`.
 
-Spec: [`../src/components/Field/Field.md`](../src/components/Field/Field.md)
+Spec: [`../packages/web/src/components/Field/Field.md`](../packages/web/src/components/Field/Field.md)
 
 ## 4. TextInput
 
@@ -53,7 +53,7 @@ Spec: [`../src/components/Field/Field.md`](../src/components/Field/Field.md)
 
 Bind: `--input-bg`, `--input-border`, `--input-border-{hover|focus|error|disabled}`, `--input-height-{size}`.
 
-Spec: [`../src/components/TextInput/TextInput.md`](../src/components/TextInput/TextInput.md)
+Spec: [`../packages/web/src/components/TextInput/TextInput.md`](../packages/web/src/components/TextInput/TextInput.md)
 
 ## 5. NumericInput
 
@@ -63,7 +63,7 @@ Spec: [`../src/components/TextInput/TextInput.md`](../src/components/TextInput/T
 
 Bind: input tokens + `--numeric-stepper-bg`, `--numeric-stepper-fg`.
 
-Spec: [`../src/components/NumericInput/NumericInput.md`](../src/components/NumericInput/NumericInput.md)
+Spec: [`../packages/web/src/components/NumericInput/NumericInput.md`](../packages/web/src/components/NumericInput/NumericInput.md)
 
 ## 6. Textarea
 
@@ -73,7 +73,7 @@ Spec: [`../src/components/NumericInput/NumericInput.md`](../src/components/Numer
 
 Bind: input tokens + `--textarea-min-height`, `--textarea-padding-block`.
 
-Spec: [`../src/components/Textarea/Textarea.md`](../src/components/Textarea/Textarea.md)
+Spec: [`../packages/web/src/components/Textarea/Textarea.md`](../packages/web/src/components/Textarea/Textarea.md)
 
 ## 7. Radio
 
@@ -89,7 +89,7 @@ Two components on the page: a single Radio and a RadioGroup composition.
 
 Bind: `--radio-{bg|border|dot|focus-ring}` × states; `--radio-size`.
 
-Spec: [`../src/components/Radio/Radio.md`](../src/components/Radio/Radio.md)
+Spec: [`../packages/web/src/components/Radio/Radio.md`](../packages/web/src/components/Radio/Radio.md)
 
 ## 8. Checkbox
 
@@ -102,7 +102,7 @@ Plus a CheckboxGroup composition (vertical and "select all" pattern).
 
 Bind: `--checkbox-{bg|border|mark}` × states; `--checkbox-size`.
 
-Spec: [`../src/components/Checkbox/Checkbox.md`](../src/components/Checkbox/Checkbox.md)
+Spec: [`../packages/web/src/components/Checkbox/Checkbox.md`](../packages/web/src/components/Checkbox/Checkbox.md)
 
 ## 9. Toast
 
@@ -114,7 +114,7 @@ Bind: `--toast-bg`, `--toast-fg`, `--toast-border`, `--toast-{tone}-accent`, `--
 
 Composition frames: stacked toasts in each of the four positions (top-right, top-center, bottom-right, bottom-center). Mark these as **Frames, not Components** — position is set by the Provider in code, not the Toast itself.
 
-Spec: [`../src/components/Toast/Toast.md`](../src/components/Toast/Toast.md)
+Spec: [`../packages/web/src/components/Toast/Toast.md`](../packages/web/src/components/Toast/Toast.md)
 
 ## 10. Badge
 
@@ -125,7 +125,7 @@ Spec: [`../src/components/Toast/Toast.md`](../src/components/Toast/Toast.md)
 
 Bind: `--badge-radius`, `--badge-height-{size}`, plus computed bg/fg per variant×tone (these are *not* tokenised individually — they're combinations of primitives + semantics; use the `_solid` / `_soft` / `_outline` styling rules from `Badge.css` and bind to the same primitives the CSS uses).
 
-Spec: [`../src/components/Badge/Badge.md`](../src/components/Badge/Badge.md)
+Spec: [`../packages/web/src/components/Badge/Badge.md`](../packages/web/src/components/Badge/Badge.md)
 
 ## 11. Tag
 
@@ -137,7 +137,7 @@ Same matrix as Badge, plus interactive states.
 
 Bind: same as Badge + `--tag-radius`, `--tag-bg-hover-tint`, `--tag-remove-hover-bg`.
 
-Spec: [`../src/components/Tag/Tag.md`](../src/components/Tag/Tag.md)
+Spec: [`../packages/web/src/components/Tag/Tag.md`](../packages/web/src/components/Tag/Tag.md)
 
 ## 12. Tabs
 
@@ -152,7 +152,7 @@ Bind: `--tabs-list-bg-segmented`, `--tabs-trigger-fg{,-hover,-active,-disabled}`
 
 > Note: `segmented + vertical` is automatically downgraded to `pill` in code. Don't build a `segmented + vertical` Figma variant — it doesn't exist in the system.
 
-Spec: [`../src/components/Tabs/Tabs.md`](../src/components/Tabs/Tabs.md)
+Spec: [`../packages/web/src/components/Tabs/Tabs.md`](../packages/web/src/components/Tabs/Tabs.md)
 
 ## 13. Select
 
@@ -163,7 +163,7 @@ Spec: [`../src/components/Tabs/Tabs.md`](../src/components/Tabs/Tabs.md)
 
 Bind: `--select-trigger-{bg|border|fg|radius}`, `--dropdown-{bg|border|radius|shadow}`, item tokens.
 
-Spec: [`../src/components/Select/Select.md`](../src/components/Select/Select.md)
+Spec: [`../packages/web/src/components/Select/Select.md`](../packages/web/src/components/Select/Select.md)
 
 ## 14. MultiSelect
 
@@ -173,7 +173,7 @@ Spec: [`../src/components/Select/Select.md`](../src/components/Select/Select.md)
 
 Bind: select tokens + `--select-chip-{bg|fg|radius}`.
 
-Spec: [`../src/components/MultiSelect/MultiSelect.md`](../src/components/MultiSelect/MultiSelect.md)
+Spec: [`../packages/web/src/components/MultiSelect/MultiSelect.md`](../packages/web/src/components/MultiSelect/MultiSelect.md)
 
 ## 15. Menu
 
@@ -184,7 +184,7 @@ Spec: [`../src/components/MultiSelect/MultiSelect.md`](../src/components/MultiSe
 
 Bind: `--dropdown-*` tokens for surface; `--dropdown-item-fg{,-active,-disabled,-destructive}`, `--dropdown-item-bg-{hover,active,destructive-hover}`.
 
-Spec: [`../src/components/Menu/Menu.md`](../src/components/Menu/Menu.md)
+Spec: [`../packages/web/src/components/Menu/Menu.md`](../packages/web/src/components/Menu/Menu.md)
 
 ## 16. ProgressBar
 
@@ -197,13 +197,13 @@ Bind: `--progress-track-bg`, `--progress-fill-{tone}`, `--progress-height-{size}
 
 > Indeterminate animation can't render statically. Show a still-frame and label it "indeterminate (animated)".
 
-Spec: [`../src/components/ProgressBar/ProgressBar.md`](../src/components/ProgressBar/ProgressBar.md)
+Spec: [`../packages/web/src/components/ProgressBar/ProgressBar.md`](../packages/web/src/components/ProgressBar/ProgressBar.md)
 
 ---
 
 ## Acceptance — every component must
 
-- [ ] Render correctly under all four Modes (light-compact, dark-compact, light-comfortable, dark-comfortable)
+- [ ] Render correctly under light and dark modes
 - [ ] Have every visible value bound to a Variable (no hex literals, no detached colour fills)
 - [ ] Have an Anatomy diagram on its page with parts labelled
 - [ ] Have at least one "in context" example showing realistic usage

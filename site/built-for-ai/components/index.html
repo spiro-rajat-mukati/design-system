@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Component usage · Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI</span>
+      <h1>Component usage.</h1>
+      <p class="lead">
+        The contract every AI agent — and every human — must follow when assembling
+        UI from Kijani components. If you're about to write a <code>&lt;div&gt;</code>
+        for something a component covers, stop and read this first.
+      </p>
+
+      <p>
+        Canonical version: <code>docs/ai/component-usage.md</code>.
+      </p>
+
+      <hr class="divider" />
+
+      <h2>How to choose a component</h2>
+      <p>
+        A five-question decision tree covers the most common pickers, form fields, and
+        feedback elements. <em>Full tree in the canonical doc — content to be mirrored
+        here.</em>
+      </p>
+
+      <h2>The 16 production components</h2>
+      <p>
+        Reference table: name, what it's for, what it isn't for, link to the live
+        Storybook story. <em>Content to be mirrored from the canonical doc.</em>
+      </p>
+
+      <h2>Composition rules</h2>
+      <ul>
+        <li>Compose from the inside out — fields → form → page.</li>
+        <li>Mode is inherited — never pass colour props for theming.</li>
+        <li>Spacing comes from layout primitives, not from margin on components.</li>
+        <li>Forms always use <code>Field</code>.</li>
+      </ul>
+
+      <h2>Anti-patterns AI must avoid</h2>
+      <ul>
+        <li>Re-implementing a component "with a tweak" — file an RFC instead.</li>
+        <li>Wrapping a component in extra divs to override styling — the component is missing a prop.</li>
+        <li>Mixing Kijani components with raw HTML controls on the same surface.</li>
+        <li>Using <code>Modal</code> as a non-modal panel — focus trap matters.</li>
+        <li>Stacking <code>Tooltip</code> on critical info — not reachable for SR / touch users.</li>
+      </ul>
+
+      <h2>Examples</h2>
+      <p>
+        Three before / after snippets — picking the right disclosure, form
+        composition, and status messaging. <em>To be filled in.</em>
+      </p>
+
+      <h2>When you can't find the right component</h2>
+      <p>
+        Don't ship a one-off. RFC template (TODO) in the repo. Token tweak: same week.
+        New variant: 1–2 weeks. New component: 3–6 weeks.
+      </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

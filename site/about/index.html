@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="about">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <main class="site-content">
+      <span class="section-eyebrow">About</span>
+      <h1>How this came<br/>to be.</h1>
+    <p class="lead">
+      How this came to be, who owns it, and how it evolves.
+    </p>
+
+    <h2>What this is</h2>
+    <p>
+      The Kijani Design System is the shared visual language and component library
+      used across Kijani's product surfaces. It exists so designers and engineers
+      can build product faster, consistently, without re-inventing the same button
+      or form for every feature.
+    </p>
+
+    <h2>How it's built</h2>
+    <p>
+      One source repository on GitHub holds every artifact — tokens, components,
+      documentation, the Figma plugin, this site. Tokens are authored once as W3C
+      JSON; a build script generates the CSS, TypeScript, and Figma Variables
+      representations. The Figma library is kept in sync by a custom plugin that
+      pulls from the same source.
+    </p>
+
+    <h2>Ownership</h2>
+    <p>
+      The design system is owned jointly by the design lead and the engineering lead.
+      Both must sign off on any token addition, component addition, or breaking change.
+      Anyone on the Kijani team can propose changes; the leads triage and approve.
+    </p>
+
+    <h2>Versioning</h2>
+    <p>
+      Semver discipline:
+    </p>
+    <ul>
+      <li><strong>Major</strong> — breaking changes (component API changes, removed tokens, renamed Variables).</li>
+      <li><strong>Minor</strong> — new components, new tokens, new variants.</li>
+      <li><strong>Patch</strong> — bug fixes, value tweaks (e.g. nudging a colour hue), documentation.</li>
+    </ul>
+
+    <h2>License</h2>
+    <p>
+      Internal to Kijani. The source repository and this site are private to the
+      team.
+    </p>
+
+    <h2>How to contribute</h2>
+    <p>
+      See <a href="/resources/">Resources</a> for the contribution flow. Token tweaks
+      and bug fixes start as GitHub issues or PRs; new components require an RFC.
+    </p>
+
+    </main>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

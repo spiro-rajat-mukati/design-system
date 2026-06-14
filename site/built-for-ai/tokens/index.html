@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Token usage · Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI</span>
+      <h1>Token usage.</h1>
+      <p class="lead">
+        The contract for visual values. No hardcoded colours, sizes, radii, durations,
+        or shadows — ever. This page explains the tier system, when each tier is
+        appropriate, and the anti-patterns that creep in when nobody's looking.
+      </p>
+
+      <p>
+        Canonical version: <code>docs/ai/token-usage.md</code>.
+      </p>
+
+      <hr class="divider" />
+
+      <h2>The three tiers</h2>
+      <p>
+        <code>primitive → semantic → component</code>. Primitives are raw values;
+        semantics are intent-bound and rebind per mode; component tokens are
+        per-component slots. <em>Full explanation in the canonical doc.</em>
+      </p>
+
+      <h2>Which tier to use</h2>
+      <p>
+        Four-question decision tree to pick the right tier. <em>To be mirrored.</em>
+      </p>
+
+      <h2>Anti-patterns</h2>
+      <ul>
+        <li>Hex colours in CSS — use the semantic token.</li>
+        <li>Pixel spacing — use the spacing scale or a layout primitive.</li>
+        <li>Hardcoded radius / shadow / duration — every visual value has a token.</li>
+        <li>Referencing a primitive directly from a component — go through a semantic.</li>
+      </ul>
+
+      <h2>Modes, RTL</h2>
+      <p>
+        Modes (light / dark) rebind at the semantic tier. RTL uses logical CSS
+        properties only — never <code>left</code> / <code>right</code>. Touch-target
+        sizing lives in the mobile (React Native) tokens, not a web density mode.
+        <em>Detail in the canonical doc.</em>
+      </p>
+
+      <h2>When you need a new token</h2>
+      <p>
+        New primitives are rare; new semantics happen most weeks. File the change
+        against <code>src/tokens/source/</code> — never against generated files.
+      </p>
+
+      <h2>How AI agents query token availability</h2>
+      <p>
+        Grep <code>src/tokens/source/</code> for the intent name. If nothing
+        matches, the token doesn't exist — propose it, don't invent it in CSS.
+      </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

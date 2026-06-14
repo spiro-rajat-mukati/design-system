@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prompt library · Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI</span>
+      <h1>Prompt library.</h1>
+      <p class="lead">
+        Templates that reliably produce Kijani-quality output across Claude.ai, Claude
+        Code, Cowork, Lovable, and Antigravity. Copy a template, fill in the bracketed
+        slots, send.
+      </p>
+
+      <p>
+        Canonical version: <code>docs/ai/prompting.md</code>.
+      </p>
+
+      <hr class="divider" />
+
+      <h2>The project context block</h2>
+      <p>
+        A short, fixed block that goes at the top of every prompt. It tells the model
+        to read <code>CLAUDE.md</code> first and lists the hard constraints (Kijani
+        components, Kijani tokens, light and dark modes, accessibility as a build error).
+        <em>Full block in the canonical doc.</em>
+      </p>
+
+      <h2>Templates by task</h2>
+      <ol class="steps">
+        <li><h3>Build a screen from a spec</h3><p>For Claude Code, given a Figma spec or Markdown spec.</p></li>
+        <li><h3>Generate a component variant</h3><p>For library changes — RFC-aware prompt.</p></li>
+        <li><h3>Turn a Figma frame into a spec</h3><p>For Cowork / Claude.ai with a screenshot or Figma URL.</p></li>
+        <li><h3>Review a PR for design-system fidelity</h3><p>First-pass review against the quality bar.</p></li>
+        <li><h3>Sharpen a problem statement</h3><p>For PMs, drafting a one-pager.</p></li>
+        <li><h3>Explore a flow</h3><p>For PMs + designers, generating three plausible layouts in Lovable / Cowork.</p></li>
+      </ol>
+
+      <h2>Patterns that produce better output</h2>
+      <ul>
+        <li>Tell the model where to start reading.</li>
+        <li>Demand a plan before code.</li>
+        <li>Constrain output shape, not creativity.</li>
+        <li>Give negative examples — what not to do.</li>
+        <li>Ask for the diff, not the whole file.</li>
+        <li>Make the model self-check against the quality bar.</li>
+      </ul>
+
+      <h2>Anti-patterns</h2>
+      <ul>
+        <li>"Just make it look nice" — there's no shared reference for "nice."</li>
+        <li>Pasting a screenshot without the context block — defaults to generic UI.</li>
+        <li>Letting the model pick a component without naming a reason.</li>
+        <li>Re-prompting after a bad output without naming what was wrong.</li>
+      </ul>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

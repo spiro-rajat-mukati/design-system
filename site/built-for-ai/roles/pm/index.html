@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For product managers · Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI · Role guide</span>
+      <h1>For product managers.</h1>
+      <p class="lead">
+        Your two-minute orientation to using AI inside the Kijani Design System. You
+        won't need to write code; you do need to know which tools produce which
+        outputs and how to scope a build so AI delivers something usable.
+      </p>
+
+      <p>
+        Canonical version: <code>docs/ai/roles/pm.md</code>.
+      </p>
+
+      <hr class="divider" />
+
+      <h2>The shape of your day with AI</h2>
+      <ol class="steps">
+        <li><h3>Sharpen intent</h3><p>Cowork / Claude.ai turn a fuzzy idea into a sharp one-pager.</p></li>
+        <li><h3>Explore options</h3><p>Lovable / Cowork stand up three plausible flows before designers commit.</p></li>
+        <li><h3>Review builds</h3><p>Cowork runs the quality bar on a PR diff so you spot fidelity issues without reading code.</p></li>
+      </ol>
+
+      <h2>What to ask for, and from whom</h2>
+      <p>
+        Compact tool-to-task table. <em>Mirrored from the canonical doc.</em>
+      </p>
+
+      <h2>Templates you'll use most</h2>
+      <ul>
+        <li>Sharpen a problem statement</li>
+        <li>Explore a flow</li>
+        <li>Review this PR for design-system fidelity</li>
+      </ul>
+      <p>Full text in the <a href="/built-for-ai/prompting/">prompt library</a>.</p>
+
+      <h2>How to scope a build so AI delivers</h2>
+      <ul>
+        <li>Always describe the user, the action, and the success state.</li>
+        <li>Name 1–3 components you expect in the result.</li>
+        <li>Specify which states matter (loading, empty, error, RTL).</li>
+        <li>Decline the first answer that looks close; ask for three variations.</li>
+      </ul>
+
+      <h2>Anti-patterns</h2>
+      <ul>
+        <li>Treating Cowork as a designer — it produces prose and prototypes, not decisions.</li>
+        <li>Skipping the Spec stage of the pipeline.</li>
+        <li>Shipping the first prototype as "design done."</li>
+      </ul>
+
+      <h2>What to escalate, and to whom</h2>
+      <p>
+        Bug → GitHub issue with the <code>bug</code> label. New variant: 1–2 weeks.
+        New component: 3–6 weeks. Use the RFC template (TODO).
+      </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

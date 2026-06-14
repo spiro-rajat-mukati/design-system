@@ -1,0 +1,32 @@
+# Kijani Design System
+
+> The visual language, tokens, and React component library powering Kijani products across web and mobile. Source of truth for all UI decisions: tokens, components, modes, and conventions.
+
+The repository contains three coordinated artifacts: W3C-format design tokens (authored as JSON), a React component library generated from those tokens, and a custom Figma plugin that syncs both to design. The showcase site under `site/` is the human-facing landing surface and mirrors the same guidance.
+
+When generating, reviewing, or modifying UI that depends on this system, agents must follow the rules in `CLAUDE.md` and the deeper guides under `docs/ai/`. The most common failure modes — hardcoded visual values, detached component instances, missing dark/RTL/density coverage, and missing accessibility — are all called out explicitly in those documents.
+
+## Primary
+
+- [CLAUDE.md](/CLAUDE.md): Front door for every AI session. Golden rules, file map, pipeline summary, quality bar.
+- [AGENTS.md](/AGENTS.md): Alias for agents using the AGENTS.md convention. Points to CLAUDE.md.
+
+## Guides
+
+- [Design-to-dev pipeline](/docs/ai/pipeline.md): The end-to-end workflow from idea to shipped code, with AI insertion points at every stage.
+- [Component usage](/docs/ai/component-usage.md): Component selection rules, composition rules, and anti-patterns AI must avoid.
+- [Token usage](/docs/ai/token-usage.md): Three-tier token hierarchy, when each tier is appropriate, hardcoded-value anti-patterns.
+- [Prompting](/docs/ai/prompting.md): Reusable prompt templates per role and per task type.
+- [Quality bar](/docs/ai/quality-bar.md): The production-readiness checklist every AI output must pass before review.
+
+## Roles
+
+- [PMs](/docs/ai/roles/pm.md): Prompt-to-app flows, Lovable + Cowork conventions, scoping a build.
+- [Designers](/docs/ai/roles/designer.md): Figma library workflow, Variables and modes, handoff-to-AI conventions.
+- [Developers](/docs/ai/roles/developer.md): Claude Code workflow inside the repo, PR conventions, review checklist.
+
+## Resources
+
+- [Storybook](https://main--689e1fa86b32f2c00f0eda7e.chromatic.com): Live component reference.
+- [Showcase site](/site/built-for-ai/): Human-facing version of these guides.
+- [GitHub repository](https://github.com/rajatspiro/design-system): Issues, RFCs, and changelog.

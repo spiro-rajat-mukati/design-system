@@ -16,7 +16,7 @@ _Bulleted contract:_
 
 - Every visible element is a Kijani library component instance.
 - Every visual value (colour, type, spacing) is a Variable / Text Style — not a hand-picked value.
-- Light, dark, compact, comfortable modes all switch correctly when you flip them at the frame level.
+- Light and dark modes switch correctly when you flip them at the frame level (mobile: light/dark × platform).
 - Zero detached instances. (If you detached to "make it work", that's the signal we need a new variant — file an RFC, don't ship the detach.)
 - Empty / loading / error / RTL frames present alongside the happy path.
 
@@ -51,5 +51,5 @@ _Bulleted:_
 _Two paragraphs:_
 
 - _A library component is missing a variant_ → RFC in GitHub, both leads review.
-- _A token feels off_ → file the proposed change in `src/tokens/source/`; both leads review.
+- _A token feels off_ → file the proposed change in `packages/tokens/source/`; both leads review.
 - _Something doesn't fit in any existing component_ → don't fork in Figma. Propose the component.
