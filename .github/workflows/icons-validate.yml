@@ -1,0 +1,29 @@
+name: Validate icons
+
+# Runs on every PR commit (no paths filter) so that when icons-build.yml
+# auto-commits regenerated components, this check re-runs on the new head
+# SHA and can go green — allowing auto-merge to fire.
+#
+# Also runs on push to main to keep the build gate on the default branch.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - "packages/icons/**"
+
+jobs:
+  check:
+    name: icons:check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Zero-dep build — no npm install needed.
+      - name: Re-run build and verify generated files match source
+        run: node packages/icons/check-generated.mjs

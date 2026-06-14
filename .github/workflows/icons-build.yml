@@ -1,0 +1,58 @@
+name: Regenerate icon build output
+
+# Mirrors the tokens-build.yml pattern — PAT-signed auto-commit.
+#
+# Why PAT and not GITHUB_TOKEN: see tokens-build.yml for the full rationale.
+# Short version: GITHUB_TOKEN commits don't re-trigger CI, so icons:check
+# would never go green → auto-merge would stall.
+#
+# Path filter: only re-run when SVG sources or the build script change.
+# The auto-commit touches only src/**,index.ts,native.ts — not svg/ or
+# build.mjs — so the filter prevents an infinite self-trigger loop.
+#
+# Required secret: TOKENS_BUILD_PAT (already configured for tokens-build.yml;
+# reused here — same fine-grained PAT, Contents → Read and Write).
+
+on:
+  pull_request:
+    paths:
+      - "packages/icons/svg/**"
+      - "packages/icons/build.mjs"
+
+permissions:
+  contents: read  # write ops go through the PAT below
+
+jobs:
+  build:
+    name: icons:build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.TOKENS_BUILD_PAT }}
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+
+      - name: Rebuild icon components
+        # Zero-dep build — no npm install needed.
+        run: node packages/icons/build.mjs
+
+      - name: Commit and push regenerated files (if changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/icons/src/ \
+                  packages/icons/index.ts \
+                  packages/icons/native.ts
+          if git diff --cached --quiet; then
+            echo "Build output already in sync — nothing to commit."
+          else
+            git commit -m "chore(icons): regenerate build output"
+            git push
+          fi

@@ -70,6 +70,36 @@ A private Figma plugin that keeps the design system in sync with this repo: **pu
 - The styles step is idempotent: re-running it on an already-bound file is a no-op.
 - Naming convention: `text.web.h1` ↔ var `type/web/h1/*` ↔ style `Web/H1`; weight stored as numeric in the repo, mapped to Figma style-name on write (400 ↔ Regular, 500 ↔ Medium, 600 ↔ Semi Bold, 700 ↔ Bold).
 
+## P2 — ② Icons (scaffolded 2026-06-15)
+
+### Operating model
+
+Icons follow the same **source → build → generated** model as tokens:
+
+- **Source (authored):** `packages/icons/svg/<name>.svg` — 24 × 24 `viewBox`, `currentColor` fills/strokes, kebab-case filenames.
+- **Generated (never hand-edited):** per-icon React components in `src/web/<Name>.tsx` + `src/native/<Name>.tsx`, barrel files `src/web/index.ts` + `src/native/index.ts`, root entry-points `index.ts` + `native.ts`.
+- **Build:** `packages/icons/build.mjs` (zero-dep Node ESM) — reads SVGs, normalises indentation, transforms attributes to JSX camelCase, binds `currentColor` to a `color` prop, maps SVG element names to react-native-svg components, generates `forwardRef` web components and named-function native components.
+- **CI:** `icons-build.yml` (path-filtered to `svg/**` and `build.mjs`, PAT-signed commit — reuses `TOKENS_BUILD_PAT`) + `icons-validate.yml` (no path filter, idempotency guard).
+
+### Entry points
+
+| Import | Use case |
+|---|---|
+| `@kijani/icons` | Web — full barrel |
+| `@kijani/icons/src/web/<Name>` | Web — per-icon deep import for tree-shaking |
+| `@kijani/icons/native` | React Native / Metro — full barrel |
+| `@kijani/icons/src/native/<Name>` | React Native — per-icon deep import (Metro tree-shaking) |
+
+### Starter set (PR #54 — 5 icons)
+
+`arrow-left`, `arrow-right`, `check`, `close`, `search`.
+
+### Figma asset file (deferred — plugin step)
+
+The plugin's icon-export action (future P2 step) will read from the **"Kijani — Assets" Figma file** (one file, pages by type: icons / illustrations / images). Icons are exported as 24 × 24 SVGs with hardcoded colors stripped, then pushed as a PR to `packages/icons/svg/`. The CI `icons-build.yml` regenerates components automatically — the plugin never touches `src/`.
+
+See `decisions.md D11` for the full assets routing model.
+
 ## Guardrails
 
 - Write `packages/tokens/source/` only; let `build.mjs` + the `tokens-validate` CI build. Never hand-edit generated files.
