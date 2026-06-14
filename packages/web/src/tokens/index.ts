@@ -143,7 +143,7 @@ export type TypographyRole =
   | "caption" | "code" | "overline";
 
 export type TypographyTokenSlot = "size" | "line" | "weight";
-export type TypographyToken = `--text-${TypographyRole}-${TypographyTokenSlot}`;
+export type TypographyToken = `--text-web-${TypographyRole}-${TypographyTokenSlot}`;
 
 export type SpacingRoleToken =
   | "--space-inset-sm" | "--space-inset-md" | "--space-inset-lg" | "--space-inset-xl"

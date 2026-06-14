@@ -9,7 +9,7 @@
   border: var(--input-border-width) solid var(--select-trigger-border);
   border-radius: var(--select-trigger-radius);
   font-family: var(--font-family-sans);
-  font-size: var(--text-body-s-size);
+  font-size: var(--text-web-body-s-size);
   cursor: pointer;
   padding: var(--select-trigger-padding);
   transition: var(--input-transition);

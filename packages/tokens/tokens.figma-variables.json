@@ -1017,22 +1017,22 @@
       "type": "STRING",
       "values": {
         "light-web": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "dark-web": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "light-ios": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "dark-ios": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "light-android": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "dark-android": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         }
       }
     },
@@ -5985,22 +5985,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "text/caption/line"
+          "alias": "text/web/caption/line"
         },
         "dark-web": {
-          "alias": "text/caption/line"
+          "alias": "text/web/caption/line"
         },
         "light-ios": {
-          "alias": "text/caption/line"
+          "alias": "text/web/caption/line"
         },
         "dark-ios": {
-          "alias": "text/caption/line"
+          "alias": "text/web/caption/line"
         },
         "light-android": {
-          "alias": "text/caption/line"
+          "alias": "text/web/caption/line"
         },
         "dark-android": {
-          "alias": "text/caption/line"
+          "alias": "text/web/caption/line"
         }
       }
     },
@@ -6009,22 +6009,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "text/caption/size"
+          "alias": "text/web/caption/size"
         },
         "dark-web": {
-          "alias": "text/caption/size"
+          "alias": "text/web/caption/size"
         },
         "light-ios": {
-          "alias": "text/caption/size"
+          "alias": "text/web/caption/size"
         },
         "dark-ios": {
-          "alias": "text/caption/size"
+          "alias": "text/web/caption/size"
         },
         "light-android": {
-          "alias": "text/caption/size"
+          "alias": "text/web/caption/size"
         },
         "dark-android": {
-          "alias": "text/caption/size"
+          "alias": "text/web/caption/size"
         }
       }
     },
@@ -6081,22 +6081,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "text/label-m/line"
+          "alias": "text/web/label-m/line"
         },
         "dark-web": {
-          "alias": "text/label-m/line"
+          "alias": "text/web/label-m/line"
         },
         "light-ios": {
-          "alias": "text/label-m/line"
+          "alias": "text/web/label-m/line"
         },
         "dark-ios": {
-          "alias": "text/label-m/line"
+          "alias": "text/web/label-m/line"
         },
         "light-android": {
-          "alias": "text/label-m/line"
+          "alias": "text/web/label-m/line"
         },
         "dark-android": {
-          "alias": "text/label-m/line"
+          "alias": "text/web/label-m/line"
         }
       }
     },
@@ -6105,22 +6105,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "text/label-m/size"
+          "alias": "text/web/label-m/size"
         },
         "dark-web": {
-          "alias": "text/label-m/size"
+          "alias": "text/web/label-m/size"
         },
         "light-ios": {
-          "alias": "text/label-m/size"
+          "alias": "text/web/label-m/size"
         },
         "dark-ios": {
-          "alias": "text/label-m/size"
+          "alias": "text/web/label-m/size"
         },
         "light-android": {
-          "alias": "text/label-m/size"
+          "alias": "text/web/label-m/size"
         },
         "dark-android": {
-          "alias": "text/label-m/size"
+          "alias": "text/web/label-m/size"
         }
       }
     },
@@ -6129,22 +6129,22 @@
       "type": "STRING",
       "values": {
         "light-web": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "dark-web": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "light-ios": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "dark-ios": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "light-android": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         },
         "dark-android": {
-          "alias": "text/label-m/weight"
+          "alias": "text/web/label-m/weight"
         }
       }
     },
@@ -6337,6 +6337,30 @@
         },
         "dark-android": {
           "value": 14
+        }
+      }
+    },
+    {
+      "name": "font-size/25",
+      "type": "FLOAT",
+      "values": {
+        "light-web": {
+          "value": 10
+        },
+        "dark-web": {
+          "value": 10
+        },
+        "light-ios": {
+          "value": 10
+        },
+        "dark-ios": {
+          "value": 10
+        },
+        "light-android": {
+          "value": 10
+        },
+        "dark-android": {
+          "value": 10
         }
       }
     },
@@ -6945,22 +6969,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "text/body-s/size"
+          "alias": "text/web/body-s/size"
         },
         "dark-web": {
-          "alias": "text/body-s/size"
+          "alias": "text/web/body-s/size"
         },
         "light-ios": {
-          "alias": "text/body-s/size"
+          "alias": "text/web/body-s/size"
         },
         "dark-ios": {
-          "alias": "text/body-s/size"
+          "alias": "text/web/body-s/size"
         },
         "light-android": {
-          "alias": "text/body-s/size"
+          "alias": "text/web/body-s/size"
         },
         "dark-android": {
-          "alias": "text/body-s/size"
+          "alias": "text/web/body-s/size"
         }
       }
     },
@@ -7089,22 +7113,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "text/body-s/line"
+          "alias": "text/web/body-s/line"
         },
         "dark-web": {
-          "alias": "text/body-s/line"
+          "alias": "text/web/body-s/line"
         },
         "light-ios": {
-          "alias": "text/body-s/line"
+          "alias": "text/web/body-s/line"
         },
         "dark-ios": {
-          "alias": "text/body-s/line"
+          "alias": "text/web/body-s/line"
         },
         "light-android": {
-          "alias": "text/body-s/line"
+          "alias": "text/web/body-s/line"
         },
         "dark-android": {
-          "alias": "text/body-s/line"
+          "alias": "text/web/body-s/line"
         }
       }
     },
@@ -9749,7 +9773,871 @@
       }
     },
     {
-      "name": "text/body-l/line",
+      "name": "text/mobile/body-lg-regular/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/normal"
+        },
+        "dark-ios": {
+          "alias": "line-height/normal"
+        },
+        "light-android": {
+          "alias": "line-height/normal"
+        },
+        "dark-android": {
+          "alias": "line-height/normal"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-lg-regular/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/300"
+        },
+        "dark-ios": {
+          "alias": "font-size/300"
+        },
+        "light-android": {
+          "alias": "font-size/300"
+        },
+        "dark-android": {
+          "alias": "font-size/300"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-lg-regular/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/regular"
+        },
+        "dark-ios": {
+          "alias": "font-weight/regular"
+        },
+        "light-android": {
+          "alias": "font-weight/regular"
+        },
+        "dark-android": {
+          "alias": "font-weight/regular"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-lg-semibold/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/normal"
+        },
+        "dark-ios": {
+          "alias": "line-height/normal"
+        },
+        "light-android": {
+          "alias": "line-height/normal"
+        },
+        "dark-android": {
+          "alias": "line-height/normal"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-lg-semibold/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/300"
+        },
+        "dark-ios": {
+          "alias": "font-size/300"
+        },
+        "light-android": {
+          "alias": "font-size/300"
+        },
+        "dark-android": {
+          "alias": "font-size/300"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-lg-semibold/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-md-regular/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/normal"
+        },
+        "dark-ios": {
+          "alias": "line-height/normal"
+        },
+        "light-android": {
+          "alias": "line-height/normal"
+        },
+        "dark-android": {
+          "alias": "line-height/normal"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-md-regular/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/200"
+        },
+        "dark-ios": {
+          "alias": "font-size/200"
+        },
+        "light-android": {
+          "alias": "font-size/200"
+        },
+        "dark-android": {
+          "alias": "font-size/200"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-md-regular/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/regular"
+        },
+        "dark-ios": {
+          "alias": "font-weight/regular"
+        },
+        "light-android": {
+          "alias": "font-weight/regular"
+        },
+        "dark-android": {
+          "alias": "font-weight/regular"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-md-semibold/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/normal"
+        },
+        "dark-ios": {
+          "alias": "line-height/normal"
+        },
+        "light-android": {
+          "alias": "line-height/normal"
+        },
+        "dark-android": {
+          "alias": "line-height/normal"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-md-semibold/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/200"
+        },
+        "dark-ios": {
+          "alias": "font-size/200"
+        },
+        "light-android": {
+          "alias": "font-size/200"
+        },
+        "dark-android": {
+          "alias": "font-size/200"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-md-semibold/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-sm-regular/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/normal"
+        },
+        "dark-ios": {
+          "alias": "line-height/normal"
+        },
+        "light-android": {
+          "alias": "line-height/normal"
+        },
+        "dark-android": {
+          "alias": "line-height/normal"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-sm-regular/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/100"
+        },
+        "dark-ios": {
+          "alias": "font-size/100"
+        },
+        "light-android": {
+          "alias": "font-size/100"
+        },
+        "dark-android": {
+          "alias": "font-size/100"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-sm-regular/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/regular"
+        },
+        "dark-ios": {
+          "alias": "font-weight/regular"
+        },
+        "light-android": {
+          "alias": "font-weight/regular"
+        },
+        "dark-android": {
+          "alias": "font-weight/regular"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-sm-semibold/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/normal"
+        },
+        "dark-ios": {
+          "alias": "line-height/normal"
+        },
+        "light-android": {
+          "alias": "line-height/normal"
+        },
+        "dark-android": {
+          "alias": "line-height/normal"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-sm-semibold/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/100"
+        },
+        "dark-ios": {
+          "alias": "font-size/100"
+        },
+        "light-android": {
+          "alias": "font-size/100"
+        },
+        "dark-android": {
+          "alias": "font-size/100"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/body-sm-semibold/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/caption/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/normal"
+        },
+        "dark-ios": {
+          "alias": "line-height/normal"
+        },
+        "light-android": {
+          "alias": "line-height/normal"
+        },
+        "dark-android": {
+          "alias": "line-height/normal"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/caption/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/50"
+        },
+        "dark-ios": {
+          "alias": "font-size/50"
+        },
+        "light-android": {
+          "alias": "font-size/50"
+        },
+        "dark-android": {
+          "alias": "font-size/50"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/caption/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/regular"
+        },
+        "dark-ios": {
+          "alias": "font-weight/regular"
+        },
+        "light-android": {
+          "alias": "font-weight/regular"
+        },
+        "dark-android": {
+          "alias": "font-weight/regular"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/headline/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/snug"
+        },
+        "dark-ios": {
+          "alias": "line-height/snug"
+        },
+        "light-android": {
+          "alias": "line-height/snug"
+        },
+        "dark-android": {
+          "alias": "line-height/snug"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/headline/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/300"
+        },
+        "dark-ios": {
+          "alias": "font-size/300"
+        },
+        "light-android": {
+          "alias": "font-size/300"
+        },
+        "dark-android": {
+          "alias": "font-size/300"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/headline/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/label/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/snug"
+        },
+        "dark-ios": {
+          "alias": "line-height/snug"
+        },
+        "light-android": {
+          "alias": "line-height/snug"
+        },
+        "dark-android": {
+          "alias": "line-height/snug"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/label/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/100"
+        },
+        "dark-ios": {
+          "alias": "font-size/100"
+        },
+        "light-android": {
+          "alias": "font-size/100"
+        },
+        "dark-android": {
+          "alias": "font-size/100"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/label/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/micro/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/normal"
+        },
+        "dark-ios": {
+          "alias": "line-height/normal"
+        },
+        "light-android": {
+          "alias": "line-height/normal"
+        },
+        "dark-android": {
+          "alias": "line-height/normal"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/micro/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/25"
+        },
+        "dark-ios": {
+          "alias": "font-size/25"
+        },
+        "light-android": {
+          "alias": "font-size/25"
+        },
+        "dark-android": {
+          "alias": "font-size/25"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/micro/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/regular"
+        },
+        "dark-ios": {
+          "alias": "font-weight/regular"
+        },
+        "light-android": {
+          "alias": "font-weight/regular"
+        },
+        "dark-android": {
+          "alias": "font-weight/regular"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/subhead-md/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/snug"
+        },
+        "dark-ios": {
+          "alias": "line-height/snug"
+        },
+        "light-android": {
+          "alias": "line-height/snug"
+        },
+        "dark-android": {
+          "alias": "line-height/snug"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/subhead-md/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/200"
+        },
+        "dark-ios": {
+          "alias": "font-size/200"
+        },
+        "light-android": {
+          "alias": "font-size/200"
+        },
+        "dark-android": {
+          "alias": "font-size/200"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/subhead-md/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/subhead-sm/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/snug"
+        },
+        "dark-ios": {
+          "alias": "line-height/snug"
+        },
+        "light-android": {
+          "alias": "line-height/snug"
+        },
+        "dark-android": {
+          "alias": "line-height/snug"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/subhead-sm/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/100"
+        },
+        "dark-ios": {
+          "alias": "font-size/100"
+        },
+        "light-android": {
+          "alias": "font-size/100"
+        },
+        "dark-android": {
+          "alias": "font-size/100"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/subhead-sm/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-lg/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/snug"
+        },
+        "dark-ios": {
+          "alias": "line-height/snug"
+        },
+        "light-android": {
+          "alias": "line-height/snug"
+        },
+        "dark-android": {
+          "alias": "line-height/snug"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-lg/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/700"
+        },
+        "dark-ios": {
+          "alias": "font-size/700"
+        },
+        "light-android": {
+          "alias": "font-size/700"
+        },
+        "dark-android": {
+          "alias": "font-size/700"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-lg/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-md/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/snug"
+        },
+        "dark-ios": {
+          "alias": "line-height/snug"
+        },
+        "light-android": {
+          "alias": "line-height/snug"
+        },
+        "dark-android": {
+          "alias": "line-height/snug"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-md/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/600"
+        },
+        "dark-ios": {
+          "alias": "font-size/600"
+        },
+        "light-android": {
+          "alias": "font-size/600"
+        },
+        "dark-android": {
+          "alias": "font-size/600"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-md/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-sm/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/snug"
+        },
+        "dark-ios": {
+          "alias": "line-height/snug"
+        },
+        "light-android": {
+          "alias": "line-height/snug"
+        },
+        "dark-android": {
+          "alias": "line-height/snug"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-sm/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/500"
+        },
+        "dark-ios": {
+          "alias": "font-size/500"
+        },
+        "light-android": {
+          "alias": "font-size/500"
+        },
+        "dark-android": {
+          "alias": "font-size/500"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-sm/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/medium"
+        },
+        "dark-ios": {
+          "alias": "font-weight/medium"
+        },
+        "light-android": {
+          "alias": "font-weight/medium"
+        },
+        "dark-android": {
+          "alias": "font-weight/medium"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-xl/line",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "line-height/tight"
+        },
+        "dark-ios": {
+          "alias": "line-height/tight"
+        },
+        "light-android": {
+          "alias": "line-height/tight"
+        },
+        "dark-android": {
+          "alias": "line-height/tight"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-xl/size",
+      "type": "FLOAT",
+      "values": {
+        "light-ios": {
+          "alias": "font-size/800"
+        },
+        "dark-ios": {
+          "alias": "font-size/800"
+        },
+        "light-android": {
+          "alias": "font-size/800"
+        },
+        "dark-android": {
+          "alias": "font-size/800"
+        }
+      }
+    },
+    {
+      "name": "text/mobile/title-xl/weight",
+      "type": "STRING",
+      "values": {
+        "light-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-ios": {
+          "alias": "font-weight/semibold"
+        },
+        "light-android": {
+          "alias": "font-weight/semibold"
+        },
+        "dark-android": {
+          "alias": "font-weight/semibold"
+        }
+      }
+    },
+    {
+      "name": "text/web/body-l/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -9773,7 +10661,7 @@
       }
     },
     {
-      "name": "text/body-l/size",
+      "name": "text/web/body-l/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -9797,7 +10685,7 @@
       }
     },
     {
-      "name": "text/body-l/weight",
+      "name": "text/web/body-l/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -9821,7 +10709,7 @@
       }
     },
     {
-      "name": "text/body-m/line",
+      "name": "text/web/body-m/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -9845,7 +10733,7 @@
       }
     },
     {
-      "name": "text/body-m/size",
+      "name": "text/web/body-m/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -9869,7 +10757,7 @@
       }
     },
     {
-      "name": "text/body-m/weight",
+      "name": "text/web/body-m/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -9893,7 +10781,7 @@
       }
     },
     {
-      "name": "text/body-s/line",
+      "name": "text/web/body-s/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -9917,7 +10805,7 @@
       }
     },
     {
-      "name": "text/body-s/size",
+      "name": "text/web/body-s/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -9941,7 +10829,7 @@
       }
     },
     {
-      "name": "text/body-s/weight",
+      "name": "text/web/body-s/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -9965,7 +10853,7 @@
       }
     },
     {
-      "name": "text/caption/line",
+      "name": "text/web/caption/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -9989,7 +10877,7 @@
       }
     },
     {
-      "name": "text/caption/size",
+      "name": "text/web/caption/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10013,7 +10901,7 @@
       }
     },
     {
-      "name": "text/caption/weight",
+      "name": "text/web/caption/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10037,7 +10925,7 @@
       }
     },
     {
-      "name": "text/code/family",
+      "name": "text/web/code/family",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10061,7 +10949,7 @@
       }
     },
     {
-      "name": "text/code/line",
+      "name": "text/web/code/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10085,7 +10973,7 @@
       }
     },
     {
-      "name": "text/code/size",
+      "name": "text/web/code/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10109,7 +10997,7 @@
       }
     },
     {
-      "name": "text/code/weight",
+      "name": "text/web/code/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10133,7 +11021,7 @@
       }
     },
     {
-      "name": "text/display-l/line",
+      "name": "text/web/display-l/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10157,7 +11045,7 @@
       }
     },
     {
-      "name": "text/display-l/size",
+      "name": "text/web/display-l/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10181,7 +11069,7 @@
       }
     },
     {
-      "name": "text/display-l/weight",
+      "name": "text/web/display-l/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10205,7 +11093,7 @@
       }
     },
     {
-      "name": "text/display-m/line",
+      "name": "text/web/display-m/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10229,7 +11117,7 @@
       }
     },
     {
-      "name": "text/display-m/size",
+      "name": "text/web/display-m/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10253,7 +11141,7 @@
       }
     },
     {
-      "name": "text/display-m/weight",
+      "name": "text/web/display-m/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10277,7 +11165,7 @@
       }
     },
     {
-      "name": "text/display-s/line",
+      "name": "text/web/display-s/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10301,7 +11189,7 @@
       }
     },
     {
-      "name": "text/display-s/size",
+      "name": "text/web/display-s/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10325,7 +11213,7 @@
       }
     },
     {
-      "name": "text/display-s/weight",
+      "name": "text/web/display-s/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10349,7 +11237,7 @@
       }
     },
     {
-      "name": "text/heading-1/line",
+      "name": "text/web/heading-1/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10373,7 +11261,7 @@
       }
     },
     {
-      "name": "text/heading-1/size",
+      "name": "text/web/heading-1/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10397,7 +11285,7 @@
       }
     },
     {
-      "name": "text/heading-1/weight",
+      "name": "text/web/heading-1/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10421,7 +11309,7 @@
       }
     },
     {
-      "name": "text/heading-2/line",
+      "name": "text/web/heading-2/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10445,7 +11333,7 @@
       }
     },
     {
-      "name": "text/heading-2/size",
+      "name": "text/web/heading-2/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10469,7 +11357,7 @@
       }
     },
     {
-      "name": "text/heading-2/weight",
+      "name": "text/web/heading-2/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10493,7 +11381,7 @@
       }
     },
     {
-      "name": "text/heading-3/line",
+      "name": "text/web/heading-3/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10517,7 +11405,7 @@
       }
     },
     {
-      "name": "text/heading-3/size",
+      "name": "text/web/heading-3/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10541,7 +11429,7 @@
       }
     },
     {
-      "name": "text/heading-3/weight",
+      "name": "text/web/heading-3/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10565,7 +11453,7 @@
       }
     },
     {
-      "name": "text/heading-4/line",
+      "name": "text/web/heading-4/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10589,7 +11477,7 @@
       }
     },
     {
-      "name": "text/heading-4/size",
+      "name": "text/web/heading-4/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10613,7 +11501,7 @@
       }
     },
     {
-      "name": "text/heading-4/weight",
+      "name": "text/web/heading-4/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10637,7 +11525,7 @@
       }
     },
     {
-      "name": "text/heading-5/line",
+      "name": "text/web/heading-5/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10661,7 +11549,7 @@
       }
     },
     {
-      "name": "text/heading-5/size",
+      "name": "text/web/heading-5/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10685,7 +11573,7 @@
       }
     },
     {
-      "name": "text/heading-5/weight",
+      "name": "text/web/heading-5/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10709,7 +11597,7 @@
       }
     },
     {
-      "name": "text/heading-6/line",
+      "name": "text/web/heading-6/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10733,7 +11621,7 @@
       }
     },
     {
-      "name": "text/heading-6/size",
+      "name": "text/web/heading-6/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10757,7 +11645,7 @@
       }
     },
     {
-      "name": "text/heading-6/weight",
+      "name": "text/web/heading-6/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10781,7 +11669,7 @@
       }
     },
     {
-      "name": "text/label-l/line",
+      "name": "text/web/label-l/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10805,7 +11693,7 @@
       }
     },
     {
-      "name": "text/label-l/size",
+      "name": "text/web/label-l/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10829,7 +11717,7 @@
       }
     },
     {
-      "name": "text/label-l/weight",
+      "name": "text/web/label-l/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10853,7 +11741,7 @@
       }
     },
     {
-      "name": "text/label-m/line",
+      "name": "text/web/label-m/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10877,7 +11765,7 @@
       }
     },
     {
-      "name": "text/label-m/size",
+      "name": "text/web/label-m/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10901,7 +11789,7 @@
       }
     },
     {
-      "name": "text/label-m/weight",
+      "name": "text/web/label-m/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10925,7 +11813,7 @@
       }
     },
     {
-      "name": "text/label-s/line",
+      "name": "text/web/label-s/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10949,7 +11837,7 @@
       }
     },
     {
-      "name": "text/label-s/size",
+      "name": "text/web/label-s/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -10973,7 +11861,7 @@
       }
     },
     {
-      "name": "text/label-s/weight",
+      "name": "text/web/label-s/weight",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -10997,7 +11885,7 @@
       }
     },
     {
-      "name": "text/overline/line",
+      "name": "text/web/overline/line",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -11021,7 +11909,7 @@
       }
     },
     {
-      "name": "text/overline/size",
+      "name": "text/web/overline/size",
       "type": "FLOAT",
       "values": {
         "light-web": {
@@ -11045,7 +11933,7 @@
       }
     },
     {
-      "name": "text/overline/spacing",
+      "name": "text/web/overline/spacing",
       "type": "STRING",
       "values": {
         "light-web": {
@@ -11069,7 +11957,7 @@
       }
     },
     {
-      "name": "text/overline/weight",
+      "name": "text/web/overline/weight",
       "type": "STRING",
       "values": {
         "light-web": {

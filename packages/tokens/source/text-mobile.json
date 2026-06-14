@@ -1,0 +1,86 @@
+{
+  "text": {
+    "mobile": {
+      "title-xl": {
+        "size":   { "$value": "{font-size.800}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.tight}",    "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "title-lg": {
+        "size":   { "$value": "{font-size.700}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.snug}",     "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "title-md": {
+        "size":   { "$value": "{font-size.600}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.snug}",     "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "title-sm": {
+        "size":   { "$value": "{font-size.500}",       "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.snug}",    "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.medium}",  "$type": "fontWeights" }
+      },
+      "headline": {
+        "size":   { "$value": "{font-size.300}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.snug}",     "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "body-lg-regular": {
+        "size":   { "$value": "{font-size.300}",       "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.normal}",  "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.regular}", "$type": "fontWeights" }
+      },
+      "body-lg-semibold": {
+        "size":   { "$value": "{font-size.300}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.normal}",   "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "body-md-regular": {
+        "size":   { "$value": "{font-size.200}",       "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.normal}",  "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.regular}", "$type": "fontWeights" }
+      },
+      "body-md-semibold": {
+        "size":   { "$value": "{font-size.200}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.normal}",   "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "body-sm-regular": {
+        "size":   { "$value": "{font-size.100}",       "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.normal}",  "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.regular}", "$type": "fontWeights" }
+      },
+      "body-sm-semibold": {
+        "size":   { "$value": "{font-size.100}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.normal}",   "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "subhead-md": {
+        "size":   { "$value": "{font-size.200}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.snug}",     "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "subhead-sm": {
+        "size":   { "$value": "{font-size.100}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.snug}",     "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "label": {
+        "size":   { "$value": "{font-size.100}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.snug}",     "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
+      },
+      "caption": {
+        "size":   { "$value": "{font-size.50}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.normal}",  "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.regular}", "$type": "fontWeights" }
+      },
+      "micro": {
+        "size":   { "$value": "{font-size.25}",        "$type": "fontSizes" },
+        "line":   { "$value": "{line-height.normal}",  "$type": "lineHeights" },
+        "weight": { "$value": "{font-weight.regular}", "$type": "fontWeights" }
+      }
+    }
+  }
+}

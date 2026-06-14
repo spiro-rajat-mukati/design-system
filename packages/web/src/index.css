@@ -10,8 +10,8 @@ html {
 body {
   margin: 0;
   font-family: var(--font-family-sans);
-  font-size: var(--text-body-m-size);
-  line-height: var(--text-body-m-line);
+  font-size: var(--text-web-body-m-size);
+  line-height: var(--text-web-body-m-line);
   color: var(--color-text-primary);
   background-color: var(--color-surface-default);
   -webkit-font-smoothing: antialiased;

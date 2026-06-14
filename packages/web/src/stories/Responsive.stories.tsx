@@ -40,9 +40,9 @@ const Form = () => {
     >
       <h2
         style={{
-          fontSize: "var(--text-display-s-size)",
-          lineHeight: "var(--text-display-s-line)",
-          fontWeight: "var(--text-display-s-weight)",
+          fontSize: "var(--text-web-display-s-size)",
+          lineHeight: "var(--text-web-display-s-line)",
+          fontWeight: "var(--text-web-display-s-weight)",
           margin: 0,
         }}
       >
