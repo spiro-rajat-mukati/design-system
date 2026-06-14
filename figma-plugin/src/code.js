@@ -1829,6 +1829,129 @@ function computeDiff(repoData, collection) {
 }
 
 /* ============================================================
+   PRUNE — delete Figma-only (orphaned) variables
+   Reuses computeDiff's "in Figma, not in repo" set.
+   Checks each candidate for alias references from other variables
+   and text style bindings before marking it safe to delete.
+   ============================================================ */
+
+async function computePrunePreview(repoData) {
+  var collection = figma.variables.getLocalVariableCollections()
+    .find(function(c) { return c.name === COLLECTION_NAME; });
+  if (!collection) {
+    return { error: "No '" + COLLECTION_NAME + "' collection — run Sync Tokens first." };
+  }
+
+  var diff = computeDiff(repoData, collection);
+  if (diff.error) return { error: diff.error };
+  if (!diff.removed.length) {
+    return { canDelete: [], willSkip: [], total: 0 };
+  }
+
+  var removedNames = new Set(diff.removed.map(function(r) { return r.name; }));
+
+  // Build id → name index across ALL local variables (not just this collection)
+  // so we can detect cross-collection alias references too.
+  var allVars = figma.variables.getLocalVariables();
+  var idToName = new Map();
+  for (var i = 0; i < allVars.length; i++) idToName.set(allVars[i].id, allVars[i].name);
+
+  // Find removed vars that are still aliased by other variables.
+  var aliasedBy = new Map();
+  for (var vi = 0; vi < allVars.length; vi++) {
+    var v = allVars[vi];
+    if (removedNames.has(v.name)) continue;
+    var modeVals = Object.values(v.valuesByMode || {});
+    for (var mi = 0; mi < modeVals.length; mi++) {
+      var val = modeVals[mi];
+      if (val && typeof val === "object" && val.type === "VARIABLE_ALIAS") {
+        var tName = idToName.get(val.id);
+        if (tName && removedNames.has(tName)) {
+          if (!aliasedBy.has(tName)) aliasedBy.set(tName, []);
+          aliasedBy.get(tName).push(v.name);
+        }
+      }
+    }
+  }
+
+  // Find removed vars bound to local text styles.
+  var boundInStyle = new Map();
+  var styles = figma.getLocalTextStyles();
+  for (var si = 0; si < styles.length; si++) {
+    var style = styles[si];
+    var bv = style.boundVariables || {};
+    var fields = Object.keys(bv);
+    for (var fi = 0; fi < fields.length; fi++) {
+      var ref = bv[fields[fi]];
+      if (!ref) continue;
+      var refArr = Array.isArray(ref) ? ref : [ref];
+      for (var ri = 0; ri < refArr.length; ri++) {
+        var r = refArr[ri];
+        if (!r || !r.id) continue;
+        var rName = idToName.get(r.id);
+        if (rName && removedNames.has(rName)) {
+          if (!boundInStyle.has(rName)) boundInStyle.set(rName, []);
+          boundInStyle.get(rName).push(style.name + " [" + fields[fi] + "]");
+        }
+      }
+    }
+  }
+
+  var canDelete = [];
+  var willSkip  = [];
+  for (var di = 0; di < diff.removed.length; di++) {
+    var item = diff.removed[di];
+    var aliases  = aliasedBy.get(item.name)   || [];
+    var bindings = boundInStyle.get(item.name) || [];
+    var allRefs  = aliases.concat(bindings);
+    if (allRefs.length) {
+      willSkip.push({ name: item.name, type: item.type, refs: allRefs });
+    } else {
+      canDelete.push({ name: item.name, type: item.type });
+    }
+  }
+
+  return { canDelete: canDelete, willSkip: willSkip, total: diff.removed.length };
+}
+
+function applyPrune(names) {
+  var collection = figma.variables.getLocalVariableCollections()
+    .find(function(c) { return c.name === COLLECTION_NAME; });
+  if (!collection) {
+    uiLog("No '" + COLLECTION_NAME + "' collection.", "err");
+    figma.ui.postMessage({ type: "prune-done", deleted: 0, errors: 0 });
+    return;
+  }
+
+  var varIndex = indexVariables(collection);
+  var deleted = 0, errors = 0;
+
+  for (var ni = 0; ni < names.length; ni++) {
+    var name = names[ni];
+    var variable = varIndex.get(name);
+    if (!variable) {
+      errors++;
+      uiLog("  · Not found: " + name, "warn");
+      continue;
+    }
+    try {
+      variable.remove();
+      deleted++;
+      uiLog("  · Deleted: " + name, "muted");
+    } catch (e) {
+      errors++;
+      uiLog("  · Cannot delete " + name + ": " + (e && e.message ? e.message : String(e)), "warn");
+    }
+  }
+
+  uiLog(
+    "Prune complete — " + deleted + " deleted" + (errors ? ", " + errors + " error(s)" : ""),
+    errors ? "warn" : "ok"
+  );
+  figma.ui.postMessage({ type: "prune-done", deleted: deleted, errors: errors });
+}
+
+/* ============================================================
    PULL — 3-way preview + apply
    ============================================================ */
 
@@ -2172,6 +2295,11 @@ figma.ui.onmessage = async (msg) => {
     } else if (msg.type === "ensure-text-styles-apply") {
       await fontsReady;
       await applyEnsureTextStyles(msg.platform);
+    } else if (msg.type === "prune-preview") {
+      const preview = await computePrunePreview(msg.repoData);
+      figma.ui.postMessage({ type: "prune-preview-result", preview: preview });
+    } else if (msg.type === "prune-apply") {
+      applyPrune(msg.names || []);
     } else if (msg.type === "sync-tokens") {
       await fontsReady;
       syncTokens(msg.data);

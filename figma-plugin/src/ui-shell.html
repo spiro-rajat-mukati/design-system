@@ -164,6 +164,7 @@
   <button id="btn-diff" class="secondary">Diff tokens vs GitHub</button>
   <button id="btn-pull" class="secondary">Pull tokens from GitHub → Figma</button>
   <button id="btn-push" class="secondary">Push Figma → GitHub (create PR)</button>
+  <button id="btn-prune" class="secondary">Prune Figma-only variables</button>
 
   <div class="group-label">Styles &amp; components</div>
   <button id="sync-text-styles" class="secondary">Sync Text Styles (Foundations)</button>
@@ -247,6 +248,25 @@
     <button class="secondary" id="ensure-ts-cancel">Cancel</button>
     <button class="secondary" id="ensure-ts-preview-btn">Preview</button>
     <button id="ensure-ts-apply" disabled>Apply</button>
+  </div>
+</div>
+
+<!-- ═══════════ PRUNE OVERLAY ═══════════ -->
+<div id="prune-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">Prune Figma-only variables</span>
+    <button class="ov-close" id="close-prune" title="Close">✕</button>
+  </div>
+  <div class="ov-body">
+    <p style="font-size:11px;color:var(--fg-muted);margin:0 0 12px">Finds variables that exist in Figma but not in the current repo JSON (orphans from renames or removed token sets). Checks each for alias references and text style bindings — only unreferenced orphans are deleted. Run from the Foundations file after a Pull.</p>
+    <div id="prune-preview-area">
+      <p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Preview</strong> to fetch the repo variable list and compare against the live collection.</p>
+    </div>
+  </div>
+  <div class="ov-footer">
+    <button class="secondary" id="prune-cancel">Cancel</button>
+    <button class="secondary" id="prune-preview-btn">Preview</button>
+    <button id="prune-apply" disabled>Delete unreferenced</button>
   </div>
 </div>
 

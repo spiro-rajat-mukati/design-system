@@ -47,6 +47,7 @@ const SPECS = [
 ];
 let activePat = null;
 let pullPreviewCache = null;
+let prunePreviewData = null;
 const logEl = document.getElementById("log");
 function log(msg, kind) {
   const empty = logEl.querySelector(".empty");
@@ -101,7 +102,7 @@ async function ghFetchMeta(repoPath, ref) {
   }
   return resp.json();
 }
-const ALL_BTNS = ["sync-tokens", "btn-diff", "btn-pull", "btn-push", "sync-text-styles", "ensure-text-styles", "generate-foundations", "generate-components", "save-pat"];
+const ALL_BTNS = ["sync-tokens", "btn-diff", "btn-pull", "btn-push", "btn-prune", "sync-text-styles", "ensure-text-styles", "generate-foundations", "generate-components", "save-pat"];
 function setBusy(busy) {
   for (const id of ALL_BTNS) {
     const el = document.getElementById(id);
@@ -186,6 +187,78 @@ function renderDiff(result) {
   }
   return html;
 }
+function renderPrunePreview(preview) {
+  if (preview.error) return '<div class="panel-error">' + esc(preview.error) + "</div>";
+  const { canDelete, willSkip, total } = preview;
+  if (total === 0) {
+    return '<div class="diff-summary"><span class="pill ok">\u2713 No Figma-only variables \u2014 collection is clean</span></div>';
+  }
+  let html = '<div class="diff-summary">';
+  if (canDelete.length) html += '<span class="pill removed">' + canDelete.length + " to delete</span>";
+  if (willSkip.length) html += '<span class="pill muted-pill">' + willSkip.length + " skipped (still referenced)</span>";
+  html += "</div>";
+  if (canDelete.length) {
+    html += '<details class="diff-collapse" open><summary>Will delete (' + canDelete.length + ")</summary>";
+    const show = canDelete.slice(0, 60);
+    for (const item of show) {
+      html += '<div class="diff-row"><div class="var-name removed">' + esc(item.name) + "</div></div>";
+    }
+    if (canDelete.length > 60) html += '<div class="diff-more">\u2026 ' + (canDelete.length - 60) + " more</div>";
+    html += "</details>";
+  }
+  if (willSkip.length) {
+    html += '<details class="diff-collapse"><summary>Skipped \u2014 still referenced (' + willSkip.length + ")</summary>";
+    for (const item of willSkip) {
+      html += '<div class="diff-row">';
+      html += '<div class="var-name" style="color:var(--fg-muted)">' + esc(item.name) + "</div>";
+      const refLabel = item.refs.slice(0, 3).map(esc).join(", ") + (item.refs.length > 3 ? " +" + (item.refs.length - 3) + " more" : "");
+      html += '<div class="mode-change" style="font-size:10px">refs: ' + refLabel + "</div>";
+      html += "</div>";
+    }
+    html += "</details>";
+  }
+  return html;
+}
+function closePrunePanel() {
+  document.getElementById("prune-panel").hidden = true;
+  prunePreviewData = null;
+  document.getElementById("prune-apply").disabled = true;
+  document.getElementById("prune-preview-btn").disabled = false;
+  document.getElementById("prune-cancel").disabled = false;
+  document.getElementById("prune-preview-area").innerHTML = '<p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Preview</strong> to fetch the repo variable list and compare against the live collection.</p>';
+  setBusy(false);
+}
+document.getElementById("btn-prune").addEventListener("click", function() {
+  document.getElementById("prune-panel").hidden = false;
+  setBusy(true);
+});
+document.getElementById("close-prune").addEventListener("click", closePrunePanel);
+document.getElementById("prune-cancel").addEventListener("click", closePrunePanel);
+document.getElementById("prune-preview-btn").addEventListener("click", async function() {
+  document.getElementById("prune-preview-area").innerHTML = '<div class="line muted">Fetching repo variable list and computing diff\u2026</div>';
+  document.getElementById("prune-apply").disabled = true;
+  document.getElementById("prune-preview-btn").disabled = true;
+  prunePreviewData = null;
+  try {
+    const repoData = await ghFetch("packages/tokens/tokens.figma-variables.json");
+    parent.postMessage({ pluginMessage: { type: "prune-preview", repoData } }, "*");
+  } catch (e) {
+    log("Prune preview failed: " + e.message, "err");
+    document.getElementById("prune-preview-area").innerHTML = '<div class="panel-error">' + esc(e.message) + "</div>";
+    document.getElementById("prune-preview-btn").disabled = false;
+  }
+});
+document.getElementById("prune-apply").addEventListener("click", function() {
+  if (!prunePreviewData || !prunePreviewData.canDelete || !prunePreviewData.canDelete.length) return;
+  document.getElementById("prune-apply").disabled = true;
+  document.getElementById("prune-preview-btn").disabled = true;
+  document.getElementById("prune-cancel").disabled = true;
+  const names = prunePreviewData.canDelete.map(function(item) {
+    return item.name;
+  });
+  log("Pruning " + names.length + " unreferenced variable(s)\u2026", "muted");
+  parent.postMessage({ pluginMessage: { type: "prune-apply", names } }, "*");
+});
 function renderModeRecon(recon) {
   const { toRename, toAdd, toRemove } = recon;
   const total = toRename.length + toAdd.length + toRemove.length;
@@ -1036,6 +1109,29 @@ window.onmessage = (event) => {
       document.getElementById("ensure-ts-preview-btn").disabled = false;
       document.getElementById("ensure-ts-cancel").disabled = false;
       setBusy(false);
+      break;
+    case "prune-preview-result": {
+      const prev = msg.preview;
+      prunePreviewData = prev;
+      document.getElementById("prune-preview-area").innerHTML = renderPrunePreview(prev);
+      document.getElementById("prune-preview-btn").disabled = false;
+      if (!prev.error && prev.canDelete && prev.canDelete.length > 0) {
+        document.getElementById("prune-apply").disabled = false;
+      }
+      if (!prev.error) {
+        log(
+          "Prune preview: " + (prev.canDelete ? prev.canDelete.length : 0) + " to delete, " + (prev.willSkip ? prev.willSkip.length : 0) + " skipped (referenced)",
+          "info"
+        );
+      }
+      break;
+    }
+    case "prune-done":
+      closePrunePanel();
+      log(
+        "Prune: " + (msg.deleted || 0) + " deleted" + (msg.errors > 0 ? ", " + msg.errors + " error(s)" : ""),
+        msg.errors > 0 ? "warn" : "ok"
+      );
       break;
     case "log":
       log(msg.text, msg.kind || "info");
