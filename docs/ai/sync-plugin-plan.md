@@ -48,6 +48,28 @@ A private Figma plugin that keeps the design system in sync with this repo: **pu
 
 ① Claude Code Phase 0 (repo defines all 6 modes) → ② **Cowork** sets up the 3-file Figma split + 6-mode foundation → ③ Claude Code builds the plugin against the aligned repo + Figma.
 
+## P2 — ① Typography / Text Styles sync (planned, locked 2026-06-14)
+
+### Layer model
+
+- **Foundations file** — holds the variable collections: type primitive vars (`type/size/*`, `type/weight/*`, `type/line-height/*`, `type/family/*`, `type/tracking/*`) + semantic text vars (`type/web/h1/*`, `type/web/body-m/*`, … and `type/mobile/*` equivalents) where each semantic var aliases the corresponding primitive. Both collections are published.
+- **Web file / Mobile file** — each holds its own Text Styles (`Web/H1`, `Web/Body M`, …; `Mobile/H1`, …). Every style sub-property (fontSize, lineHeight, fontWeight, fontFamily, letterSpacing) is bound to the **Foundations published semantic variable** via `importVariableByKeyAsync` + `setBoundVariable`. Styles are never duplicated in Foundations.
+
+### Build steps
+
+1. **Repo — token split.** Add `packages/tokens/source/type-primitives.json` (raw scale values, platform-agnostic) and `packages/tokens/source/text.web.json` / `text.mobile.json` (semantic sets that alias primitives: `text.web.h1.size → {type.size.4xl}`). Line-height values in px throughout. Extend `build.mjs` to emit web + RN type tokens into existing targets; update `tokens:check` to cover the new files.
+
+2. **Plugin — variable sync.** Extend the existing Push / Pull / Diff pipeline to cover type primitive + semantic text variables. Reuse v1's shared normalize-compare functions (float32 for numeric dims, string for weight names). No new sync architecture needed — just new variable collections using the same code path.
+
+3. **Plugin — "ensure Text Styles" step.** A separate idempotent action (run per library file, not from Foundations): for each `text.web.*` / `text.mobile.*` semantic variable in the published Foundations collection, find or create a matching Text Style in the active file, then call `importVariableByKeyAsync` + `setBoundVariable` for each sub-property. If the variable binding already matches, no write occurs.
+
+### Operating model
+
+- Variable sync (steps 1–2) runs from Foundations, same as today.
+- Text Style binding (step 3) runs separately from the Web file and again from the Mobile file — Foundations must be published + enabled first.
+- The styles step is idempotent: re-running it on an already-bound file is a no-op.
+- Naming convention: `text.web.h1` ↔ var `type/web/h1/*` ↔ style `Web/H1`; weight stored as numeric in the repo, mapped to Figma style-name on write (400 ↔ Regular, 500 ↔ Medium, 600 ↔ Semi Bold, 700 ↔ Bold).
+
 ## Guardrails
 
 - Write `packages/tokens/source/` only; let `build.mjs` + the `tokens-validate` CI build. Never hand-edit generated files.

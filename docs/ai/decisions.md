@@ -34,6 +34,8 @@ The durable, agent-facing record of **why** Kijani is built the way it is, and *
 
 **L4 · Figma's value representation differs from the source.** Figma stores numbers as float32, dimensions unitless, colours as `{r,g,b,a}`. Reading back without normalizing produced false diffs (`0.1` → `0.10000000149011612`, `26px` → `26`, `rgba(...)` → `#rrggbbaa`). Always normalize on read / compare / write (see D9).
 
+**D10 · Typography sync = variable-bound Text Styles (Option B); styles live in the library files.** _(locked 2026-06-14)_ Type primitives + semantic variables (semantic alias primitives) live in Foundations (published). Figma Text Styles are created in the LIBRARY files — `Web/*` in the Web file, `Mobile/*` in the Mobile file — each sub-property (fontSize, lineHeight, fontWeight, fontFamily, letterSpacing) bound to the Foundations published semantic variable via `importVariableByKeyAsync` + `setBoundVariable`. Repo `text.web.*` / `text.mobile.*` map 1:1 to the semantic vars. Line-height stored in px (Figma type variables are px-only). Naming: `text.web.h1` ↔ var `type/web/h1/*` ↔ style `Web/H1`. Weight: numeric ↔ Figma style-name (400 ↔ Regular, 600 ↔ Semi Bold). Requires Foundations library published + enabled in Web/Mobile before the styles step. Build plan in `sync-plugin-plan.md`.
+
 ## Open / deferred
 
 - **Reset the Chromatic token.** The committed token was moved into the `CHROMATIC_TOKEN` secret but not yet rotated — the leaked value is still live and in git history. Reset it in Chromatic and update the secret.
