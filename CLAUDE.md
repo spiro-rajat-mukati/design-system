@@ -34,6 +34,7 @@ This repo is currently run **solo by the owner, with Claude Code driving executi
 - **Work in chunks, not single steps.** Given a multi-step goal (e.g. "build the core component set"), proceed through the steps autonomously — don't stop after each one to ask "what next?".
 - **Per unit of work, run the full loop yourself:** build + test + lint → commit → push → open a PR → squash-merge it → delete the branch → sync `main`. One focused PR per component/unit.
 - **Keep the gates green:** every change must pass the web build and `npm run tokens:check`; never hand-edit generated token files.
+- **Commit before destructive git ops.** Never run `git clean`, `git reset --hard`, or a branch switch with uncommitted or untracked work present without first committing it (or confirming it's disposable) — untracked files like `site/` are unrecoverable once cleaned.
 - **Only stop to ask the owner for** a genuine product/design decision or ambiguity, or a failure you can't resolve. Surface those clearly; never guess on direction.
 
 The master roadmap — (1) the mobile component library, then (2) the two-way Figma↔GitHub sync plugin — **shipped in v1**. Build history and the deferred P2 backlog live in `docs/ai/mobile-library-plan.md` and `docs/ai/sync-plugin-plan.md`.
