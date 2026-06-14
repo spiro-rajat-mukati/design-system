@@ -1,6 +1,6 @@
 # Component specs
 
-Declarative JSON descriptions of each component, consumed by the **figma-plugin** to construct Figma components programmatically. One file per component, mirroring `src/components/<Name>/<Name>.md` but in a shape a machine can act on.
+Declarative JSON descriptions of each component, consumed by the **figma-plugin** to construct Figma components programmatically. One file per component, mirroring `packages/web/src/components/<Name>/<Name>.md` but in a shape a machine can act on.
 
 ## File naming
 

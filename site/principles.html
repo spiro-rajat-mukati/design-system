@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Principles · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="principles">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <main class="site-content">
+      <span class="section-eyebrow">Principles</span>
+      <h1>What we<br/>believe.</h1>
+      <p class="lead">
+      What we believe about how a design system should work, and the decisions
+      that flow from those beliefs. If a contribution disagrees with one of these,
+      we'll have a conversation.
+    </p>
+
+    <div class="principle-list">
+
+      <div class="principle">
+        <div class="principle__num">01</div>
+        <h2 class="principle__title">Tokens are the contract</h2>
+        <p class="principle__body">
+          Every visual value lives in a token. If a value isn't a token, it's a bug. The
+          token is the shared agreement between design and engineering — when it changes,
+          it changes everywhere, in one motion. No raw hex, no magic numbers in component
+          CSS or Figma fills.
+        </p>
+      </div>
+
+      <div class="principle">
+        <div class="principle__num">02</div>
+        <h2 class="principle__title">Composition over configuration</h2>
+        <p class="principle__body">
+          A Field that takes <code>&lt;Input /&gt;</code> as a child beats a Field with twenty
+          input-related props. Slots scale to whatever content a team needs; prop sprawl
+          doesn't. When in doubt, design the API around children, not properties.
+        </p>
+      </div>
+
+      <div class="principle">
+        <div class="principle__num">03</div>
+        <h2 class="principle__title">Light and dark are first-class</h2>
+        <p class="principle__body">
+          Not bolted on. Every component is built knowing it will render on a light
+          background and a dark background. The token system handles the swap; components
+          don't ship until both look right. Touch-target sizing lives in the mobile
+          (React Native) tokens, where iOS and Android are separate platforms.
+        </p>
+      </div>
+
+      <div class="principle">
+        <div class="principle__num">04</div>
+        <h2 class="principle__title">Accessibility is the floor, not the goal</h2>
+        <p class="principle__body">
+          WCAG 2.1 AA contrast on every state. Visible focus on every interactive element.
+          Keyboard parity with mouse. RTL-safe via logical properties. Reduced-motion
+          honoured. These aren't features — they're the baseline. If a component
+          doesn't meet them, it doesn't ship.
+        </p>
+      </div>
+
+      <div class="principle">
+        <div class="principle__num">05</div>
+        <h2 class="principle__title">The system is a product</h2>
+        <p class="principle__body">
+          It has users — every team that consumes it. It has a roadmap. It has versioning,
+          changelogs, and breaking-change discipline. Treat the system the way you'd
+          want any vendor to treat the libraries you depend on.
+        </p>
+      </div>
+
+      <div class="principle">
+        <div class="principle__num">06</div>
+        <h2 class="principle__title">Prefer the boring choice</h2>
+        <p class="principle__body">
+          A new pattern means an RFC, design review, code, documentation, Figma, and
+          migration. Use what's already in the library unless there's a strong reason
+          not to. New entries get added when product needs force it, not when product
+          teams ask for novelty.
+        </p>
+      </div>
+
+      <div class="principle">
+        <div class="principle__num">07</div>
+        <h2 class="principle__title">One source of truth, multiple targets</h2>
+        <p class="principle__body">
+          Tokens are authored once, in JSON. CSS, TypeScript, and Figma Variables are
+          generated. No one edits the generated files. The discipline is what keeps
+          the system from drifting — and what makes "change once, applies everywhere"
+          a property of the system, not aspirational marketing.
+        </p>
+      </div>
+
+      </div>
+
+    </main>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

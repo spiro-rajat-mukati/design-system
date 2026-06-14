@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quality bar · Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI</span>
+      <h1>Quality bar.</h1>
+      <p class="lead">
+        The definition of done for every change that touches the design system or
+        consumes it. An AI agent's job is not finished until this checklist passes.
+      </p>
+
+      <p>
+        Canonical version: <code>docs/ai/quality-bar.md</code>.
+      </p>
+
+      <hr class="divider" />
+
+      <h2>The checklist</h2>
+      <p>
+        Grouped by concern — tokens, components, modes, states, accessibility, code
+        quality, tests, bundle, documentation. Each item is a yes/no check, not a
+        discussion. <em>Full list mirrored from the canonical doc.</em>
+      </p>
+
+      <h3>Tokens</h3>
+      <ul>
+        <li>No hardcoded colours, sizes, radii, durations, shadows.</li>
+        <li>Visual values come from semantic or component tokens.</li>
+      </ul>
+
+      <h3>Components</h3>
+      <ul>
+        <li>Every UI element is a Kijani component or a documented composition.</li>
+        <li>No detached / forked / locally-redefined logic.</li>
+        <li>Props match the documented API.</li>
+      </ul>
+
+      <h3>Modes</h3>
+      <ul>
+        <li>Light and dark render correctly.</li>
+        <li>RTL: no <code>left</code> / <code>right</code> properties.</li>
+      </ul>
+
+      <h3>States</h3>
+      <ul>
+        <li>Default, hover, focus, disabled, loading, empty, error — all covered.</li>
+      </ul>
+
+      <h3>Accessibility</h3>
+      <ul>
+        <li>axe-core: zero violations.</li>
+        <li>Keyboard reachable + operable.</li>
+        <li>Screen reader: labels, roles, state changes announced.</li>
+        <li>Colour contrast meets WCAG AA in every mode.</li>
+        <li><code>prefers-reduced-motion</code> respected.</li>
+      </ul>
+
+      <h3>Code quality, tests, bundle, docs</h3>
+      <p>
+        Detail mirrored in the canonical doc. Strict types, behaviour-based tests,
+        Storybook story + Chromatic snapshot, bundle impact noted, changelog written.
+      </p>
+
+      <h2>How AI self-runs the checklist</h2>
+      <p>
+        A short prompt fragment AI can append to any task: run the checklist on the
+        code you just produced, report pass / fail / not-applicable per section with
+        one sentence of evidence, no "looks good" summaries.
+      </p>
+
+      <h2>When a check legitimately fails</h2>
+      <p>
+        Name the exception in the PR description. Anything not named is taken as
+        missed.
+      </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

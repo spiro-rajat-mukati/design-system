@@ -28,10 +28,11 @@ _Grouped by concern. Each item should be a yes/no check, not a discussion._
 
 ### Modes
 
-- [ ] Renders correctly in light.
-- [ ] Renders correctly in dark.
-- [ ] Touch targets meet platform minimums (≥ 44px on mobile).
-- [ ] Renders correctly in RTL (no `left` / `right` properties — logical only).
+- [ ] Web: renders correctly in light.
+- [ ] Web: renders correctly in dark.
+- [ ] Web: renders correctly in RTL (no `left` / `right` properties — logical only).
+- [ ] Mobile: renders correctly in light/dark × platform (iOS/Android).
+- [ ] Mobile: touch targets meet platform minimums (≥ 44px).
 
 ### States
 

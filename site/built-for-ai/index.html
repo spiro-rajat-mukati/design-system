@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI</span>
+      <h1>A system AI<br/>agents understand.</h1>
+      <p class="lead">
+        The next generation of product work happens with an agent in the loop. We
+        built this design system so any AI tool — and any person prompting one — can
+        produce real product surfaces that look and behave like the rest of Kijani.
+      </p>
+
+      <h2>Why our system is AI-ready by default</h2>
+
+      <div class="callout-row">
+        <div class="callout">
+          <div class="callout__num">01</div>
+          <h3 class="callout__title">Tokens are machine-readable JSON</h3>
+          <p class="callout__body">
+            481 design tokens authored in the W3C Design Tokens format. Any agent can
+            parse the file, look up a value, and reference it by name without guessing.
+          </p>
+        </div>
+        <div class="callout">
+          <div class="callout__num">02</div>
+          <h3 class="callout__title">Components have TypeScript types</h3>
+          <p class="callout__body">
+            Every prop, variant, and size is declared in <code>.types.ts</code>. Agents get
+            autocomplete and validation the same way a human IDE does — no
+            hallucinated APIs.
+          </p>
+        </div>
+        <div class="callout">
+          <div class="callout__num">03</div>
+          <h3 class="callout__title">Declarative component specs</h3>
+          <p class="callout__body">
+            Each component ships with a JSON spec describing its anatomy, variants, and
+            token bindings. Agents read the spec the same way the Figma plugin does — so
+            humans and agents share one source of truth.
+          </p>
+        </div>
+        <div class="callout">
+          <div class="callout__num">04</div>
+          <h3 class="callout__title">Documentation is part of the artefact</h3>
+          <p class="callout__body">
+            Each component has an inline <code>.md</code> spec covering anatomy, API,
+            accessibility, and do/don't. Agents read these the same way junior
+            engineers do — and produce work that matches the conventions.
+          </p>
+        </div>
+      </div>
+
+      <h2>Built for everyone, with an agent.</h2>
+      <p class="lead">
+        AI isn't only for developers. The system is structured so that anyone on the
+        team can prompt their tool of choice and produce real product.
+      </p>
+
+      <div class="persona-grid">
+
+        <div class="persona-card">
+          <div class="persona-card__num">For product managers</div>
+          <div class="persona-card__illustration">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="10" y="14" width="44" height="36" rx="3"/>
+              <path d="M10 26 L54 26"/>
+              <circle cx="18" cy="20" r="1.5"/>
+              <circle cx="24" cy="20" r="1.5"/>
+              <circle cx="30" cy="20" r="1.5"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Build prototypes that ship</h3>
+          <p class="persona-card__desc">
+            Open Lovable, describe the screen, and watch real production components
+            assemble themselves. The output is real code, not a click-through mock.
+          </p>
+        </div>
+
+        <div class="persona-card">
+          <div class="persona-card__num">For designers</div>
+          <div class="persona-card__illustration">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="22" cy="32" r="14"/>
+              <circle cx="42" cy="32" r="14"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Skip the redline handoff</h3>
+          <p class="persona-card__desc">
+            Build in Figma using the bound Variables; the agent reads the same tokens
+            on the code side. There's nothing to translate.
+          </p>
+        </div>
+
+        <div class="persona-card">
+          <div class="persona-card__num">For developers</div>
+          <div class="persona-card__illustration">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M14 32 L24 22 L34 32 L24 42 Z"/>
+              <path d="M30 32 L40 22 L50 32 L40 42 Z"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Pair with an agent that knows the rules</h3>
+          <p class="persona-card__desc">
+            Claude Code reads the .md specs and component-specs files. It uses your
+            components correctly the first time, with the right tokens, the right
+            props, and the right a11y.
+          </p>
+        </div>
+
+        <div class="persona-card">
+          <div class="persona-card__num">For leadership</div>
+          <div class="persona-card__illustration">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 50 L14 32 L26 32 L26 50 Z"/>
+              <path d="M26 50 L26 20 L38 20 L38 50 Z"/>
+              <path d="M38 50 L38 14 L50 14 L50 50 Z"/>
+            </svg>
+          </div>
+          <h3 class="persona-card__title">Move from idea to shipped faster</h3>
+          <p class="persona-card__desc">
+            When everyone on the team can produce real product with the system in the
+            background, planning meetings stop being mock-up reviews and start being
+            real-product reviews.
+          </p>
+        </div>
+
+      </div>
+
+      <hr class="divider" />
+
+      <h2>The tools we work with</h2>
+      <p class="lead">
+        Three integrations cover most workflows from prompt to production. Pick the
+        one that fits the work.
+      </p>
+
+      <!-- Lovable -->
+      <div id="lovable" class="callout" style="padding: 48px; margin-bottom: 16px;">
+        <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 24px;">
+          <div class="ai-tool-card__logo" style="background: var(--fg); color: var(--bg-card);">L</div>
+          <div>
+            <h3 style="margin: 0 0 4px; font-size: 28px; letter-spacing: -0.02em;">Lovable</h3>
+            <p style="margin: 0; color: var(--fg-muted); font-size: 16px;">Prompt-to-app builder for non-developers.</p>
+          </div>
+        </div>
+        <p>
+          Lovable's agent generates web app code from natural language. Connect it to
+          this system so the generated components are <em>your</em> components, not
+          generic ones — meaning what your PM prototyped this morning is shippable
+          this afternoon.
+        </p>
+        <h3 style="margin-top: 24px; font-size: 16px;">Connecting Lovable</h3>
+        <ol>
+          <li>Create a Lovable project.</li>
+          <li>Add the design system as a dependency in your Lovable workspace settings:
+<pre><code>npm install rajatspiro/design-system</code></pre>
+          </li>
+          <li>Import the token CSS in <code>main.tsx</code>:
+<pre><code>import "design-system/src/tokens/primitives.css";
+import "design-system/src/tokens/semantics.css";
+import "design-system/src/tokens/component-tokens.css";</code></pre>
+          </li>
+          <li>Prompt Lovable with system component names: "Build a sign-in page using the Kijani Button, Field, and TextInput components." The agent will use them.</li>
+        </ol>
+        <p>
+          <a href="https://lovable.dev" target="_blank" rel="noopener">Open Lovable ↗</a>
+        </p>
+      </div>
+
+      <!-- Claude Code -->
+      <div id="claude-code" class="callout" style="padding: 48px; margin-bottom: 16px;">
+        <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 24px;">
+          <div class="ai-tool-card__logo" style="background: var(--fg); color: var(--bg-card);">C</div>
+          <div>
+            <h3 style="margin: 0 0 4px; font-size: 28px; letter-spacing: -0.02em;">Claude Code</h3>
+            <p style="margin: 0; color: var(--fg-muted); font-size: 16px;">CLI pair-programmer that reads your codebase.</p>
+          </div>
+        </div>
+        <p>
+          Claude Code runs inside your repo, reads the structure, and writes code that
+          fits. Because this system documents itself via <code>.md</code> specs and
+          declarative <code>component-specs/*.json</code> files, Claude Code uses the
+          right component with the right props on the first try.
+        </p>
+        <h3 style="margin-top: 24px; font-size: 16px;">Connecting Claude Code</h3>
+        <ol>
+          <li>Install Claude Code globally (one-time):
+<pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+          </li>
+          <li>From any project that consumes the design system, run:
+<pre><code>cd /path/to/your-app
+claude</code></pre>
+          </li>
+          <li>Reference components by name in your prompts. Claude will look up the
+          spec and use them correctly: "Build a settings form using the Field and
+          TextInput components, with a primary Button at the bottom."</li>
+          <li>For best results, keep this repo open alongside — Claude can read the
+          source <code>.md</code> specs directly.</li>
+        </ol>
+        <p>
+          <a href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">Claude Code docs ↗</a>
+        </p>
+      </div>
+
+      <!-- Antigravity -->
+      <div id="antigravity" class="callout" style="padding: 48px;">
+        <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 24px;">
+          <div class="ai-tool-card__logo" style="background: var(--fg); color: var(--bg-card);">A</div>
+          <div>
+            <h3 style="margin: 0 0 4px; font-size: 28px; letter-spacing: -0.02em;">Antigravity</h3>
+            <p style="margin: 0; color: var(--fg-muted); font-size: 16px;">Agentic IDE that drives editors, terminals, and browsers.</p>
+          </div>
+        </div>
+        <p>
+          Antigravity coordinates multiple specialized agents — coding, planning,
+          browser-testing — against a single goal. Combined with this system's
+          machine-readable contracts, an Antigravity workflow can implement a full
+          feature, run the Storybook visual diffs, and open a PR without leaving the
+          agent.
+        </p>
+        <h3 style="margin-top: 24px; font-size: 16px;">Connecting Antigravity</h3>
+        <ol>
+          <li>Install Antigravity from <a href="https://antigravity.google" target="_blank" rel="noopener">antigravity.google</a>.</li>
+          <li>Open the design system repository (or any consumer app) as the active workspace.</li>
+          <li>Point the planning agent at <code>src/components/</code> and
+          <code>src/component-specs/</code> — both are well-structured directories
+          the agent can enumerate.</li>
+          <li>Run the Storybook MCP integration so the agent can capture Chromatic
+          snapshots as part of its verification step.</li>
+        </ol>
+        <p>
+          <a href="https://antigravity.google" target="_blank" rel="noopener">Antigravity ↗</a>
+        </p>
+      </div>
+
+      <hr class="divider" />
+
+      <h2>Principles for AI-augmented design systems</h2>
+      <p>
+        A few rules we follow so the system stays useful for agents over time:
+      </p>
+      <ul>
+        <li><strong>One source of truth.</strong> Tokens authored once, in JSON. Anything else
+        (CSS, TS, Figma Variables) is generated. Agents reading the source get the
+        same answer as agents reading the artefacts.</li>
+        <li><strong>Specs over screenshots.</strong> A component is documented by its
+        <code>.md</code> + JSON spec, not by a Figma image. Agents can parse
+        structure; they can't parse intent from pixels.</li>
+        <li><strong>Conventional structure.</strong> Predictable folders, predictable file
+        names, predictable variant property names. Agents perform best on systems
+        where naming is uniform across components.</li>
+        <li><strong>Explicit not implicit.</strong> Defaults are stated, not inferred. The
+        Button's default size is documented as "md" in the type definition,
+        not left to be discovered from CSS.</li>
+        <li><strong>Tests are part of the system.</strong> Storybook stories per variant
+        and Chromatic snapshots give agents a way to verify their work — not
+        just generate it.</li>
+      </ul>
+
+      <h2>What's coming next</h2>
+      <ul>
+        <li>Storybook MCP server — exposes the live component reference to any
+        MCP-compatible agent.</li>
+        <li>Agent-friendly token diffing — when an agent proposes a token change,
+        the system surfaces the cascade (every component affected) for review.</li>
+        <li>RFC template tailored for AI-proposed changes — explicitly identifying
+        which parts of the proposal an agent generated and which a human reviewed.</li>
+      </ul>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

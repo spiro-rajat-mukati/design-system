@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For product · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="get-started">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <h1>For product managers</h1>
+      <p class="lead">
+        A two-minute orientation: what this is, what it gives you, and how to get
+        what isn't here yet.
+      </p>
+
+      <h2>What is a design system, in plain language</h2>
+      <p>
+        A design system is a shared set of building blocks — colours, typography,
+        spacing, buttons, forms — that designers and developers both use. Instead of
+        designing and coding a button from scratch each time, the team picks "the
+        button" from the library. The product looks consistent, ships faster, and
+        accessibility / dark mode / mobile-friendliness come for free.
+      </p>
+
+      <h2>What this system gives your team</h2>
+      <ul>
+        <li>
+          <strong>Faster shipping.</strong> 16 production-ready components mean a typical
+          form-heavy screen drops from a week of design + a week of build to a few days
+          of each.
+        </li>
+        <li>
+          <strong>Consistency across products.</strong> Whatever Kijani ships next will
+          look like it belongs in the same product as everything else. No drift between
+          teams.
+        </li>
+        <li>
+          <strong>Dark mode, touch-friendly, accessible, RTL-ready by default.</strong>
+          These aren't follow-up tasks — they're baked in to every component.
+        </li>
+        <li>
+          <strong>One source of truth.</strong> When the brand colour changes, it changes
+          in code and in Figma in one motion. No "the designs say one blue and the
+          product ships another" problems.
+        </li>
+        <li>
+          <strong>Lower review overhead.</strong> Less debate about "what should this
+          look like" — most visual decisions are already made. Reviews focus on UX
+          and content, not pixel-level details.
+        </li>
+      </ul>
+
+      <h2>What's done, what's coming</h2>
+
+      <h3>Done</h3>
+      <ul>
+        <li>481 design tokens (colours, typography, spacing, motion, etc.)</li>
+        <li>16 React components with Storybook documentation</li>
+        <li>Full Figma library mirroring the code, with light and dark modes</li>
+        <li>Custom Figma plugin that syncs everything from the source of truth</li>
+        <li>Live <a href="https://main--689e1fa86b32f2c00f0eda7e.chromatic.com" target="_blank" rel="noopener">Storybook</a> and this showcase site</li>
+      </ul>
+
+      <h3>Coming</h3>
+      <ul>
+        <li>Patterns library (common page-level compositions)</li>
+        <li>React Native component library (mobile app surfaces)</li>
+        <li>Icon library link</li>
+        <li>Per-component documentation on this site</li>
+        <li>Live Foundations reference pages</li>
+      </ul>
+
+      <h2>How to request something</h2>
+      <p>
+        Most asks fall into one of three buckets — they each have a different lead time:
+      </p>
+      <ul>
+        <li>
+          <strong>Token tweak</strong> (e.g. "the brand blue feels a bit dark"): same day to
+          a week. File an issue or post in <code>#design-system</code>.
+        </li>
+        <li>
+          <strong>New variant of an existing component</strong> (e.g. "we need an
+          extra-small destructive button"): 1-2 weeks. RFC required, both leads review.
+        </li>
+        <li>
+          <strong>New component</strong> (e.g. "we need a date picker"): 3-6 weeks. Full
+          RFC with use cases, design exploration, accessibility considerations.
+        </li>
+      </ul>
+
+      <p>
+        If you're not sure which bucket applies, ask. The leads will route it.
+      </p>
+
+      <h2>Who owns this</h2>
+      <p>
+        The design system is owned by the design and engineering leads jointly. They're
+        the approvers on token changes, new components, and breaking changes. Everyone
+        on the team can propose changes; both leads have to sign off.
+      </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

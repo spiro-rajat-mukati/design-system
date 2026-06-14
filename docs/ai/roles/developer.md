@@ -35,8 +35,8 @@ The [prompting library](../prompting.md) has six templates. The three you'll use
 _Bulleted advice:_
 
 - **Always demand a plan before code.** Tell the agent to list components + tokens it'll use, before writing anything. Reject the plan if it's wrong; don't reject the implementation.
-- **Constrain the diff.** "Modify only `src/components/Button/` and its stories" stops collateral edits.
-- **Reference files by path, not name.** `src/components/Button/Button.tsx` beats "the button component."
+- **Constrain the diff.** "Modify only `packages/web/src/components/Button/` and its stories" stops collateral edits.
+- **Reference files by path, not name.** `packages/web/src/components/Button/Button.tsx` beats "the button component."
 - **Ask for tests in the same turn.** Adding tests after the fact is harder than asking for them up front.
 - **End every prompt with the self-check.** "Now run docs/ai/quality-bar.md on your output."
 
@@ -60,6 +60,6 @@ _Bulleted:_
 
 _Two paragraphs:_
 
-- _Token change_ → both leads review the PR against `src/tokens/source/`.
+- _Token change_ → both leads review the PR against `packages/tokens/source/`.
 - _Component API change_ → RFC required. Both leads sign off.
 - _Cross-cutting change (e.g. all components getting a new prop)_ → schedule a sync; don't surprise the team in a PR.

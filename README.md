@@ -33,22 +33,21 @@ This means:
 ## File layout
 
 ```
-src/
-  tokens/
-    source/                       ← AUTHORED. Tokens Studio reads this folder.
-      $metadata.json              ←   set order
-      $themes.json                ←   theme combinations
-      core.json                   ←   primitives + mode-agnostic semantics
-      color-light.json            ←   semantic colors (light)
-      color-dark.json             ←   semantic colors (dark)
-      components.json             ←   component tokens (compact density default)
-      components-dark.json        ←   dark-only component overrides
-      density-comfortable.json    ←   touch-target overrides
-      platform-{web,ios,android}.json   ← platform overrides (iOS/Android wired in Phase 4)
-      README.md                   ←   authoring contract
+packages/tokens/
+  source/                       ← AUTHORED. Tokens Studio reads this folder.
+    $metadata.json              ←   set order
+    $themes.json                ←   theme combinations
+    core.json                   ←   primitives + mode-agnostic semantics
+    color-light.json            ←   semantic colors (light)
+    color-dark.json             ←   semantic colors (dark)
+    components.json             ←   component tokens (single baseline)
+    components-dark.json        ←   dark-only component overrides
+    platform-{web,ios,android}.json   ← platform overrides (iOS/Android wired in Phase 4)
+    README.md                   ←   authoring contract
+  build/
     primitives.css                ← GENERATED — do not edit
     semantics.css                 ← GENERATED — light + [data-theme="dark"]
-    component-tokens.css          ← GENERATED — light + dark + [data-density="comfortable"]
+    component-tokens.css          ← GENERATED — light + dark
     tokens.ts                     ← GENERATED — flat maps for RN / JS consumers
     build.mjs                     ← transform: source/*.json → CSS + TS
     check-generated.mjs           ← CI guard — fails if generated files are stale
@@ -57,7 +56,7 @@ src/
     spacing.ts
     typography.ts
     Tokens.stories.tsx
-  components/
+packages/web/src/components/
     Button/
     ButtonGroup/
     Field/
@@ -116,7 +115,7 @@ All components use logical properties (`padding-inline-start`, `inset-inline-end
 
 The web library handles desktop and mobile web from one codebase via three mechanisms:
 
-1. **Density attribute.** Set `[data-density="comfortable"]` on `<html>` (or any wrapper) to bump touch targets — buttons, inputs, radio/checkbox indicators, tab triggers — to ≥ 44px. Compact (32–40px) is the default for desktop. Toggle interactively in Storybook via the **Density** toolbar.
+1. **Touch-target sizing lives in the mobile tokens.** Density was removed from the web library — web ships a single baseline. Touch-target sizing (≥ 44px) is handled in the mobile (React Native) tokens, where it varies by platform.
 2. **Hover-pointer guards.** Every `:hover` rule in component CSS is wrapped in `@media (hover: hover)` so taps on touch devices don't leave phantom hover states. `:focus-visible`, `:active`, and `:disabled` work on every input and stay outside the guard.
 3. **Fluid display sizes.** `--text-display-{l,m,s}-size` use `clamp()` in CSS so headlines scale with viewport. The static value (the `clamp` ceiling) is what gets exported to Figma and React Native, so design tools and native consumers see a stable number.
 
@@ -124,7 +123,7 @@ Breakpoint primitives (`--breakpoint-{sm,md,lg,xl}` = 640 / 768 / 1024 / 1280 px
 
 ## Token build pipeline
 
-Tokens are authored as W3C-shaped JSON in `src/tokens/source/` (Tokens Studio compatible). A zero-dep Node transform converts them to CSS variables for the web library and a flat TS map for React Native:
+Tokens are authored in Tokens Studio format (DTCG $value/$type) in `packages/tokens/source/` (Tokens Studio compatible). A zero-dep Node transform converts them to CSS variables for the web library and a flat TS map for React Native:
 
 ```
 npm run tokens:build      # generate primitives.css, semantics.css, component-tokens.css, tokens.ts
@@ -132,11 +131,11 @@ npm run tokens:watch      # rebuild on source change
 npm run tokens:check      # CI guard — fails if a generated file is stale or hand-edited
 ```
 
-The build runs automatically before `start`, `build`, `storybook`, and `build-storybook`. Edits to the generated files are rejected by the CI guard. See `src/tokens/source/README.md` for the authoring contract.
+The build runs automatically before `start`, `build`, `storybook`, and `build-storybook`. Edits to the generated files are rejected by the CI guard. See `packages/tokens/source/README.md` for the authoring contract.
 
 ## Figma library
 
-The Figma side mirrors the code library one-to-one. Tokens flow from `src/tokens/source/*.json` into Figma Variables via Tokens Studio (GitHub sync). Components in Figma match components in Storybook 1:1, consume only Variables, and re-theme via Variable Modes (light/dark × compact/comfortable × web/iOS/Android).
+The Figma side mirrors the code library one-to-one. Tokens flow from `packages/tokens/source/*.json` into Figma Variables via Tokens Studio (GitHub sync). Components in Figma match components in Storybook 1:1, consume only Variables, and re-theme via Variable Modes (light/dark (web); light/dark × platform (iOS/Android)).
 
 Setup, library structure, and per-component requirements are in [`figma/`](figma/):
 
@@ -191,7 +190,7 @@ parameters: { chromatic: { disableSnapshot: true } }
 
 1. **Audit semantics first.** Does the new component need a colour, surface, or border that isn't already a semantic token? If so, add a semantic token *before* writing component CSS, and document the rationale.
 2. **Define component tokens.** Add a `--<component>-…` block to `tokens/component-tokens.css`. Map only to semantic tokens. Cover every variant × state.
-3. **Write the component CSS.** Use only `--<component>-…` variables. Lint rule (recommended): forbid raw hex/colour values in `src/components/**/*.css`.
+3. **Write the component CSS.** Use only `--<component>-…` variables. Lint rule (recommended): forbid raw hex/colour values in `packages/web/src/components/**/*.css`.
 4. **Implement the component.** Use logical properties. Never hardcode px in inline styles. Forward refs. Accept native attributes via `...rest`.
 5. **Write the spec doc** (`ComponentName.md`) — anatomy, API, variants × states matrix, a11y, do/don'ts. Reviewers should be able to use this without reading the implementation.
 6. **Add Storybook stories** covering every variant, every state, both themes. Add a Chromatic baseline.

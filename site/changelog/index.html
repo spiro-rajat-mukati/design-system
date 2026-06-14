@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Changelog · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="changelog">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <main class="site-content">
+      <span class="section-eyebrow">Changelog</span>
+      <h1>Notable<br/>changes.</h1>
+    <p class="lead">
+      Notable changes to the design system. Reverse chronological — newest first.
+    </p>
+
+    <div class="release">
+      <div class="release__meta">
+        <span class="release__version">v0.5</span>
+        <span class="release__date">May 2026</span>
+        <div class="release__tags"><span class="tag tag--feature">Feature</span></div>
+      </div>
+      <p>
+        <strong>Showcase site launched.</strong> Get started guides for designers,
+        developers, and PMs. Principles page. Placeholders for Foundations,
+        Components, and Patterns content (with links to Storybook and Figma in the
+        meantime).
+      </p>
+    </div>
+
+    <div class="release">
+      <div class="release__meta">
+        <span class="release__version">v0.4</span>
+        <span class="release__date">May 2026</span>
+        <div class="release__tags">
+          <span class="tag tag--feature">Feature</span>
+          <span class="tag tag--breaking">Breaking</span>
+        </div>
+      </div>
+      <p>
+        <strong>Full typography binding in Figma.</strong> Added
+        <code>$extensions[design-system.figma-value]</code> overrides for fontFamily and
+        fontWeight tokens so Figma Variables hold values it can use as actual font
+        assets (<code>Inter</code>, <code>Medium</code>, etc.).
+        Created 18 Figma Text Styles, one per typography role, with all four axes
+        (fontFamily / fontStyle / fontSize / lineHeight) bound to the underlying
+        Variables.
+      </p>
+      <p>
+        <strong>Breaking:</strong> font-weight Variables are now <code>STRING</code>
+        type instead of <code>FLOAT</code>. The plugin auto-migrates on next Sync
+        tokens — manual cleanup not required, but components bound to the old FLOAT
+        variables need a regenerate.
+      </p>
+    </div>
+
+    <div class="release">
+      <div class="release__meta">
+        <span class="release__version">v0.3</span>
+        <span class="release__date">May 2026</span>
+        <div class="release__tags"><span class="tag tag--feature">Feature</span></div>
+      </div>
+      <p>
+        <strong>Custom Figma plugin shipped.</strong> Four one-click sync features:
+        Sync tokens (creates 481 Variables across 4 Modes), Sync Text Styles (18
+        styles), Generate Foundations pages (5 reference pages), Generate components
+        (16 components, ~2,400 variants).
+      </p>
+      <p>
+        Replaces Tokens Studio Pro for our workflow. Reads directly from
+        <code>tokens.figma-variables.json</code> on GitHub.
+      </p>
+    </div>
+
+    <div class="release">
+      <div class="release__meta">
+        <span class="release__version">v0.2</span>
+        <span class="release__date">May 2026</span>
+        <div class="release__tags"><span class="tag tag--feature">Feature</span></div>
+      </div>
+      <p>
+        <strong>Responsive web extensions.</strong> Breakpoint primitives, fluid
+        <code>clamp()</code> display sizes (CSS only — Figma keeps static ceilings),
+        <code>@media (hover: hover)</code> guards on every component's <code>:hover</code>
+        rule, density attribute support, Storybook Theme + Density toolbars, Chromatic
+        four-corner snapshot matrix.
+      </p>
+    </div>
+
+    <div class="release">
+      <div class="release__meta">
+        <span class="release__version">v0.1</span>
+        <span class="release__date">May 2026</span>
+        <div class="release__tags"><span class="tag tag--feature">Feature</span></div>
+      </div>
+      <p>
+        <strong>Initial release.</strong> 481 tokens (primitives, semantics, components)
+        authored as W3C JSON. Zero-dep Node build script emits CSS, TypeScript, and
+        Figma Variables JSON. CI guards reject hand-edits to generated files. 16 React
+        components with full a11y, dark mode, RTL, reduced-motion support. Storybook
+        with stories for every variant.
+      </p>
+    </div>
+
+    </main>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

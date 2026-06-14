@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For designers · Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI · Role guide</span>
+      <h1>For designers.</h1>
+      <p class="lead">
+        Your two-minute orientation. You'll spend most of your AI time on
+        intent-to-frames and on handoff specs. The Figma library is your source of
+        truth; AI plugs into it, not around it.
+      </p>
+
+      <p>
+        Canonical version: <code>docs/ai/roles/designer.md</code>.
+      </p>
+
+      <hr class="divider" />
+
+      <h2>The shape of your day with AI</h2>
+      <ol class="steps">
+        <li><h3>Intent to frames</h3><p>Cowork / Lovable produce rough flows from prose — argue with yourself before committing.</p></li>
+        <li><h3>Compose inside Figma</h3><p>Stay inside library components + Variables. The plugin keeps it in sync with code.</p></li>
+        <li><h3>Write specs for handoff</h3><p>AI turns finished frames into the written spec a dev needs.</p></li>
+      </ol>
+
+      <h2>What "library-clean" frames look like</h2>
+      <ul>
+        <li>Every element is a library component instance.</li>
+        <li>Every visual value is a Variable / Text Style.</li>
+        <li>Light and dark switch correctly.</li>
+        <li>Zero detached instances.</li>
+        <li>Empty / loading / error / RTL frames present.</li>
+      </ul>
+
+      <h2>Templates you'll use most</h2>
+      <ul>
+        <li>Turn this Figma frame into a spec</li>
+        <li>Explore a flow</li>
+        <li>Generate a component variant (when proposing a library change)</li>
+      </ul>
+      <p>Full text in the <a href="/built-for-ai/prompting/">prompt library</a>.</p>
+
+      <h2>How AI reads your work</h2>
+      <p>
+        Devs' AI agents read your spec first and your frames second. If the spec is
+        sparse, the AI fills the gaps with guesses. Spend the time on the spec.
+      </p>
+
+      <h2>Anti-patterns</h2>
+      <ul>
+        <li>Designing pixel-perfect mocks of components that already exist.</li>
+        <li>Specifying colours by hex instead of by Variable.</li>
+        <li>Treating an AI prototype as the design.</li>
+        <li>Annotating prop values as colours / sizes rather than prop names.</li>
+      </ul>
+
+      <h2>What to escalate, and to whom</h2>
+      <p>
+        Missing variant → RFC, both leads review. Token feels off → PR against
+        <code>src/tokens/source/</code>. Doesn't fit any component → don't fork;
+        propose the component.
+      </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

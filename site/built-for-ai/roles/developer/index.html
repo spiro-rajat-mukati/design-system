@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For developers · Built for AI · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="built-for-ai">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+      <span class="section-eyebrow">Built for AI · Role guide</span>
+      <h1>For developers.</h1>
+      <p class="lead">
+        Your two-minute orientation. Claude Code is the primary tool; the repo is the
+        context. Before you prompt, make sure the agent has read <code>CLAUDE.md</code>.
+      </p>
+
+      <p>
+        Canonical version: <code>docs/ai/roles/developer.md</code>.
+      </p>
+
+      <hr class="divider" />
+
+      <h2>The shape of your day with AI</h2>
+      <ol class="steps">
+        <li><h3>In-repo builds</h3><p>Claude Code implements specs against the library when given <code>CLAUDE.md</code> + the component-usage doc.</p></li>
+        <li><h3>Refactors and migrations</h3><p>Claude Code is excellent at sweeping changes when scope is explicit.</p></li>
+        <li><h3>Review and self-review</h3><p>Run the quality bar checklist on your diff before requesting human review.</p></li>
+      </ol>
+
+      <h2>Setting up Claude Code for this repo</h2>
+      <ol>
+        <li>Clone the repo and <code>cd</code> in.</li>
+        <li>Confirm <code>CLAUDE.md</code> is at the repo root.</li>
+        <li>Start a session in this directory — Claude Code reads <code>CLAUDE.md</code> automatically.</li>
+        <li>Run the <code>/init</code> skill once for long sessions.</li>
+        <li>Run <code>/review</code> on your branch before pushing.</li>
+      </ol>
+
+      <h2>Templates you'll use most</h2>
+      <ul>
+        <li>Build me a screen from this spec</li>
+        <li>Generate a component variant</li>
+        <li>Review this PR for design-system fidelity</li>
+      </ul>
+      <p>Full text in the <a href="/built-for-ai/prompting/">prompt library</a>.</p>
+
+      <h2>How to write prompts Claude Code executes well</h2>
+      <ul>
+        <li>Demand a plan before code — components + tokens it'll use.</li>
+        <li>Constrain the diff — name the paths to modify.</li>
+        <li>Reference files by path, not name.</li>
+        <li>Ask for tests in the same turn.</li>
+        <li>End every prompt with the self-check against the quality bar.</li>
+      </ul>
+
+      <h2>What Claude Code is bad at</h2>
+      <ul>
+        <li>Architecture decisions across the system — that's an RFC.</li>
+        <li>Long-running refactors without checkpoints — chunk by PR.</li>
+        <li>Visual judgement — run Chromatic and look.</li>
+      </ul>
+
+      <h2>Anti-patterns</h2>
+      <ul>
+        <li>Letting the agent introduce a dependency without confirming.</li>
+        <li>Accepting an implementation that "looks fine" without the quality-bar checklist.</li>
+        <li>Skipping the Storybook story update — it's part of the change.</li>
+      </ul>
+
+      <h2>What to escalate, and to whom</h2>
+      <p>
+        Token change → both leads review the PR. Component API change → RFC,
+        both leads sign off. Cross-cutting change → schedule a sync.
+      </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

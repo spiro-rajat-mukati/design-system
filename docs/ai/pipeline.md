@@ -31,7 +31,7 @@ _Each stage gets a heading below. For every stage we describe: **inputs**, **the
 - **Owner:** designer
 - **Input:** the low-fi flow + edge-case list
 - **AI reading:** [`component-usage.md`](./component-usage.md), [`token-usage.md`](./token-usage.md), [`roles/designer.md`](./roles/designer.md)
-- **Deliverable:** Figma frames built _entirely_ from Kijani library components, Variables, and Text Styles. Modes covered (light, dark, compact, comfortable). Empty / loading / error / RTL states included.
+- **Deliverable:** Figma frames built _entirely_ from Kijani library components, Variables, and Text Styles. Modes covered (light, dark). Mobile: light/dark × platform (iOS/Android). Empty / loading / error / RTL states included.
 - **Gate:** zero detached instances, zero hardcoded values in the Figma file.
 
 ### Stage 4 — Spec

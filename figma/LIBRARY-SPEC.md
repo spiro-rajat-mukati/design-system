@@ -50,11 +50,11 @@ A 1440 × 1024 frame with:
 - One-line purpose
 - Last-updated date (manually update on publish)
 - Links to: Storybook URL, GitHub repo, Slack channel
-- A four-quadrant preview of one component (the Button) in light-compact, dark-compact, light-comfortable, dark-comfortable, so anyone opening the file immediately understands what the modes do
+- A dual preview of one component (the Button) in light and dark, so anyone opening the file immediately understands what the modes do. (Any legacy Figma modes are reconciled by the DesignSync plugin.)
 
 ## Foundations pages
 
-Each foundations page is a visual reference, **never** the source of truth. The source is `src/tokens/source/*.json`. These pages exist so designers and stakeholders can see what's available.
+Each foundations page is a visual reference, **never** the source of truth. The source is `packages/tokens/source/*.json`. These pages exist so designers and stakeholders can see what's available.
 
 ### Color
 
@@ -137,7 +137,7 @@ This is the design-side complement to `CHANGELOG.md`. Designers update it on pub
 
 - **Pages:** as listed above. Don't rename without coordinating with the eng lead.
 - **Component (master):** `Button` — exact match with the React component name.
-- **Variants properties:** `variant`, `size`, `state`, `density` (lowercase, single word). Use Figma's variant property syntax — they show up cleanly in the panel.
+- **Variants properties:** `variant`, `size`, `state` (lowercase, single word). Use Figma's variant property syntax — they show up cleanly in the panel. (Density is mobile-only and not a web variant property.)
 - **Variant values:** match the TypeScript prop values exactly (`primary`, `sm`, `hover`). No spaces, no capitalisation differences.
 - **Frames:** named `Component / Use case` (e.g., `Button / In a form`, `Button / In a toolbar`).
 

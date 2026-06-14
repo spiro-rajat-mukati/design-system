@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Design System · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="design-system">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+        <span class="section-eyebrow">Design System</span>
+        <h1>Foundations,<br/>components,<br/>patterns.</h1>
+        <p class="lead">
+          The three layers that make up the system. Foundations are the raw tokens.
+          Components are the building blocks. Patterns are the recipes for putting them
+          together. Pick where you want to start.
+        </p>
+
+        <div class="persona-grid">
+
+          <a class="persona-card" href="/design-system/foundations/">
+            <div class="persona-card__num">01 · Foundations</div>
+            <div class="persona-card__illustration">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+                <ellipse cx="32" cy="20" rx="22" ry="6"/>
+                <ellipse cx="32" cy="32" rx="22" ry="6"/>
+                <ellipse cx="32" cy="44" rx="22" ry="6"/>
+              </svg>
+            </div>
+            <h3 class="persona-card__title">Foundations</h3>
+            <p class="persona-card__desc">
+              Color, typography, spacing, motion. The shared values everything else is
+              made of.
+            </p>
+          </a>
+
+          <a class="persona-card" href="/design-system/components/">
+            <div class="persona-card__num">02 · Components</div>
+            <div class="persona-card__illustration">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="10" y="10" width="20" height="20" rx="3"/>
+                <rect x="34" y="10" width="20" height="20" rx="3"/>
+                <rect x="10" y="34" width="20" height="20" rx="3"/>
+                <rect x="34" y="34" width="20" height="20" rx="3"/>
+              </svg>
+            </div>
+            <h3 class="persona-card__title">Components</h3>
+            <p class="persona-card__desc">
+              16 production-ready components, each with full accessibility and dark mode.
+            </p>
+          </a>
+
+          <a class="persona-card" href="/design-system/patterns/">
+            <div class="persona-card__num">03 · Patterns</div>
+            <div class="persona-card__illustration">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M10 20 L54 20"/>
+                <path d="M10 32 L40 32"/>
+                <path d="M10 44 L48 44"/>
+                <circle cx="56" cy="32" r="2" fill="currentColor"/>
+                <circle cx="52" cy="44" r="2" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3 class="persona-card__title">Patterns</h3>
+            <p class="persona-card__desc">
+              Composition recipes for common UI. Coming soon — see the page for what's
+              planned.
+            </p>
+          </a>
+
+        </div>
+
+        <hr class="divider" />
+
+        <h2>How the three layers work together.</h2>
+        <p>
+          A <strong>foundation</strong> is a token — a colour, a font size, a spacing
+          step. Tokens are authored once and flow uniformly to CSS, React Native, and
+          Figma Variables.
+        </p>
+        <p>
+          A <strong>component</strong> is a piece of UI that consumes foundations. A
+          Button reads from <code>button/primary/bg</code>, which aliases
+          <code>color/action/primary/bg</code>, which aliases
+          <code>color/brand/700</code>. Three layers, one source of truth.
+        </p>
+        <p>
+          A <strong>pattern</strong> is a documented way to compose components. Patterns
+          don't ship as code — they're recipes. "A page header is a heading + a
+          subtitle + right-aligned actions." Designers and developers follow the recipe
+          and produce something that fits the system.
+        </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>

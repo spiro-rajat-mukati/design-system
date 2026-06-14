@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Get started · Kijani Design System</title>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body data-section="get-started">
+
+  <div class="page">
+    <div data-include="header"></div>
+
+    <div class="site-layout">
+      <div data-include="sidebar"></div>
+
+      <main class="site-content">
+        <span class="section-eyebrow">Get started</span>
+        <h1>Three guides.<br/>Pick yours.</h1>
+        <p class="lead">
+          Short walkthroughs depending on what you do. Five minutes each to get productive.
+        </p>
+
+        <div class="persona-grid">
+
+          <a class="persona-card" href="/get-started/designers/">
+            <div class="persona-card__num">001 · For designers</div>
+            <div class="persona-card__illustration">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="8" y="8" width="48" height="48" rx="4"/>
+                <rect x="18" y="18" width="28" height="28" rx="3"/>
+                <rect x="26" y="26" width="12" height="12" rx="2"/>
+              </svg>
+            </div>
+            <h3 class="persona-card__title">Open the Figma library</h3>
+            <p class="persona-card__desc">Find components, apply Text Styles, switch Modes, request changes.</p>
+          </a>
+
+          <a class="persona-card" href="/get-started/developers/">
+            <div class="persona-card__num">002 · For developers</div>
+            <div class="persona-card__illustration">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 14 L8 32 L20 50"/>
+                <path d="M44 14 L56 32 L44 50"/>
+                <path d="M36 12 L28 52"/>
+              </svg>
+            </div>
+            <h3 class="persona-card__title">Install the package</h3>
+            <p class="persona-card__desc">Import tokens, drop in components, hook up themes.</p>
+          </a>
+
+          <a class="persona-card" href="/get-started/pms/">
+            <div class="persona-card__num">003 · For product</div>
+            <div class="persona-card__illustration">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="32" cy="14" r="4"/>
+                <circle cx="14" cy="48" r="4"/>
+                <circle cx="50" cy="48" r="4"/>
+                <path d="M32 18 L14 44"/>
+                <path d="M32 18 L50 44"/>
+                <path d="M18 48 L46 48"/>
+              </svg>
+            </div>
+            <h3 class="persona-card__title">Understand what's here</h3>
+            <p class="persona-card__desc">What the system gives you, what's coming, how to ask for things.</p>
+          </a>
+
+        </div>
+
+        <hr class="divider" />
+
+        <h2>How the system works,<br/>in one paragraph.</h2>
+        <p>
+          Tokens live as JSON in <a href="https://github.com/rajatspiro/design-system" target="_blank" rel="noopener">a single GitHub repo</a>.
+          A build script generates CSS variables, a TypeScript token map, and a Figma-shaped
+          JSON from the same source. Components consume those tokens — never raw values.
+          Figma Variables, Text Styles, and the entire component library in Figma are
+          kept in sync by a custom plugin that pulls from the same source. Change a token,
+          push, and the same value flows to web, native, and design in one motion.
+        </p>
+
+      </main>
+    </div>
+
+    <div data-include="footer"></div>
+  </div>
+
+  <script src="/js/chrome.js"></script>
+</body>
+</html>
