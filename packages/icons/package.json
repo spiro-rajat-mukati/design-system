@@ -1,0 +1,33 @@
+{
+  "name": "@kijani/icons",
+  "version": "0.1.0",
+  "description": "Kijani icon components for web (React) and React Native.",
+  "type": "module",
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./native": "./native.ts",
+    "./src/web/*": "./src/web/*",
+    "./src/native/*": "./src/native/*"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node check-generated.mjs"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native-svg": ">=13"
+  },
+  "peerDependenciesMeta": {
+    "react-native-svg": {
+      "optional": true
+    }
+  },
+  "devDependencies": {},
+  "files": [
+    "src/",
+    "index.ts",
+    "native.ts",
+    "svg/"
+  ]
+}
