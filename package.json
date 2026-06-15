@@ -12,6 +12,8 @@
     "tokens:check": "node packages/tokens/check-generated.mjs",
     "icons:build": "node packages/icons/build.mjs",
     "icons:check": "node packages/icons/check-generated.mjs",
+    "illustrations:build": "node packages/illustrations/build.mjs",
+    "illustrations:check": "node packages/illustrations/check-generated.mjs",
     "plugin:build": "npm run build -w @kijani/figma-plugin",
     "plugin:check": "node figma-plugin/test/check-dist.mjs",
     "plugin:roundtrip": "node figma-plugin/test/check-roundtrip.mjs",
