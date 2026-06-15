@@ -1943,6 +1943,45 @@ async function loadPat() {
     figma.ui.postMessage({ type: "pat-loaded", pat: null });
   }
 }
+function toKebabCase(s) {
+  return s.replace(/\s+/g, "-").replace(/[^a-z0-9-]/gi, "").toLowerCase();
+}
+async function exportIconsScan() {
+  var allFound = [];
+  figma.root.findAll(function(node2) {
+    return (node2.type === "COMPONENT" || node2.type === "COMPONENT_SET") && node2.name.startsWith("icon/");
+  }).forEach(function(node2) {
+    if (node2.type === "COMPONENT" && node2.parent && node2.parent.type === "COMPONENT_SET") return;
+    allFound.push(node2);
+  });
+  if (!allFound.length) {
+    figma.ui.postMessage({
+      type: "export-icons-scan-result",
+      error: 'No "icon/*" components found in this file.\nRun Export Icons from the Kijani \u2014 Assets file.'
+    });
+    return;
+  }
+  var results = [];
+  for (var i = 0; i < allFound.length; i++) {
+    var node = allFound[i];
+    var exportNode = node;
+    if (node.type === "COMPONENT_SET") {
+      var children = node.children.filter(function(c) {
+        return c.type === "COMPONENT";
+      });
+      if (children.length) exportNode = children[0];
+    }
+    var rawName = node.name.replace(/^icon\//, "");
+    var name = toKebabCase(rawName) || "icon-" + i;
+    try {
+      var bytes = await exportNode.exportAsync({ format: "SVG" });
+      results.push({ name, figmaName: node.name, bytes: Array.from(bytes) });
+    } catch (e) {
+      results.push({ name, figmaName: node.name, error: String(e.message || e) });
+    }
+  }
+  figma.ui.postMessage({ type: "export-icons-scan-result", icons: results });
+}
 figma.ui.onmessage = async (msg) => {
   try {
     if (msg.type === "compute-diff") {
@@ -1994,6 +2033,8 @@ figma.ui.onmessage = async (msg) => {
     } else if (msg.type === "generate-foundations") {
       await fontsReady;
       await generateFoundations();
+    } else if (msg.type === "export-icons-scan") {
+      await exportIconsScan();
     } else {
       uiLog("Unknown message: " + msg.type, "warn");
     }
