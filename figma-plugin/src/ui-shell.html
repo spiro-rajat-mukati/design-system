@@ -145,14 +145,17 @@
   .ets-var   { font-family:ui-monospace,monospace; font-size:9px; color:var(--fg-muted); line-height:1.6; }
   .ets-missing { border-radius:6px; padding:8px 10px; margin-top:8px; color:var(--removed-fg); font-size:11px; background:var(--removed-bg); }
 
-  /* Export Icons overlay */
-  .ei-section { margin-bottom:12px; }
-  .ei-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:5px; }
-  .ei-row { display:flex; align-items:baseline; gap:6px; padding:4px 0; border-bottom:1px solid var(--border); font-size:11px; }
+  /* Export Assets overlay */
+  .ei-lane { margin-bottom:16px; border-top:1px solid var(--border); padding-top:10px; }
+  .ei-lane:first-child { border-top:none; padding-top:0; }
+  .ei-lane-title { font-size:10px; font-weight:600; color:var(--fg-muted); font-family:ui-monospace,monospace; margin-bottom:6px; }
+  .ei-section { margin-bottom:8px; }
+  .ei-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:4px; }
+  .ei-row { display:flex; align-items:baseline; gap:6px; padding:3px 0; border-bottom:1px solid var(--border); font-size:11px; }
   .ei-row:last-child { border-bottom:none; }
   .ei-name { font-family:ui-monospace,monospace; font-size:10px; flex:1; word-break:break-all; }
   .ei-warn { color:var(--warning); font-size:10px; white-space:nowrap; }
-  .ei-mc-banner { border:1px solid; border-color:var(--warning); border-radius:4px; padding:6px 10px; font-size:11px; color:var(--warning); margin-bottom:10px; line-height:1.5; }
+  .ei-mc-banner { border:1px solid; border-color:var(--warning); border-radius:4px; padding:6px 10px; font-size:11px; color:var(--warning); margin-bottom:8px; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -182,7 +185,7 @@
   <button id="generate-components" class="secondary">Generate components</button>
 
   <div class="group-label">Assets</div>
-  <button id="btn-export-icons" class="secondary">Export Icons → GitHub PR</button>
+  <button id="btn-export-assets" class="secondary">Export Assets → GitHub PR</button>
 </div>
 
 <div class="log" id="log">
@@ -282,22 +285,29 @@
   </div>
 </div>
 
-<!-- ═══════════ EXPORT ICONS OVERLAY ═══════════ -->
-<div id="export-icons-panel" class="overlay" hidden>
+<!-- ═══════════ EXPORT ASSETS OVERLAY ═══════════ -->
+<div id="export-assets-panel" class="overlay" hidden>
   <div class="ov-header">
-    <span class="ov-title">Export Icons — Figma → GitHub</span>
-    <button class="ov-close" id="close-export-icons" title="Close">✕</button>
+    <span class="ov-title">Export Assets — Figma → GitHub</span>
+    <button class="ov-close" id="close-export-assets" title="Close">✕</button>
   </div>
   <div class="ov-body">
-    <p style="font-size:11px;color:var(--fg-muted);margin:0 0 12px">Exports all <code>icon/*</code> components from this file as optimized SVGs, compares them against <code>packages/icons/svg/</code> (add / update / remove), and opens an auto-merge PR. The existing <code>icons-build</code> CI regenerates the web + RN components automatically. Run from the <strong>Kijani — Assets</strong> file.</p>
-    <div id="export-icons-preview-area">
-      <p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Scan</strong> to export <code>icon/*</code> components and compare against the repo.</p>
+    <p style="font-size:11px;color:var(--fg-muted);margin:0 0 12px">
+      Exports from the <strong>Kijani — Assets</strong> file by prefix:
+      <code>icon/*</code> → SVG (currentColor) → <code>packages/icons/svg/</code> ·
+      <code>illustration/*</code> → SVG (colors preserved) → <code>packages/illustrations/svg/</code> ·
+      <code>image/*</code> → PNG → <code>packages/illustrations/raster-src/</code>.
+      Diffs against the repo (add / update / remove) and opens a single auto-merge PR.
+      CI regenerates all derived outputs automatically.
+    </p>
+    <div id="export-assets-preview-area">
+      <p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Scan</strong> to export assets and compare against the repo.</p>
     </div>
   </div>
   <div class="ov-footer">
-    <button class="secondary" id="export-icons-cancel">Cancel</button>
-    <button class="secondary" id="export-icons-scan-btn">Scan</button>
-    <button id="export-icons-confirm" disabled>Export PR</button>
+    <button class="secondary" id="export-assets-cancel">Cancel</button>
+    <button class="secondary" id="export-assets-scan-btn">Scan</button>
+    <button id="export-assets-confirm" disabled>Export PR</button>
   </div>
 </div>
 

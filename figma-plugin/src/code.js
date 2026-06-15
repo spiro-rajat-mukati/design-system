@@ -2257,32 +2257,45 @@ async function loadPat() {
 }
 
 /* ============================================================
-   EXPORT ICONS — read icon/* components, export SVG bytes, send to UI.
-   The UI handles SVG optimization, GitHub diff, and PR creation.
-   Run from the "Kijani — Assets" Figma file.
+   EXPORT ASSETS — reads icon/*, illustration/*, and image/* components
+   from the "Kijani — Assets" Figma file, exports them by type, and
+   sends the raw bytes to ui.js for optimization, diffing, and PR creation.
+
+   Routing by prefix:
+     icon/*         → SVG bytes  → packages/icons/svg/<name>.svg
+     illustration/* → SVG bytes  → packages/illustrations/svg/<name>.svg
+     image/*        → PNG bytes  → packages/illustrations/raster-src/<name>.png
+
+   The UI handles per-lane SVG cleaning (icons: currentColor; illustrations:
+   colors preserved), binary PNG encoding, git blob SHA diffing, and the
+   atomic multi-file PR. CI regenerates all derived outputs automatically.
    ============================================================ */
 
 function toKebabCase(s) {
   return s.replace(/\s+/g, "-").replace(/[^a-z0-9-]/gi, "").toLowerCase();
 }
 
-async function exportIconsScan() {
-  // Collect COMPONENT_SET nodes named "icon/*" plus plain COMPONENT nodes
-  // named "icon/*" whose parent is NOT a COMPONENT_SET (i.e. not a variant).
+var ASSET_PREFIXES = ["icon/", "illustration/", "image/"];
+
+async function exportAssetsScan() {
+  // Collect top-level COMPONENT and COMPONENT_SET nodes whose name starts with
+  // one of the three known prefixes. Skip variant components (parent = COMPONENT_SET).
   var allFound = [];
   figma.root.findAll(function(node) {
-    return (node.type === "COMPONENT" || node.type === "COMPONENT_SET") &&
-           node.name.startsWith("icon/");
+    if (node.type !== "COMPONENT" && node.type !== "COMPONENT_SET") return false;
+    for (var pi = 0; pi < ASSET_PREFIXES.length; pi++) {
+      if (node.name.startsWith(ASSET_PREFIXES[pi])) return true;
+    }
+    return false;
   }).forEach(function(node) {
-    // Skip variant components (children of a COMPONENT_SET)
     if (node.type === "COMPONENT" && node.parent && node.parent.type === "COMPONENT_SET") return;
     allFound.push(node);
   });
 
   if (!allFound.length) {
     figma.ui.postMessage({
-      type: "export-icons-scan-result",
-      error: "No \"icon/*\" components found in this file.\nRun Export Icons from the Kijani — Assets file.",
+      type: "export-assets-scan-result",
+      error: "No icon/*, illustration/*, or image/* components found.\nRun Export Assets from the Kijani — Assets file.",
     });
     return;
   }
@@ -2290,27 +2303,39 @@ async function exportIconsScan() {
   var results = [];
   for (var i = 0; i < allFound.length; i++) {
     var node = allFound[i];
-    // Determine the node to actually export.
-    // For a COMPONENT_SET, export its first COMPONENT child (the default variant).
+
+    // For COMPONENT_SET, export the first COMPONENT child (default variant).
     var exportNode = node;
     if (node.type === "COMPONENT_SET") {
       var children = node.children.filter(function(c) { return c.type === "COMPONENT"; });
       if (children.length) exportNode = children[0];
     }
 
-    // Derive the icon name: strip "icon/" prefix, to kebab-case.
-    var rawName = node.name.replace(/^icon\//, "");
-    var name = toKebabCase(rawName) || ("icon-" + i);
+    // Identify prefix and strip it for the filename.
+    var prefix = null;
+    for (var pi = 0; pi < ASSET_PREFIXES.length; pi++) {
+      if (node.name.startsWith(ASSET_PREFIXES[pi])) { prefix = ASSET_PREFIXES[pi]; break; }
+    }
+    if (!prefix) continue;
+
+    var rawName = node.name.slice(prefix.length);
+    var name = toKebabCase(rawName) || (prefix.replace("/", "-") + i);
+    var format = (prefix === "image/") ? "png" : "svg";
 
     try {
-      var bytes = await exportNode.exportAsync({ format: "SVG" });
-      results.push({ name: name, figmaName: node.name, bytes: Array.from(bytes) });
+      var bytes;
+      if (format === "png") {
+        bytes = await exportNode.exportAsync({ format: "PNG", constraint: { type: "SCALE", value: 1 } });
+      } else {
+        bytes = await exportNode.exportAsync({ format: "SVG" });
+      }
+      results.push({ name: name, figmaName: node.name, prefix: prefix, bytes: Array.from(bytes), format: format });
     } catch (e) {
-      results.push({ name: name, figmaName: node.name, error: String(e.message || e) });
+      results.push({ name: name, figmaName: node.name, prefix: prefix, error: String(e.message || e), format: format });
     }
   }
 
-  figma.ui.postMessage({ type: "export-icons-scan-result", icons: results });
+  figma.ui.postMessage({ type: "export-assets-scan-result", assets: results });
 }
 
 /* ---------- message router ---------- */
@@ -2369,8 +2394,8 @@ figma.ui.onmessage = async (msg) => {
     } else if (msg.type === "generate-foundations") {
       await fontsReady;
       await generateFoundations();
-    } else if (msg.type === "export-icons-scan") {
-      await exportIconsScan();
+    } else if (msg.type === "export-assets-scan") {
+      await exportAssetsScan();
     } else {
       uiLog("Unknown message: " + msg.type, "warn");
     }

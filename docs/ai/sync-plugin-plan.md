@@ -134,12 +134,35 @@ See `decisions.md D11` for the full assets routing model.
 - `illustrations-build.yml` — path-filtered to `svg/**`, `raster-src/**`, `build.mjs`; runs `npm ci` (sharp needs install); PAT-signed commit back to branch.
 - `illustrations-validate.yml` — unfiltered on PR; runs `check-generated.mjs` (binary-aware idempotency guard using `Buffer.equals()`).
 
-### Starter set (PR #56 — 1 vector + 1 raster)
+### Starter set (PR #57 — 1 vector + 1 raster)
 
 - `empty-state.svg` — 240 × 180, multi-color (blue palette, folder + plus-circle motif). Proves the vector color-preservation lane.
 - `hero-banner.png` → `hero-banner.webp` + `hero-banner@2x.webp` — 400 × 300 → 200 × 150 / 400 × 300. Proves the raster lane end-to-end.
 
 See `decisions.md D12` for the full architectural rationale.
+
+### Step 2 — plugin Export Assets (shipped PR #58)
+
+The "Export Icons → GitHub PR" plugin action was generalized into a single **"Export Assets → GitHub PR"** action that routes by name prefix.
+
+**Scanning (code.js):** `exportAssetsScan()` finds all `icon/*`, `illustration/*`, and `image/*` top-level COMPONENT / COMPONENT_SET nodes. COMPONENT_SET nodes export their first COMPONENT child (default variant). Exports:
+- `icon/*` + `illustration/*` → `exportAsync({format:"SVG"})` → SVG bytes
+- `image/*` → `exportAsync({format:"PNG", constraint:{type:"SCALE",value:1}})` → PNG bytes
+
+All raw bytes sent to UI as `Array.from(uint8Array)`.
+
+**Processing (ui.js):**
+- Icons: `optimizeSVG()` — strips metadata, normalizes single-color → `currentColor`, flags multi-color.
+- Illustrations: `cleanIllustrationSVG()` — strips metadata/editor attrs; **never alters colors** (matches D12 vector-lane spec).
+- Images: kept as `Uint8Array`; no color processing.
+
+**Diff:** Fetches GitHub directory listings for all three target paths in parallel (`ghFetchMeta`, 404 → empty). Computes git blob SHA:
+- SVG: `computeGitBlobSha(svgString)` (UTF-8).
+- PNG: `computeGitBlobShaBytes(uint8Array)` (binary, same formula: `SHA1("blob " + n + "\0" + bytes)`).
+
+**PR creation:** Single atomic commit via Git Data API. PNG files committed as `{ content: base64, encoding: "base64" }` via `ghCreateBinaryBlob()` — base64-encoded in 4 KB chunks to avoid call-stack overflow. All three lanes in one tree, one commit, one branch, one auto-merge PR.
+
+**Drop-folder fallback:** `packages/illustrations/raster-src/` can still receive PNG files by manual placement (CI `illustrations-build.yml` is path-filtered to that directory and runs on push). The plugin route is the primary path; drop-folder is the fallback.
 
 ## Guardrails
 

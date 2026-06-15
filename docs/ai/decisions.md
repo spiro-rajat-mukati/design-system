@@ -44,11 +44,21 @@ The durable, agent-facing record of **why** Kijani is built the way it is, and *
 
 **D12 · Illustrations use two lanes: vector (SVG string) and raster (sharp → WebP).** _(locked 2026-06-15)_ `@kijani/illustrations` (`packages/illustrations`) adds a second asset package following the same source→build pattern as D11 but with two distinct lanes. (a) **Vector lane**: multi-color SVGs in `svg/`. Colors are preserved as-is (not currentColor-ified). Web components embed the cleaned SVG string via `dangerouslySetInnerHTML` inside a `<span>` that owns width + aspect-ratio — this approach handles SVG features (gradients, masks, defs) that JSX conversion would break, requires zero new runtime deps beyond React, and keeps the component file tiny. RN components use `SvgXml` from react-native-svg (same reason: handles full SVG feature set from a string). (b) **Raster lane**: PNG/JPG sources in `raster-src/` (AI-generated art, opaque blobs). `build.mjs` uses `sharp` (only devDep) to emit 1×WebP (source ÷ 2) and 2×WebP (source original) into `raster/` — both committed to the repo. Web component: `<img srcSet>` with bundler-resolved `require()` paths. RN component: `<Image>` with `require()` — Metro's @2x naming convention handles hi-DPI. (c) **Unified `<Illustration name="…" />`** plus a typed `manifest.ts` ship for both platforms. Entry points: `@kijani/illustrations` (web), `@kijani/illustrations/native` (RN). CI pattern: `illustrations-build.yml` (path-filtered, PAT-signed commit, `npm ci` for sharp) + `illustrations-validate.yml` (unfiltered PR check, idempotency guard). Binary idempotency guard uses `Buffer.equals()` — never `readFileSync(abs, 'utf8')` for WebP.
 
+**D13 · Single "Export Assets" plugin action with prefix routing.** _(locked 2026-06-15)_ The DesignSync plugin's asset-export action is a single button that scans all `icon/*`, `illustration/*`, and `image/*` top-level COMPONENT / COMPONENT_SET nodes in the Kijani — Assets file and routes each by prefix:
+
+| Prefix | Export format | SVG treatment | Target path |
+|---|---|---|---|
+| `icon/*` | `exportAsync({format:"SVG"})` | `optimizeSVG` — single-color → currentColor; multi-color flagged (preserved) | `packages/icons/svg/<name>.svg` |
+| `illustration/*` | `exportAsync({format:"SVG"})` | `cleanIllustrationSVG` — strips metadata/editor attrs; **colors preserved** | `packages/illustrations/svg/<name>.svg` |
+| `image/*` | `exportAsync({format:"PNG", constraint:{type:"SCALE",value:1}})` | Binary as-is (no color processing) | `packages/illustrations/raster-src/<name>.png` |
+
+PNG blobs are committed via the Git Data API as `{ content: base64, encoding: "base64" }` (never as UTF-8). SHA comparison for idempotency uses `SHA1("blob " + byteLength + "\0" + bytes)` — same formula as icons but operating on the raw `Uint8Array`. All three lanes land in a single atomic commit on one auto-merge PR. The plugin never touches generated files (`src/`, `raster/`, `manifest.ts`) — CI icons-build and illustrations-build regenerate those from the source files. The `raster-src/` drop-folder (manual file placement) remains a valid fallback if Figma is not the source.
+
 ## Open / deferred
 
 - **Reset the Chromatic token.** The committed token was moved into the `CHROMATIC_TOKEN` secret but not yet rotated — the leaked value is still live and in git history. Reset it in Chromatic and update the secret.
 - **CRA → Vite** for `packages/web` (~½ day, low risk; Storybook already runs on its own webpack5).
-- **P2 plugin backlog:** Styles sync, component drift via Code Connect, icon export, team / GitHub-App auth, npm publishing.
+- **P2 plugin backlog:** Styles sync, component drift via Code Connect, team / GitHub-App auth, npm publishing.
 
 ---
 
