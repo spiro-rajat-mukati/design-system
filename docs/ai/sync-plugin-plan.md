@@ -100,6 +100,47 @@ The plugin's icon-export action (future P2 step) will read from the **"Kijani �
 
 See `decisions.md D11` for the full assets routing model.
 
+## P2 — ②b Illustrations (scaffolded 2026-06-15)
+
+### Two lanes
+
+`@kijani/illustrations` (`packages/illustrations`) extends the assets-by-type model to illustration artwork — two distinct source lanes, one unified consumer API.
+
+**Vector lane** (`packages/illustrations/svg/<name>.svg`)
+- Multi-color artwork. Colors are preserved as-is — illustrations are not icon-like; forcing currentColor would break gradients and multi-tone art.
+- `build.mjs` cleans the SVG (strips XML decl / editor metadata / comments / inkscape attrs; removes explicit `width`/`height` from root `<svg>`; adds `width="100%" height="100%"`). Colors untouched.
+- Web component: `dangerouslySetInnerHTML` on a `<span>` that sets `width` + `aspectRatio` — handles all SVG features without JSX conversion or SVGR.
+- RN component: `SvgXml` from react-native-svg — accepts the SVG string, supports full SVG feature set including gradients.
+- Dimensions read from `viewBox`; `width` prop controls rendered size; height auto-computed from intrinsic aspect ratio.
+
+**Raster lane** (`packages/illustrations/raster-src/<name>.(png|jpg|jpeg)`)
+- Drop-folder for AI-generated raster art. PNG is treated as 2× input.
+- `build.mjs` uses `sharp` (only devDep): emits `raster/<name>@2x.webp` (original size, quality 85) + `raster/<name>.webp` (50% size, 1×). Both committed to the repo — no CDN required at this stage.
+- Web component: `<img srcSet="… 1x, … 2x">` with bundler-resolved `require()` paths.
+- RN component: `<Image source={require(…)}>` — Metro picks `@2x` automatically on hi-DPI.
+
+### Unified API
+
+| Export | Web | React Native |
+|---|---|---|
+| `@kijani/illustrations` | barrel + `<Illustration name="…" />` | — |
+| `@kijani/illustrations/native` | — | barrel + `<Illustration name="…" />` |
+| `@kijani/illustrations/manifest` | typed `manifest.ts` (name → meta) | typed `manifest.ts` |
+| `@kijani/illustrations/src/web/<Name>` | deep per-illustration import | — |
+| `@kijani/illustrations/src/native/<Name>` | — | deep per-illustration import |
+
+### CI
+
+- `illustrations-build.yml` — path-filtered to `svg/**`, `raster-src/**`, `build.mjs`; runs `npm ci` (sharp needs install); PAT-signed commit back to branch.
+- `illustrations-validate.yml` — unfiltered on PR; runs `check-generated.mjs` (binary-aware idempotency guard using `Buffer.equals()`).
+
+### Starter set (PR #56 — 1 vector + 1 raster)
+
+- `empty-state.svg` — 240 × 180, multi-color (blue palette, folder + plus-circle motif). Proves the vector color-preservation lane.
+- `hero-banner.png` → `hero-banner.webp` + `hero-banner@2x.webp` — 400 × 300 → 200 × 150 / 400 × 300. Proves the raster lane end-to-end.
+
+See `decisions.md D12` for the full architectural rationale.
+
 ## Guardrails
 
 - Write `packages/tokens/source/` only; let `build.mjs` + the `tokens-validate` CI build. Never hand-edit generated files.

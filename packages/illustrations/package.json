@@ -1,0 +1,42 @@
+{
+  "name": "@kijani/illustrations",
+  "version": "0.1.0",
+  "description": "Kijani illustration components for web (React) and React Native — vector and raster lanes.",
+  "type": "module",
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./native": "./native.ts",
+    "./manifest": "./manifest.ts",
+    "./src/web/*": "./src/web/*",
+    "./src/native/*": "./src/native/*"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node check-generated.mjs"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.72",
+    "react-native-svg": ">=13"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    },
+    "react-native-svg": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "sharp": "^0.33.0"
+  },
+  "files": [
+    "src/",
+    "raster/",
+    "svg/",
+    "manifest.ts",
+    "index.ts",
+    "native.ts"
+  ]
+}

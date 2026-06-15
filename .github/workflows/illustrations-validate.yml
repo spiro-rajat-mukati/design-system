@@ -1,0 +1,30 @@
+name: illustrations-validate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/illustrations/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af68  # v4
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (includes sharp)
+        run: npm ci
+
+      - name: Check generated illustrations are up to date
+        run: node packages/illustrations/check-generated.mjs
