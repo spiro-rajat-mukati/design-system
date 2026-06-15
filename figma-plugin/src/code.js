@@ -2256,6 +2256,63 @@ async function loadPat() {
   }
 }
 
+/* ============================================================
+   EXPORT ICONS — read icon/* components, export SVG bytes, send to UI.
+   The UI handles SVG optimization, GitHub diff, and PR creation.
+   Run from the "Kijani — Assets" Figma file.
+   ============================================================ */
+
+function toKebabCase(s) {
+  return s.replace(/\s+/g, "-").replace(/[^a-z0-9-]/gi, "").toLowerCase();
+}
+
+async function exportIconsScan() {
+  // Collect COMPONENT_SET nodes named "icon/*" plus plain COMPONENT nodes
+  // named "icon/*" whose parent is NOT a COMPONENT_SET (i.e. not a variant).
+  var allFound = [];
+  figma.root.findAll(function(node) {
+    return (node.type === "COMPONENT" || node.type === "COMPONENT_SET") &&
+           node.name.startsWith("icon/");
+  }).forEach(function(node) {
+    // Skip variant components (children of a COMPONENT_SET)
+    if (node.type === "COMPONENT" && node.parent && node.parent.type === "COMPONENT_SET") return;
+    allFound.push(node);
+  });
+
+  if (!allFound.length) {
+    figma.ui.postMessage({
+      type: "export-icons-scan-result",
+      error: "No \"icon/*\" components found in this file.\nRun Export Icons from the Kijani — Assets file.",
+    });
+    return;
+  }
+
+  var results = [];
+  for (var i = 0; i < allFound.length; i++) {
+    var node = allFound[i];
+    // Determine the node to actually export.
+    // For a COMPONENT_SET, export its first COMPONENT child (the default variant).
+    var exportNode = node;
+    if (node.type === "COMPONENT_SET") {
+      var children = node.children.filter(function(c) { return c.type === "COMPONENT"; });
+      if (children.length) exportNode = children[0];
+    }
+
+    // Derive the icon name: strip "icon/" prefix, to kebab-case.
+    var rawName = node.name.replace(/^icon\//, "");
+    var name = toKebabCase(rawName) || ("icon-" + i);
+
+    try {
+      var bytes = await exportNode.exportAsync({ format: "SVG" });
+      results.push({ name: name, figmaName: node.name, bytes: Array.from(bytes) });
+    } catch (e) {
+      results.push({ name: name, figmaName: node.name, error: String(e.message || e) });
+    }
+  }
+
+  figma.ui.postMessage({ type: "export-icons-scan-result", icons: results });
+}
+
 /* ---------- message router ---------- */
 
 figma.ui.onmessage = async (msg) => {
@@ -2312,6 +2369,8 @@ figma.ui.onmessage = async (msg) => {
     } else if (msg.type === "generate-foundations") {
       await fontsReady;
       await generateFoundations();
+    } else if (msg.type === "export-icons-scan") {
+      await exportIconsScan();
     } else {
       uiLog("Unknown message: " + msg.type, "warn");
     }

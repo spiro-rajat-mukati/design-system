@@ -144,6 +144,15 @@
   .ets-style { font-family:ui-monospace,monospace; font-size:10px; word-break:break-word; }
   .ets-var   { font-family:ui-monospace,monospace; font-size:9px; color:var(--fg-muted); line-height:1.6; }
   .ets-missing { border-radius:6px; padding:8px 10px; margin-top:8px; color:var(--removed-fg); font-size:11px; background:var(--removed-bg); }
+
+  /* Export Icons overlay */
+  .ei-section { margin-bottom:12px; }
+  .ei-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:5px; }
+  .ei-row { display:flex; align-items:baseline; gap:6px; padding:4px 0; border-bottom:1px solid var(--border); font-size:11px; }
+  .ei-row:last-child { border-bottom:none; }
+  .ei-name { font-family:ui-monospace,monospace; font-size:10px; flex:1; word-break:break-all; }
+  .ei-warn { color:var(--warning); font-size:10px; white-space:nowrap; }
+  .ei-mc-banner { border:1px solid; border-color:var(--warning); border-radius:4px; padding:6px 10px; font-size:11px; color:var(--warning); margin-bottom:10px; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -171,6 +180,9 @@
   <button id="ensure-text-styles" class="secondary">Ensure Text Styles (Web / Mobile)</button>
   <button id="generate-foundations" class="secondary">Generate Foundations pages</button>
   <button id="generate-components" class="secondary">Generate components</button>
+
+  <div class="group-label">Assets</div>
+  <button id="btn-export-icons" class="secondary">Export Icons → GitHub PR</button>
 </div>
 
 <div class="log" id="log">
@@ -267,6 +279,25 @@
     <button class="secondary" id="prune-cancel">Cancel</button>
     <button class="secondary" id="prune-preview-btn">Preview</button>
     <button id="prune-apply" disabled>Delete unreferenced</button>
+  </div>
+</div>
+
+<!-- ═══════════ EXPORT ICONS OVERLAY ═══════════ -->
+<div id="export-icons-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">Export Icons — Figma → GitHub</span>
+    <button class="ov-close" id="close-export-icons" title="Close">✕</button>
+  </div>
+  <div class="ov-body">
+    <p style="font-size:11px;color:var(--fg-muted);margin:0 0 12px">Exports all <code>icon/*</code> components from this file as optimized SVGs, compares them against <code>packages/icons/svg/</code> (add / update / remove), and opens an auto-merge PR. The existing <code>icons-build</code> CI regenerates the web + RN components automatically. Run from the <strong>Kijani — Assets</strong> file.</p>
+    <div id="export-icons-preview-area">
+      <p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Scan</strong> to export <code>icon/*</code> components and compare against the repo.</p>
+    </div>
+  </div>
+  <div class="ov-footer">
+    <button class="secondary" id="export-icons-cancel">Cancel</button>
+    <button class="secondary" id="export-icons-scan-btn">Scan</button>
+    <button id="export-icons-confirm" disabled>Export PR</button>
   </div>
 </div>
 
