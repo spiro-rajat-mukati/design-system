@@ -39,7 +39,7 @@ const SPECS = [
 let activePat = null;
 let pullPreviewCache = null; // last pull-preview result, used on Apply
 let prunePreviewData = null;
-let exportIconsState = null; // { diff: { add, update, remove, unchanged, errors } }
+let exportAssetsState = null; // { icons, illustrations, images } — each { add, update, remove, unchanged, errors }
 
 /* ── logging ── */
 const logEl = document.getElementById('log');
@@ -108,7 +108,7 @@ async function ghFetchMeta(repoPath, ref) {
 }
 
 /* ── busy state (all interactive buttons) ── */
-const ALL_BTNS = ['sync-tokens','btn-diff','btn-pull','btn-push','btn-prune','sync-text-styles','ensure-text-styles','generate-foundations','generate-components','btn-export-icons','save-pat'];
+const ALL_BTNS = ['sync-tokens','btn-diff','btn-pull','btn-push','btn-prune','sync-text-styles','ensure-text-styles','generate-foundations','generate-components','btn-export-assets','save-pat'];
 function setBusy(busy) {
   for (const id of ALL_BTNS) { const el = document.getElementById(id); if (el) el.disabled = busy; }
 }
@@ -949,7 +949,7 @@ async function ghEnableAutoMerge(prNodeId) {
   }
 }
 
-/* ── Git Data API helpers (used by Export Icons for an atomic multi-file commit) ── */
+/* ── Git Data API helpers (used by Export Assets for an atomic multi-file commit) ── */
 
 async function ghGetCommitTree(commitSha) {
   const resp = await fetch('https://api.github.com/repos/' + REPO + '/git/commits/' + commitSha, {
@@ -1124,13 +1124,15 @@ function renderPushPreview(changes) {
 let pushState = null; // { figmaCollection, sourceFiles, changes }
 
 /* ══════════════════════════════════════════════════════════
-   EXPORT ICONS
+   EXPORT ASSETS
+   Three lanes: icon/* → icons SVG, illustration/* → illustrations SVG,
+   image/* → illustrations raster-src PNG.
    ══════════════════════════════════════════════════════════ */
 
 /**
- * Optimize an SVG string exported from Figma:
- *  - Strip width/height (keep viewBox), remove id/class/data-* attributes.
- *  - Detect distinct fill/stroke colors; replace with currentColor if only one.
+ * Optimize an SVG exported from Figma for the ICON lane:
+ *  - Strip width/height, id/class/data-* from all elements.
+ *  - Detect distinct fill/stroke colors; replace with currentColor if single-color.
  *  - Flag multi-color icons without altering their colors.
  * Returns { svg, warnings: string[], multiColor: bool } or { error: string }.
  */
@@ -1138,7 +1140,6 @@ function optimizeSVG(svgStr) {
   const s = svgStr.trim();
   if (!s) return { error: 'Empty SVG' };
 
-  // Collect all non-neutral color values in fill/stroke/color/stop-color attributes.
   const colorAttrRe = /(fill|stroke|stop-color|color)="(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\))"/g;
   const neutral = new Set(['none', 'transparent', 'currentcolor', 'inherit']);
   const colors = new Set();
@@ -1146,7 +1147,6 @@ function optimizeSVG(svgStr) {
   while ((m = colorAttrRe.exec(s)) !== null) {
     const v = m[2].toLowerCase();
     if (neutral.has(v)) continue;
-    // Treat fully-transparent rgba as neutral
     if (/^rgba?\(\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*\)$/.test(v)) continue;
     colors.add(v);
   }
@@ -1157,7 +1157,6 @@ function optimizeSVG(svgStr) {
     warnings.push('multi-color (' + [...colors].slice(0, 3).join(', ') + (colors.size > 3 ? ', …' : '') + ')');
   }
 
-  // Warn on unexpected viewBox
   const vbMatch = s.match(/viewBox="([^"]*)"/);
   if (!vbMatch) {
     warnings.push('missing viewBox (expected "0 0 24 24")');
@@ -1165,7 +1164,6 @@ function optimizeSVG(svgStr) {
     warnings.push('viewBox "' + vbMatch[1] + '" ≠ "0 0 24 24"');
   }
 
-  // Remove width/height/id/data-* from the <svg> open tag
   let result = s.replace(/<svg([^>]*)>/, (_, attrs) => {
     attrs = attrs.replace(/\s+width="[^"]*"/g, '');
     attrs = attrs.replace(/\s+height="[^"]*"/g, '');
@@ -1173,11 +1171,8 @@ function optimizeSVG(svgStr) {
     attrs = attrs.replace(/\s+data-[\w-]+="[^"]*"/g, '');
     return '<svg' + attrs + '>';
   });
-
-  // Remove id/class/data-* from inner elements
   result = result.replace(/\s+(?:id|class|data-[\w-]+)="[^"]*"/g, '');
 
-  // Color normalize: replace all non-neutral fill/stroke values with currentColor
   if (!multiColor) {
     result = result.replace(
       /(fill|stroke|stop-color|color)="(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\))"/g,
@@ -1195,9 +1190,50 @@ function optimizeSVG(svgStr) {
 }
 
 /**
- * Compute the git blob SHA for a string (UTF-8 content).
+ * Clean an SVG for the ILLUSTRATION lane:
+ *  - Strip editor metadata/namespaces/comments but NEVER touch colors.
+ *  - Remove width/height from the root <svg> (the build.mjs consumer controls size).
+ *  - Strip id/class/data-* from all elements.
+ * Returns { svg, warnings: string[] } or { error: string }.
+ */
+function cleanIllustrationSVG(svgStr) {
+  let s = svgStr.trim();
+  if (!s) return { error: 'Empty SVG' };
+
+  s = s.replace(/<\?xml[^?]*\?>\s*/gi, '');
+  s = s.replace(/<!DOCTYPE[^>]*>\s*/gi, '');
+  s = s.replace(/<!--[\s\S]*?-->/g, '');
+  s = s.replace(/<metadata[\s\S]*?<\/metadata>/gi, '');
+  s = s.replace(/<title>[\s\S]*?<\/title>/gi, '');
+  s = s.replace(/<desc>[\s\S]*?<\/desc>/gi, '');
+  s = s.replace(/\s+(?:inkscape|sodipodi|sketch|dc|cc|rdf):[\w-]+="[^"]*"/g, '');
+  s = s.replace(/\s+xmlns:(?:inkscape|sodipodi|sketch|xlink|dc|cc|rdf)="[^"]*"/g, '');
+
+  // Strip width/height from root <svg> (keep viewBox and everything else)
+  s = s.replace(/<svg([^>]*)>/, (_, attrs) => {
+    attrs = attrs.replace(/\s+width="[^"]*"/g, '');
+    attrs = attrs.replace(/\s+height="[^"]*"/g, '');
+    return '<svg' + attrs + '>';
+  });
+
+  // Strip id/class/data-* from inner elements (not the root svg open tag we just handled)
+  // Use a replace that skips the first occurrence since we've already handled <svg ...>
+  let svgTagDone = false;
+  s = s.replace(/<[^/][^>]*>/g, (tag) => {
+    if (!svgTagDone && tag.startsWith('<svg')) { svgTagDone = true; return tag; }
+    return tag.replace(/\s+(?:id|class|data-[\w-]+)="[^"]*"/g, '');
+  });
+
+  const warnings = [];
+  if (!s.includes('viewBox=')) warnings.push('missing viewBox');
+
+  if (!s.endsWith('\n')) s += '\n';
+  return { svg: s, warnings };
+}
+
+/**
+ * Compute the git blob SHA for a UTF-8 string.
  * SHA1("blob " + byteLength + "\0" + contentBytes)
- * Used to detect unchanged files without fetching each file's content.
  */
 async function computeGitBlobSha(content) {
   const enc = new TextEncoder();
@@ -1210,12 +1246,56 @@ async function computeGitBlobSha(content) {
   return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-function renderExportIconsPreview(diff) {
+/**
+ * Compute the git blob SHA for raw bytes (binary content — PNG etc.).
+ * SHA1("blob " + byteLength + "\0" + bytes)
+ */
+async function computeGitBlobShaBytes(bytes) {
+  const enc = new TextEncoder();
+  const header = enc.encode('blob ' + bytes.length + '\0');
+  const combined = new Uint8Array(header.length + bytes.length);
+  combined.set(header, 0);
+  combined.set(bytes, header.length);
+  const hashBuf = await crypto.subtle.digest('SHA-1', combined);
+  return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Upload a binary blob (Uint8Array) to the GitHub Git Data API.
+ * Encodes as base64 in chunks to avoid call-stack overflow on large files.
+ */
+async function ghCreateBinaryBlob(bytes) {
+  let b64 = '';
+  const CHUNK = 4096;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    b64 += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + CHUNK, bytes.length)));
+  }
+  b64 = btoa(b64);
+  const resp = await fetch('https://api.github.com/repos/' + REPO + '/git/blobs', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + activePat,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+    body: JSON.stringify({ content: b64, encoding: 'base64' }),
+  });
+  if (!resp.ok) throw new Error('GitHub ' + resp.status + ' creating binary blob');
+  return (await resp.json()).sha;
+}
+
+/** Render one diff lane (icons / illustrations / images) as HTML rows. */
+function renderAssetLane(laneTitle, ext, diff) {
   const { add, update, remove, unchanged, errors } = diff;
   const total = add.length + update.length + remove.length;
-  let html = '<div class="diff-summary">';
+  let html = '<div class="ei-lane">';
+  html += '<div class="ei-lane-title">' + esc(laneTitle) + '</div>';
+
+  // Summary pills
+  html += '<div class="diff-summary">';
   if (total === 0 && errors.length === 0) {
-    html += '<span class="pill ok">✓ All icons in sync — nothing to export</span>';
+    html += '<span class="pill ok">✓ in sync</span>';
     if (unchanged.length) html += '<span class="pill muted-pill">' + unchanged.length + ' unchanged</span>';
   } else {
     if (add.length)       html += '<span class="pill added">'     + add.length    + ' to add</span>';
@@ -1226,56 +1306,39 @@ function renderExportIconsPreview(diff) {
   }
   html += '</div>';
 
-  // Multi-color warning banner
-  const multiColorIcons = [...add, ...update].filter(i => i.multiColor);
-  if (multiColorIcons.length) {
-    html += '<div class="ei-mc-banner">⚠ <strong>' + multiColorIcons.length +
-      ' multi-color icon' + (multiColorIcons.length > 1 ? 's' : '') +
-      '</strong> — colors NOT replaced with <code>currentColor</code>. ' +
-      'Review manually after the PR lands.<br>' +
-      multiColorIcons.map(i => '<code>' + esc(i.name) + '</code>').join(', ') +
-      '</div>';
+  // Multi-color banner (icons only — illustrations always preserve colors)
+  const multiColorItems = [...add, ...update].filter(i => i.multiColor);
+  if (multiColorItems.length) {
+    html += '<div class="ei-mc-banner">⚠ <strong>' + multiColorItems.length +
+      ' multi-color</strong> — colors NOT replaced with <code>currentColor</code>. Review manually.<br>' +
+      multiColorItems.map(i => '<code>' + esc(i.name) + '</code>').join(', ') + '</div>';
   }
 
-  if (total === 0 && errors.length === 0) return html;
-
-  const renderRows = (items) => items.slice(0, 50).map(item => {
-    let row = '<div class="ei-row">';
-    row += '<span class="ei-name">' + esc(item.name) + '.svg</span>';
-    if (item.multiColor) row += '<span class="ei-warn">⚠ multi-color</span>';
-    else if (item.warnings && item.warnings.length) row += '<span class="ei-warn">' + esc(item.warnings.join('; ')) + '</span>';
-    row += '</div>';
-    return row;
-  }).join('') + (items.length > 50 ? '<div class="diff-more">… ' + (items.length - 50) + ' more</div>' : '');
+  const rowHtml = (item, cls) => {
+    let r = '<div class="ei-row"><span class="var-name ' + cls + ' ei-name">' + esc(item.name) + '.' + ext + '</span>';
+    if (item.multiColor) r += '<span class="ei-warn">⚠ multi-color</span>';
+    else if (item.warnings && item.warnings.length) r += '<span class="ei-warn">' + esc(item.warnings.join('; ')) + '</span>';
+    return r + '</div>';
+  };
 
   if (add.length) {
     html += '<div class="ei-section"><div class="ei-section-title">Add (' + add.length + ')</div>';
-    html += add.slice(0, 50).map(item => {
-      let row = '<div class="ei-row"><span class="var-name added ei-name">' + esc(item.name) + '.svg</span>';
-      if (item.multiColor) row += '<span class="ei-warn">⚠ multi-color</span>';
-      else if (item.warnings && item.warnings.length) row += '<span class="ei-warn">' + esc(item.warnings.join('; ')) + '</span>';
-      return row + '</div>';
-    }).join('');
-    if (add.length > 50) html += '<div class="diff-more">… ' + (add.length - 50) + ' more</div>';
+    html += add.slice(0, 30).map(i => rowHtml(i, 'added')).join('');
+    if (add.length > 30) html += '<div class="diff-more">… ' + (add.length - 30) + ' more</div>';
     html += '</div>';
   }
   if (update.length) {
     html += '<div class="ei-section"><div class="ei-section-title">Update (' + update.length + ')</div>';
-    html += update.slice(0, 50).map(item => {
-      let row = '<div class="ei-row"><span class="var-name changed ei-name">' + esc(item.name) + '.svg</span>';
-      if (item.multiColor) row += '<span class="ei-warn">⚠ multi-color</span>';
-      else if (item.warnings && item.warnings.length) row += '<span class="ei-warn">' + esc(item.warnings.join('; ')) + '</span>';
-      return row + '</div>';
-    }).join('');
-    if (update.length > 50) html += '<div class="diff-more">… ' + (update.length - 50) + ' more</div>';
+    html += update.slice(0, 30).map(i => rowHtml(i, 'changed')).join('');
+    if (update.length > 30) html += '<div class="diff-more">… ' + (update.length - 30) + ' more</div>';
     html += '</div>';
   }
   if (remove.length) {
     html += '<details class="diff-collapse"><summary>Remove (' + remove.length + ') — in repo, not in Figma</summary>';
-    html += remove.slice(0, 50).map(i =>
-      '<div class="ei-row"><span class="var-name removed ei-name">' + esc(i.name) + '.svg</span></div>'
+    html += remove.slice(0, 30).map(i =>
+      '<div class="ei-row"><span class="var-name removed ei-name">' + esc(i.name) + '.' + ext + '</span></div>'
     ).join('');
-    if (remove.length > 50) html += '<div class="diff-more">… ' + (remove.length - 50) + ' more</div>';
+    if (remove.length > 30) html += '<div class="diff-more">… ' + (remove.length - 30) + ' more</div>';
     html += '</details>';
   }
   if (errors.length) {
@@ -1286,28 +1349,54 @@ function renderExportIconsPreview(diff) {
     ).join('');
     html += '</details>';
   }
+
+  html += '</div>';
   return html;
 }
 
-function closeExportIconsPanel() {
-  document.getElementById('export-icons-panel').hidden = true;
-  exportIconsState = null;
-  document.getElementById('export-icons-confirm').disabled = true;
-  document.getElementById('export-icons-scan-btn').disabled = false;
-  document.getElementById('export-icons-preview-area').innerHTML =
-    '<p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Scan</strong> to export <code>icon/*</code> components and compare against the repo.</p>';
+function renderExportAssetsPreview(state) {
+  const { icons, illustrations, images } = state;
+  const totalChanges =
+    icons.add.length + icons.update.length + icons.remove.length +
+    illustrations.add.length + illustrations.update.length + illustrations.remove.length +
+    images.add.length + images.update.length + images.remove.length;
+  const totalErrors = icons.errors.length + illustrations.errors.length + images.errors.length;
+
+  let html = '';
+  if (totalChanges === 0 && totalErrors === 0) {
+    html += '<div class="diff-summary"><span class="pill ok">✓ All assets in sync — nothing to export</span></div>';
+  }
+
+  const hasIcons  = icons.add.length + icons.update.length + icons.remove.length + icons.unchanged.length + icons.errors.length > 0;
+  const hasIllu   = illustrations.add.length + illustrations.update.length + illustrations.remove.length + illustrations.unchanged.length + illustrations.errors.length > 0;
+  const hasImages = images.add.length + images.update.length + images.remove.length + images.unchanged.length + images.errors.length > 0;
+
+  if (hasIcons)  html += renderAssetLane('Icons → packages/icons/svg/',               'svg', icons);
+  if (hasIllu)   html += renderAssetLane('Illustrations → packages/illustrations/svg/', 'svg', illustrations);
+  if (hasImages) html += renderAssetLane('Images → packages/illustrations/raster-src/', 'png', images);
+
+  if (!hasIcons && !hasIllu && !hasImages) {
+    html += '<p style="font-size:11px;color:var(--fg-muted);margin:8px 0 0">No <code>icon/*</code>, <code>illustration/*</code>, or <code>image/*</code> components found in this file.</p>';
+  }
+
+  return html;
+}
+
+function closeExportAssetsPanel() {
+  document.getElementById('export-assets-panel').hidden = true;
+  exportAssetsState = null;
+  document.getElementById('export-assets-confirm').disabled = true;
+  document.getElementById('export-assets-scan-btn').disabled = false;
+  document.getElementById('export-assets-preview-area').innerHTML =
+    '<p style="font-size:11px;color:var(--fg-muted);margin:0">Click <strong>Scan</strong> to export assets and compare against the repo.</p>';
   setBusy(false);
 }
 
-async function executeExportIconsPR() {
-  const { diff } = exportIconsState;
-  const SVG_PREFIX = 'packages/icons/svg/';
+async function executeExportAssetsPR() {
+  const state = exportAssetsState;
   const now = new Date();
   const ts = now.toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
-  const branch = 'figma/export-icons-' + ts;
-
-  const addUpdate = [...diff.add, ...diff.update];
-  const total = addUpdate.length + diff.remove.length;
+  const branch = 'figma/export-assets-' + ts;
 
   log('Getting main branch SHA…', 'muted');
   const mainSha = await ghGetMainSha();
@@ -1315,60 +1404,116 @@ async function executeExportIconsPR() {
   log('Getting base tree…', 'muted');
   const baseTreeSha = await ghGetCommitTree(mainSha);
 
-  // Create blobs for every add/update
   const treeEntries = [];
-  for (const item of addUpdate) {
-    log('Blob: ' + item.name + '.svg…', 'muted');
+  const prParts = [];
+
+  // ── Icons lane ──
+  const iconAddUpdate = [...state.icons.add, ...state.icons.update];
+  for (const item of iconAddUpdate) {
+    log('Blob: icons/' + item.name + '.svg…', 'muted');
     const blobSha = await ghCreateBlob(item.svg);
-    treeEntries.push({ path: SVG_PREFIX + item.name + '.svg', mode: '100644', type: 'blob', sha: blobSha });
+    treeEntries.push({ path: 'packages/icons/svg/' + item.name + '.svg', mode: '100644', type: 'blob', sha: blobSha });
   }
-  // Delete entries for removes (sha: null removes the file from the tree)
-  for (const item of diff.remove) {
-    treeEntries.push({ path: SVG_PREFIX + item.name + '.svg', mode: '100644', type: 'blob', sha: null });
+  for (const item of state.icons.remove) {
+    treeEntries.push({ path: 'packages/icons/svg/' + item.name + '.svg', mode: '100644', type: 'blob', sha: null });
   }
+  if (state.icons.add.length + state.icons.update.length + state.icons.remove.length > 0) {
+    const parts = [];
+    if (state.icons.add.length)    parts.push('add ' + state.icons.add.map(i => i.name).join(', '));
+    if (state.icons.update.length) parts.push('update ' + state.icons.update.map(i => i.name).join(', '));
+    if (state.icons.remove.length) parts.push('remove ' + state.icons.remove.map(i => i.name).join(', '));
+    prParts.push('icons: ' + parts.join('; '));
+  }
+
+  // ── Illustrations lane ──
+  const illuAddUpdate = [...state.illustrations.add, ...state.illustrations.update];
+  for (const item of illuAddUpdate) {
+    log('Blob: illustrations/' + item.name + '.svg…', 'muted');
+    const blobSha = await ghCreateBlob(item.svg);
+    treeEntries.push({ path: 'packages/illustrations/svg/' + item.name + '.svg', mode: '100644', type: 'blob', sha: blobSha });
+  }
+  for (const item of state.illustrations.remove) {
+    treeEntries.push({ path: 'packages/illustrations/svg/' + item.name + '.svg', mode: '100644', type: 'blob', sha: null });
+  }
+  if (state.illustrations.add.length + state.illustrations.update.length + state.illustrations.remove.length > 0) {
+    const parts = [];
+    if (state.illustrations.add.length)    parts.push('add ' + state.illustrations.add.map(i => i.name).join(', '));
+    if (state.illustrations.update.length) parts.push('update ' + state.illustrations.update.map(i => i.name).join(', '));
+    if (state.illustrations.remove.length) parts.push('remove ' + state.illustrations.remove.map(i => i.name).join(', '));
+    prParts.push('illustrations: ' + parts.join('; '));
+  }
+
+  // ── Images lane (PNG — binary blob) ──
+  const imgAddUpdate = [...state.images.add, ...state.images.update];
+  for (const item of imgAddUpdate) {
+    log('Binary blob: images/' + item.name + '.png…', 'muted');
+    const blobSha = await ghCreateBinaryBlob(item.bytes);
+    treeEntries.push({ path: 'packages/illustrations/raster-src/' + item.name + '.png', mode: '100644', type: 'blob', sha: blobSha });
+  }
+  for (const item of state.images.remove) {
+    treeEntries.push({ path: 'packages/illustrations/raster-src/' + item.name + '.png', mode: '100644', type: 'blob', sha: null });
+  }
+  if (state.images.add.length + state.images.update.length + state.images.remove.length > 0) {
+    const parts = [];
+    if (state.images.add.length)    parts.push('add ' + state.images.add.map(i => i.name).join(', '));
+    if (state.images.update.length) parts.push('update ' + state.images.update.map(i => i.name).join(', '));
+    if (state.images.remove.length) parts.push('remove ' + state.images.remove.map(i => i.name).join(', '));
+    prParts.push('images: ' + parts.join('; '));
+  }
+
+  if (treeEntries.length === 0) throw new Error('No file changes to commit');
 
   log('Creating tree (' + treeEntries.length + ' entries)…', 'muted');
   const newTreeSha = await ghCreateTree(baseTreeSha, treeEntries);
 
-  const parts = [];
-  if (diff.add.length)    parts.push('add ' + diff.add.map(i => i.name).join(', '));
-  if (diff.update.length) parts.push('update ' + diff.update.map(i => i.name).join(', '));
-  if (diff.remove.length) parts.push('remove ' + diff.remove.map(i => i.name).join(', '));
-  const commitMsg = 'chore(icons): ' + parts.join('; ');
-
+  const commitMsg = 'chore(assets): ' + prParts.join(' | ');
   log('Creating commit…', 'muted');
   const commitSha = await ghCreateCommitObj(commitMsg, newTreeSha, mainSha);
 
   log('Creating branch ' + branch + '…', 'muted');
   await ghCreateBranch(branch, commitSha);
 
-  const tableRows = [
-    diff.add.length    ? '| ➕ Add    | ' + diff.add.length    + ' | ' + diff.add.map(i    => '`' + i.name + '`').join(', ') + ' |' : null,
-    diff.update.length ? '| ✏️ Update | ' + diff.update.length + ' | ' + diff.update.map(i => '`' + i.name + '`').join(', ') + ' |' : null,
-    diff.remove.length ? '| 🗑️ Remove | ' + diff.remove.length + ' | ' + diff.remove.map(i => '`' + i.name + '`').join(', ') + ' |' : null,
-  ].filter(Boolean);
+  // ── PR body ──
+  const iconTotal = state.icons.add.length + state.icons.update.length + state.icons.remove.length;
+  const illuTotal = state.illustrations.add.length + state.illustrations.update.length + state.illustrations.remove.length;
+  const imgTotal  = state.images.add.length  + state.images.update.length  + state.images.remove.length;
+  const grandTotal = iconTotal + illuTotal + imgTotal;
 
-  const multiColorNames = [...diff.add, ...diff.update].filter(i => i.multiColor).map(i => '`' + i.name + '`');
+  const buildTable = (label, target, lane, ext) => {
+    if (!lane.add.length && !lane.update.length && !lane.remove.length) return '';
+    const rows = [
+      lane.add.length    ? '| ➕ | ' + lane.add.map(i    => '`' + i.name + '.' + ext + '`').join(', ') + ' |' : null,
+      lane.update.length ? '| ✏️ | ' + lane.update.map(i => '`' + i.name + '.' + ext + '`').join(', ') + ' |' : null,
+      lane.remove.length ? '| 🗑️ | ' + lane.remove.map(i => '`' + i.name + '.' + ext + '`').join(', ') + ' |' : null,
+    ].filter(Boolean);
+    return [
+      '### ' + label + ' → `' + target + '`',
+      '| | Files |',
+      '|:---:|---|',
+      ...rows,
+      '',
+    ].join('\n');
+  };
+
+  const multiColorNames = [...state.icons.add, ...state.icons.update].filter(i => i.multiColor).map(i => '`' + i.name + '`');
 
   const prBody = [
-    '## Export Icons — Figma → GitHub',
+    '## Export Assets — Figma → GitHub',
     '',
-    '**Source:** `icon/*` components from the Kijani — Assets Figma file.',
-    '**Target:** `packages/icons/svg/`',
+    '**Source:** Kijani — Assets Figma file · **Total changes:** ' + grandTotal + ' file' + (grandTotal !== 1 ? 's' : ''),
     '',
-    '| Action | Count | Icons |',
-    '|---|:---:|---|',
-    ...tableRows,
-    '',
+    buildTable('Icons', 'packages/icons/svg/', state.icons, 'svg'),
+    buildTable('Illustrations', 'packages/illustrations/svg/', state.illustrations, 'svg'),
+    buildTable('Images', 'packages/illustrations/raster-src/', state.images, 'png'),
     multiColorNames.length
-      ? '> ⚠️ **Multi-color icons** (colors not replaced with `currentColor`): ' + multiColorNames.join(', ') + '. Review manually.\n'
-      : null,
-    'The `icons-build` CI workflow regenerates web + RN components and commits them automatically; the PR auto-merges when green.',
+      ? '> ⚠️ **Multi-color icons** (colors not replaced with `currentColor`): ' + multiColorNames.join(', ') + '.\n'
+      : '',
+    'CI workflows regenerate web + RN components from the source files and commit them automatically; the PR auto-merges when green.',
     '',
     '> Generated by the Design System Sync Figma plugin on ' + now.toLocaleDateString() + '.',
   ].filter(s => s !== null).join('\n');
 
-  const prTitle = 'chore(icons): export ' + total + ' icon' + (total !== 1 ? 's' : '') + ' from Figma';
+  const prTitle = 'chore(assets): export ' + grandTotal + ' asset' + (grandTotal !== 1 ? 's' : '') + ' from Figma';
   log('Opening PR…', 'muted');
   const pr = await ghCreatePR(branch, prTitle, prBody);
 
@@ -1610,34 +1755,34 @@ document.getElementById('push-confirm').addEventListener('click', async () => {
   setBusy(false);
 });
 
-/* ── Export Icons event handlers ── */
+/* ── Export Assets event handlers ── */
 
-document.getElementById('btn-export-icons').addEventListener('click', () => {
-  document.getElementById('export-icons-panel').hidden = false;
+document.getElementById('btn-export-assets').addEventListener('click', () => {
+  document.getElementById('export-assets-panel').hidden = false;
   setBusy(true);
 });
 
-document.getElementById('close-export-icons').addEventListener('click', closeExportIconsPanel);
-document.getElementById('export-icons-cancel').addEventListener('click', closeExportIconsPanel);
+document.getElementById('close-export-assets').addEventListener('click', closeExportAssetsPanel);
+document.getElementById('export-assets-cancel').addEventListener('click', closeExportAssetsPanel);
 
-document.getElementById('export-icons-scan-btn').addEventListener('click', () => {
-  document.getElementById('export-icons-scan-btn').disabled = true;
-  document.getElementById('export-icons-confirm').disabled = true;
-  document.getElementById('export-icons-preview-area').innerHTML =
-    '<div class="line muted">Exporting icon/* components from Figma…</div>';
+document.getElementById('export-assets-scan-btn').addEventListener('click', () => {
+  document.getElementById('export-assets-scan-btn').disabled = true;
+  document.getElementById('export-assets-confirm').disabled = true;
+  document.getElementById('export-assets-preview-area').innerHTML =
+    '<div class="line muted">Exporting icon/*, illustration/*, image/* components from Figma…</div>';
   setBusy(true);
-  parent.postMessage({ pluginMessage: { type: 'export-icons-scan' } }, '*');
+  parent.postMessage({ pluginMessage: { type: 'export-assets-scan' } }, '*');
 });
 
-document.getElementById('export-icons-confirm').addEventListener('click', async () => {
-  if (!exportIconsState) return;
-  document.getElementById('export-icons-confirm').disabled = true;
-  document.getElementById('export-icons-scan-btn').disabled = true;
-  document.getElementById('export-icons-cancel').disabled = true;
-  log('Creating Export Icons PR…', 'muted');
+document.getElementById('export-assets-confirm').addEventListener('click', async () => {
+  if (!exportAssetsState) return;
+  document.getElementById('export-assets-confirm').disabled = true;
+  document.getElementById('export-assets-scan-btn').disabled = true;
+  document.getElementById('export-assets-cancel').disabled = true;
+  log('Creating Export Assets PR…', 'muted');
   try {
-    const pr = await executeExportIconsPR();
-    closeExportIconsPanel();
+    const pr = await executeExportAssetsPR();
+    closeExportAssetsPanel();
     log('PR opened: ' + pr.html_url, 'ok');
     const logEl = document.getElementById('log');
     logEl.insertAdjacentHTML('beforeend',
@@ -1645,10 +1790,10 @@ document.getElementById('export-icons-confirm').addEventListener('click', async 
       '" target="_blank">' + esc(pr.html_url) + '</a></div>');
     logEl.scrollTop = logEl.scrollHeight;
   } catch (e) {
-    log('Export Icons PR failed: ' + e.message, 'err');
-    document.getElementById('export-icons-confirm').disabled = false;
-    document.getElementById('export-icons-scan-btn').disabled = false;
-    document.getElementById('export-icons-cancel').disabled = false;
+    log('Export Assets PR failed: ' + e.message, 'err');
+    document.getElementById('export-assets-confirm').disabled = false;
+    document.getElementById('export-assets-scan-btn').disabled = false;
+    document.getElementById('export-assets-cancel').disabled = false;
   }
   setBusy(false);
 });
@@ -1802,77 +1947,151 @@ window.onmessage = (event) => {
         msg.errors > 0 ? 'warn' : 'ok'
       );
       break;
-    case 'export-icons-scan-result': {
+    case 'export-assets-scan-result': {
       (async () => {
-        const previewEl = document.getElementById('export-icons-preview-area');
+        const previewEl = document.getElementById('export-assets-preview-area');
         if (msg.error) {
           previewEl.innerHTML = '<div class="panel-error">' + esc(msg.error) + '</div>';
-          document.getElementById('export-icons-scan-btn').disabled = false;
+          document.getElementById('export-assets-scan-btn').disabled = false;
           setBusy(false);
           return;
         }
 
-        previewEl.innerHTML = '<div class="line muted">Optimizing SVGs and comparing with repo…</div>';
+        previewEl.innerHTML = '<div class="line muted">Processing assets and comparing with repo…</div>';
 
-        // Decode bytes → SVG string and optimize
-        const processed = msg.icons.map(icon => {
-          if (icon.error) return { name: icon.name, figmaName: icon.figmaName, exportError: icon.error };
-          const svgStr = new TextDecoder().decode(new Uint8Array(icon.bytes));
+        // Partition raw assets by prefix
+        const rawIcons         = msg.assets.filter(a => a.prefix === 'icon/');
+        const rawIllustrations = msg.assets.filter(a => a.prefix === 'illustration/');
+        const rawImages        = msg.assets.filter(a => a.prefix === 'image/');
+
+        const emptyLane = () => ({ add: [], update: [], remove: [], unchanged: [], errors: [] });
+        const state = {
+          icons:         emptyLane(),
+          illustrations: emptyLane(),
+          images:        emptyLane(),
+        };
+
+        // ── Icons lane: SVG → optimizeSVG (currentColor normalization) ──
+        const processedIcons = rawIcons.map(asset => {
+          if (asset.error) return { name: asset.name, exportError: asset.error };
+          const svgStr = new TextDecoder().decode(new Uint8Array(asset.bytes));
           const opt = optimizeSVG(svgStr);
-          if (opt.error) return { name: icon.name, figmaName: icon.figmaName, exportError: opt.error };
-          return { name: icon.name, figmaName: icon.figmaName, svg: opt.svg, warnings: opt.warnings, multiColor: opt.multiColor };
+          if (opt.error) return { name: asset.name, exportError: opt.error };
+          return { name: asset.name, svg: opt.svg, warnings: opt.warnings, multiColor: opt.multiColor };
         });
 
-        // Fetch existing SVG directory listing from GitHub
-        let ghFiles = [];
+        // ── Illustrations lane: SVG → cleanIllustrationSVG (colors preserved) ──
+        const processedIllu = rawIllustrations.map(asset => {
+          if (asset.error) return { name: asset.name, exportError: asset.error };
+          const svgStr = new TextDecoder().decode(new Uint8Array(asset.bytes));
+          const opt = cleanIllustrationSVG(svgStr);
+          if (opt.error) return { name: asset.name, exportError: opt.error };
+          return { name: asset.name, svg: opt.svg, warnings: opt.warnings };
+        });
+
+        // ── Images lane: PNG bytes kept as Uint8Array for binary blob upload ──
+        const processedImages = rawImages.map(asset => {
+          if (asset.error) return { name: asset.name, exportError: asset.error };
+          return { name: asset.name, bytes: new Uint8Array(asset.bytes) };
+        });
+
+        // Fetch GitHub directory listings for all three paths (404 → empty dir)
+        let ghIconFiles = [], ghIlluFiles = [], ghImgFiles = [];
         try {
-          const listing = await ghFetchMeta('packages/icons/svg');
-          if (Array.isArray(listing)) ghFiles = listing;
+          const [iconListing, illuListing, imgListing] = await Promise.all([
+            ghFetchMeta('packages/icons/svg').then(r => Array.isArray(r) ? r : []),
+            ghFetchMeta('packages/illustrations/svg').then(r => Array.isArray(r) ? r : []),
+            ghFetchMeta('packages/illustrations/raster-src').then(r => Array.isArray(r) ? r : []),
+          ]);
+          ghIconFiles = iconListing;
+          ghIlluFiles = illuListing;
+          ghImgFiles  = imgListing;
         } catch (e) {
           previewEl.innerHTML = '<div class="panel-error">GitHub error: ' + esc(e.message) + '</div>';
-          document.getElementById('export-icons-scan-btn').disabled = false;
+          document.getElementById('export-assets-scan-btn').disabled = false;
           setBusy(false);
           return;
         }
 
-        // Build map: kebab-name → github blob SHA
-        const ghMap = new Map();
-        for (const f of ghFiles) {
-          if (f.type === 'file' && f.name.endsWith('.svg')) ghMap.set(f.name.replace('.svg', ''), f.sha);
-        }
+        // Build name → SHA maps for each lane
+        const buildShaMap = (files, ext) => {
+          const m = new Map();
+          for (const f of files) {
+            if (f.type === 'file' && f.name.endsWith('.' + ext)) m.set(f.name.slice(0, -(ext.length + 1)), f.sha);
+          }
+          return m;
+        };
+        const iconShaMap = buildShaMap(ghIconFiles, 'svg');
+        const illuShaMap = buildShaMap(ghIlluFiles, 'svg');
+        const imgShaMap  = buildShaMap(ghImgFiles, 'png');
 
-        const figmaNames = new Set(processed.filter(p => p.svg).map(p => p.name));
-        const diff = { add: [], update: [], remove: [], unchanged: [], errors: [] };
-
-        // Categorize each processed icon
-        for (const icon of processed) {
-          if (icon.exportError) { diff.errors.push(icon); continue; }
-          if (!ghMap.has(icon.name)) {
-            diff.add.push(icon);
+        // Categorize icons (SHA comparison on UTF-8 SVG string)
+        const iconFigmaNames = new Set();
+        for (const item of processedIcons) {
+          if (item.exportError) { state.icons.errors.push(item); continue; }
+          iconFigmaNames.add(item.name);
+          if (!iconShaMap.has(item.name)) {
+            state.icons.add.push(item);
           } else {
-            const existingSha = ghMap.get(icon.name);
-            const newSha = await computeGitBlobSha(icon.svg);
-            if (newSha === existingSha) diff.unchanged.push(icon);
-            else                        diff.update.push(icon);
+            const newSha = await computeGitBlobSha(item.svg);
+            if (newSha === iconShaMap.get(item.name)) state.icons.unchanged.push(item);
+            else                                       state.icons.update.push(item);
           }
         }
-
-        // Icons in repo but not in Figma → remove
-        for (const [name] of ghMap.entries()) {
-          if (!figmaNames.has(name)) diff.remove.push({ name });
+        for (const [name] of iconShaMap) {
+          if (!iconFigmaNames.has(name)) state.icons.remove.push({ name });
         }
 
-        exportIconsState = { diff };
-        previewEl.innerHTML = renderExportIconsPreview(diff);
+        // Categorize illustrations (SHA comparison on UTF-8 SVG string)
+        const illuFigmaNames = new Set();
+        for (const item of processedIllu) {
+          if (item.exportError) { state.illustrations.errors.push(item); continue; }
+          illuFigmaNames.add(item.name);
+          if (!illuShaMap.has(item.name)) {
+            state.illustrations.add.push(item);
+          } else {
+            const newSha = await computeGitBlobSha(item.svg);
+            if (newSha === illuShaMap.get(item.name)) state.illustrations.unchanged.push(item);
+            else                                        state.illustrations.update.push(item);
+          }
+        }
+        for (const [name] of illuShaMap) {
+          if (!illuFigmaNames.has(name)) state.illustrations.remove.push({ name });
+        }
 
-        const hasChanges = diff.add.length + diff.update.length + diff.remove.length > 0;
-        document.getElementById('export-icons-confirm').disabled = !hasChanges;
-        document.getElementById('export-icons-scan-btn').disabled = false;
-        const tot = diff.add.length + diff.update.length + diff.remove.length;
-        log('Icon scan: ' + tot + ' change' + (tot !== 1 ? 's' : '') +
-          ' (' + diff.add.length + ' add, ' + diff.update.length + ' update, ' +
-          diff.remove.length + ' remove), ' + diff.unchanged.length + ' unchanged' +
-          (diff.errors.length ? ', ' + diff.errors.length + ' error(s)' : ''), tot > 0 ? 'info' : 'ok');
+        // Categorize images (SHA comparison on binary bytes)
+        const imgFigmaNames = new Set();
+        for (const item of processedImages) {
+          if (item.exportError) { state.images.errors.push(item); continue; }
+          imgFigmaNames.add(item.name);
+          if (!imgShaMap.has(item.name)) {
+            state.images.add.push(item);
+          } else {
+            const newSha = await computeGitBlobShaBytes(item.bytes);
+            if (newSha === imgShaMap.get(item.name)) state.images.unchanged.push(item);
+            else                                       state.images.update.push(item);
+          }
+        }
+        for (const [name] of imgShaMap) {
+          if (!imgFigmaNames.has(name)) state.images.remove.push({ name });
+        }
+
+        exportAssetsState = state;
+        previewEl.innerHTML = renderExportAssetsPreview(state);
+
+        const hasChanges =
+          state.icons.add.length + state.icons.update.length + state.icons.remove.length +
+          state.illustrations.add.length + state.illustrations.update.length + state.illustrations.remove.length +
+          state.images.add.length + state.images.update.length + state.images.remove.length > 0;
+        document.getElementById('export-assets-confirm').disabled = !hasChanges;
+        document.getElementById('export-assets-scan-btn').disabled = false;
+
+        const tot = (state.icons.add.length + state.icons.update.length + state.icons.remove.length) +
+                    (state.illustrations.add.length + state.illustrations.update.length + state.illustrations.remove.length) +
+                    (state.images.add.length + state.images.update.length + state.images.remove.length);
+        const errs = state.icons.errors.length + state.illustrations.errors.length + state.images.errors.length;
+        log('Asset scan: ' + tot + ' change' + (tot !== 1 ? 's' : '') + ' across all lanes' +
+          (errs ? ', ' + errs + ' error(s)' : ''), tot > 0 ? 'info' : 'ok');
         setBusy(false);
       })();
       break;

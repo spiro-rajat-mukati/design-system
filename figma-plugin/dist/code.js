@@ -1946,18 +1946,23 @@ async function loadPat() {
 function toKebabCase(s) {
   return s.replace(/\s+/g, "-").replace(/[^a-z0-9-]/gi, "").toLowerCase();
 }
-async function exportIconsScan() {
+var ASSET_PREFIXES = ["icon/", "illustration/", "image/"];
+async function exportAssetsScan() {
   var allFound = [];
   figma.root.findAll(function(node2) {
-    return (node2.type === "COMPONENT" || node2.type === "COMPONENT_SET") && node2.name.startsWith("icon/");
+    if (node2.type !== "COMPONENT" && node2.type !== "COMPONENT_SET") return false;
+    for (var pi2 = 0; pi2 < ASSET_PREFIXES.length; pi2++) {
+      if (node2.name.startsWith(ASSET_PREFIXES[pi2])) return true;
+    }
+    return false;
   }).forEach(function(node2) {
     if (node2.type === "COMPONENT" && node2.parent && node2.parent.type === "COMPONENT_SET") return;
     allFound.push(node2);
   });
   if (!allFound.length) {
     figma.ui.postMessage({
-      type: "export-icons-scan-result",
-      error: 'No "icon/*" components found in this file.\nRun Export Icons from the Kijani \u2014 Assets file.'
+      type: "export-assets-scan-result",
+      error: "No icon/*, illustration/*, or image/* components found.\nRun Export Assets from the Kijani \u2014 Assets file."
     });
     return;
   }
@@ -1971,16 +1976,30 @@ async function exportIconsScan() {
       });
       if (children.length) exportNode = children[0];
     }
-    var rawName = node.name.replace(/^icon\//, "");
-    var name = toKebabCase(rawName) || "icon-" + i;
+    var prefix = null;
+    for (var pi = 0; pi < ASSET_PREFIXES.length; pi++) {
+      if (node.name.startsWith(ASSET_PREFIXES[pi])) {
+        prefix = ASSET_PREFIXES[pi];
+        break;
+      }
+    }
+    if (!prefix) continue;
+    var rawName = node.name.slice(prefix.length);
+    var name = toKebabCase(rawName) || prefix.replace("/", "-") + i;
+    var format = prefix === "image/" ? "png" : "svg";
     try {
-      var bytes = await exportNode.exportAsync({ format: "SVG" });
-      results.push({ name, figmaName: node.name, bytes: Array.from(bytes) });
+      var bytes;
+      if (format === "png") {
+        bytes = await exportNode.exportAsync({ format: "PNG", constraint: { type: "SCALE", value: 1 } });
+      } else {
+        bytes = await exportNode.exportAsync({ format: "SVG" });
+      }
+      results.push({ name, figmaName: node.name, prefix, bytes: Array.from(bytes), format });
     } catch (e) {
-      results.push({ name, figmaName: node.name, error: String(e.message || e) });
+      results.push({ name, figmaName: node.name, prefix, error: String(e.message || e), format });
     }
   }
-  figma.ui.postMessage({ type: "export-icons-scan-result", icons: results });
+  figma.ui.postMessage({ type: "export-assets-scan-result", assets: results });
 }
 figma.ui.onmessage = async (msg) => {
   try {
@@ -2033,8 +2052,8 @@ figma.ui.onmessage = async (msg) => {
     } else if (msg.type === "generate-foundations") {
       await fontsReady;
       await generateFoundations();
-    } else if (msg.type === "export-icons-scan") {
-      await exportIconsScan();
+    } else if (msg.type === "export-assets-scan") {
+      await exportAssetsScan();
     } else {
       uiLog("Unknown message: " + msg.type, "warn");
     }
