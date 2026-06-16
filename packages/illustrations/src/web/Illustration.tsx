@@ -2,15 +2,15 @@
 // Source: packages/illustrations/svg/ or raster-src/. Run `npm run illustrations:build`.
 
 import * as React from 'react';
-import { EmptyState } from './EmptyState';
-import { HeroBanner } from './HeroBanner';
+import { Coin } from './Coin';
+import { Battery } from './Battery';
 import type { IllustrationMeta } from '../../manifest';
 
-type IllustrationName = 'empty-state' | 'hero-banner';
+type IllustrationName = 'coin' | 'battery';
 
 const REGISTRY: Record<string, React.ComponentType<{ width?: number | string; alt?: string; className?: string; style?: React.CSSProperties }>> = {
-  'empty-state': EmptyState,
-  'hero-banner': HeroBanner,
+  'coin': Coin,
+  'battery': Battery,
 };
 
 export interface IllustrationProps {
