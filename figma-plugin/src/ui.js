@@ -1232,32 +1232,85 @@ function cleanIllustrationSVG(svgStr) {
 }
 
 /**
- * Compute the git blob SHA for a UTF-8 string.
- * SHA1("blob " + byteLength + "\0" + contentBytes)
+ * Pure-JS SHA-1 — fallback for contexts where crypto.subtle is unavailable
+ * (some Figma iframe environments). Operates on a Uint8Array; returns a 40-char hex string.
+ * Only used as a fallback; crypto.subtle is preferred when available.
  */
-async function computeGitBlobSha(content) {
-  const enc = new TextEncoder();
-  const contentBytes = enc.encode(content);
-  const header = enc.encode('blob ' + contentBytes.length + '\0');
-  const combined = new Uint8Array(header.length + contentBytes.length);
-  combined.set(header, 0);
-  combined.set(contentBytes, header.length);
-  const hashBuf = await crypto.subtle.digest('SHA-1', combined);
-  return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+function sha1PureJs(data) {
+  const ml = data.length;
+  // Round (ml + 1 + 8) up to the next multiple of 64 for SHA-1 padding.
+  const totalLen = ((ml + 9 + 63) & ~63) >>> 0;
+  const msg = new Uint8Array(totalLen);
+  msg.set(data);
+  msg[ml] = 0x80;
+  // 64-bit big-endian bit length at the end (files < 512 MB; upper 32 bits stay 0)
+  const bl = (ml * 8) >>> 0;
+  msg[totalLen - 4] = (bl >>> 24) & 0xff;
+  msg[totalLen - 3] = (bl >>> 16) & 0xff;
+  msg[totalLen - 2] = (bl >>>  8) & 0xff;
+  msg[totalLen - 1] =  bl         & 0xff;
+
+  // SHA-1 constants (pre-applied |0 so all are signed 32-bit)
+  const K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc | 0, 0xca62c1d6 | 0];
+  let h0 = 0x67452301, h1 = 0xefcdab89 | 0, h2 = 0x98badcfe | 0,
+      h3 = 0x10325476, h4 = 0xc3d2e1f0 | 0;
+
+  for (let i = 0; i < totalLen; i += 64) {
+    const W = new Int32Array(80);
+    for (let j = 0; j < 16; j++) {
+      W[j] = (msg[i + j*4] << 24) | (msg[i + j*4 + 1] << 16) |
+              (msg[i + j*4 + 2] << 8) | msg[i + j*4 + 3];
+    }
+    for (let j = 16; j < 80; j++) {
+      const x = W[j-3] ^ W[j-8] ^ W[j-14] ^ W[j-16];
+      W[j] = (x << 1) | (x >>> 31);
+    }
+    let a = h0, b = h1, c = h2, d = h3, e = h4;
+    for (let j = 0; j < 80; j++) {
+      let f, k;
+      if      (j < 20) { f = (b & c) | (~b & d);            k = K[0]; }
+      else if (j < 40) { f = b ^ c ^ d;                     k = K[1]; }
+      else if (j < 60) { f = (b & c) | (b & d) | (c & d);  k = K[2]; }
+      else             { f = b ^ c ^ d;                     k = K[3]; }
+      const t = (((a << 5) | (a >>> 27)) + f + e + k + W[j]) | 0;
+      e = d; d = c; c = (b << 30) | (b >>> 2); b = a; a = t;
+    }
+    h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0;
+    h3 = (h3 + d) | 0; h4 = (h4 + e) | 0;
+  }
+  return [h0, h1, h2, h3, h4].map(n => (n >>> 0).toString(16).padStart(8, '0')).join('');
 }
 
 /**
- * Compute the git blob SHA for raw bytes (binary content — PNG etc.).
- * SHA1("blob " + byteLength + "\0" + bytes)
+ * Core helper: SHA1("blob " + byteLen + "\0" + bytes).
+ * Prefers crypto.subtle (hardware-accelerated); falls back to sha1PureJs when
+ * crypto.subtle is absent (some Figma iframe environments) or throws.
+ * Always operates on bytes, so the result is identical for text (UTF-8 encoded)
+ * and binary (PNG etc.) — Git uses byte length in the blob header, not char count.
  */
-async function computeGitBlobShaBytes(bytes) {
+async function gitBlobShaBytes(bytes) {
   const enc = new TextEncoder();
   const header = enc.encode('blob ' + bytes.length + '\0');
   const combined = new Uint8Array(header.length + bytes.length);
   combined.set(header, 0);
   combined.set(bytes, header.length);
-  const hashBuf = await crypto.subtle.digest('SHA-1', combined);
-  return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  if (typeof crypto !== 'undefined' && crypto?.subtle) {
+    try {
+      const buf = await crypto.subtle.digest('SHA-1', combined);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (_) { /* fall through */ }
+  }
+  return sha1PureJs(combined);
+}
+
+/** Git blob SHA for a UTF-8 string (SVG source). */
+async function computeGitBlobSha(content) {
+  return gitBlobShaBytes(new TextEncoder().encode(content));
+}
+
+/** Git blob SHA for raw binary bytes (PNG etc.). */
+async function computeGitBlobShaBytes(bytes) {
+  return gitBlobShaBytes(bytes);
 }
 
 /**
@@ -2025,52 +2078,71 @@ window.onmessage = (event) => {
         const illuShaMap = buildShaMap(ghIlluFiles, 'svg');
         const imgShaMap  = buildShaMap(ghImgFiles, 'png');
 
-        // Categorize icons (SHA comparison on UTF-8 SVG string)
+        // Categorize all lanes in parallel (per-item try/catch on SHA so one failure
+        // can't freeze the whole scan — failing SHA is treated conservatively as "update").
         const iconFigmaNames = new Set();
-        for (const item of processedIcons) {
-          if (item.exportError) { state.icons.errors.push(item); continue; }
-          iconFigmaNames.add(item.name);
-          if (!iconShaMap.has(item.name)) {
-            state.icons.add.push(item);
-          } else {
-            const newSha = await computeGitBlobSha(item.svg);
-            if (newSha === iconShaMap.get(item.name)) state.icons.unchanged.push(item);
-            else                                       state.icons.update.push(item);
-          }
-        }
+        const illuFigmaNames = new Set();
+        const imgFigmaNames  = new Set();
+
+        await Promise.all([
+          // Icons lane: SHA on UTF-8 SVG string
+          ...processedIcons.map(async item => {
+            if (item.exportError) { state.icons.errors.push(item); return; }
+            iconFigmaNames.add(item.name);
+            if (!iconShaMap.has(item.name)) {
+              state.icons.add.push(item);
+            } else {
+              try {
+                const newSha = await computeGitBlobSha(item.svg);
+                if (newSha === iconShaMap.get(item.name)) state.icons.unchanged.push(item);
+                else                                       state.icons.update.push(item);
+              } catch (e) {
+                item.warnings = (item.warnings || []).concat(['sha-check failed: ' + e.message]);
+                state.icons.update.push(item);
+              }
+            }
+          }),
+          // Illustrations lane: SHA on UTF-8 SVG string
+          ...processedIllu.map(async item => {
+            if (item.exportError) { state.illustrations.errors.push(item); return; }
+            illuFigmaNames.add(item.name);
+            if (!illuShaMap.has(item.name)) {
+              state.illustrations.add.push(item);
+            } else {
+              try {
+                const newSha = await computeGitBlobSha(item.svg);
+                if (newSha === illuShaMap.get(item.name)) state.illustrations.unchanged.push(item);
+                else                                        state.illustrations.update.push(item);
+              } catch (e) {
+                item.warnings = (item.warnings || []).concat(['sha-check failed: ' + e.message]);
+                state.illustrations.update.push(item);
+              }
+            }
+          }),
+          // Images lane: SHA on raw binary bytes
+          ...processedImages.map(async item => {
+            if (item.exportError) { state.images.errors.push(item); return; }
+            imgFigmaNames.add(item.name);
+            if (!imgShaMap.has(item.name)) {
+              state.images.add.push(item);
+            } else {
+              try {
+                const newSha = await computeGitBlobShaBytes(item.bytes);
+                if (newSha === imgShaMap.get(item.name)) state.images.unchanged.push(item);
+                else                                       state.images.update.push(item);
+              } catch (e) {
+                item.warnings = (item.warnings || []).concat(['sha-check failed: ' + e.message]);
+                state.images.update.push(item);
+              }
+            }
+          }),
+        ]);
+
         for (const [name] of iconShaMap) {
           if (!iconFigmaNames.has(name)) state.icons.remove.push({ name });
         }
-
-        // Categorize illustrations (SHA comparison on UTF-8 SVG string)
-        const illuFigmaNames = new Set();
-        for (const item of processedIllu) {
-          if (item.exportError) { state.illustrations.errors.push(item); continue; }
-          illuFigmaNames.add(item.name);
-          if (!illuShaMap.has(item.name)) {
-            state.illustrations.add.push(item);
-          } else {
-            const newSha = await computeGitBlobSha(item.svg);
-            if (newSha === illuShaMap.get(item.name)) state.illustrations.unchanged.push(item);
-            else                                        state.illustrations.update.push(item);
-          }
-        }
         for (const [name] of illuShaMap) {
           if (!illuFigmaNames.has(name)) state.illustrations.remove.push({ name });
-        }
-
-        // Categorize images (SHA comparison on binary bytes)
-        const imgFigmaNames = new Set();
-        for (const item of processedImages) {
-          if (item.exportError) { state.images.errors.push(item); continue; }
-          imgFigmaNames.add(item.name);
-          if (!imgShaMap.has(item.name)) {
-            state.images.add.push(item);
-          } else {
-            const newSha = await computeGitBlobShaBytes(item.bytes);
-            if (newSha === imgShaMap.get(item.name)) state.images.unchanged.push(item);
-            else                                       state.images.update.push(item);
-          }
         }
         for (const [name] of imgShaMap) {
           if (!imgFigmaNames.has(name)) state.images.remove.push({ name });
@@ -2093,7 +2165,13 @@ window.onmessage = (event) => {
         log('Asset scan: ' + tot + ' change' + (tot !== 1 ? 's' : '') + ' across all lanes' +
           (errs ? ', ' + errs + ' error(s)' : ''), tot > 0 ? 'info' : 'ok');
         setBusy(false);
-      })();
+      })().catch(e => {
+        // Outer guard: prevents "Processing…" from hanging if any unhandled rejection escapes.
+        const previewEl = document.getElementById('export-assets-preview-area');
+        previewEl.innerHTML = '<div class="panel-error">Unexpected error: ' + esc(e.message) + '</div>';
+        document.getElementById('export-assets-scan-btn').disabled = false;
+        setBusy(false);
+      });
       break;
     }
     case 'log':  log(msg.text, msg.kind || 'info'); break;
