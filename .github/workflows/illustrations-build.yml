@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (PAT for push-back)
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af68  # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
         with:
           token: ${{ secrets.TOKENS_BUILD_PAT }}
           fetch-depth: 0
