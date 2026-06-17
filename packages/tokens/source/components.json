@@ -7,7 +7,7 @@
     "letter-spacing": { "$value": "{letter-spacing.normal}","$type": "letterSpacing" },
     "icon-gap":       { "$value": "{space.2}",              "$type": "spacing" },
     "transition":     { "$value": "background-color {duration.base} {ease.in-out}, color {duration.base} {ease.in-out}, border-color {duration.base} {ease.in-out}, box-shadow {duration.fast} {ease.out}", "$type": "other" },
-    "disabled-opacity":{ "$value": "{opacity.60}",          "$type": "opacity" },
+    "disabled-opacity":{ "$value": "{opacity.100}",         "$type": "opacity" },
     "focus-ring":     { "$value": "0 0 0 2px {color.surface.default}, 0 0 0 4px {color.border.focus}", "$type": "other" },
 
     "height": {
