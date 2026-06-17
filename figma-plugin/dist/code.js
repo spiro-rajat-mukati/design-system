@@ -2001,6 +2001,139 @@ async function exportAssetsScan() {
   }
   figma.ui.postMessage({ type: "export-assets-scan-result", assets: results });
 }
+var STRUCTURAL_SIZE_ALLOWLIST = [0, 1, 2, 4, 8, 12, 16, 20, 24, 32, 44, 48];
+function _toHex(c) {
+  var r = Math.round((c.r || 0) * 255).toString(16).padStart(2, "0");
+  var g = Math.round((c.g || 0) * 255).toString(16).padStart(2, "0");
+  var b = Math.round((c.b || 0) * 255).toString(16).padStart(2, "0");
+  return "#" + r + g + b;
+}
+function _layerPath(node, stopAt) {
+  var parts = [];
+  var cur = node;
+  while (cur && cur !== stopAt) {
+    parts.unshift(cur.name);
+    cur = cur.parent;
+  }
+  return parts.join(" > ");
+}
+function _auditNode(node, stopAt, seen, findings) {
+  var bv = node.boundVariables || {};
+  var path = _layerPath(node, stopAt);
+  if (Array.isArray(node.fills)) {
+    var fb = bv.fills || [];
+    for (var fi = 0; fi < node.fills.length; fi++) {
+      var fill = node.fills[fi];
+      if (!fill || fill.type !== "SOLID" || fill.visible === false) continue;
+      var fa = fill.color && fill.color.a != null ? fill.color.a : 1;
+      if (fa === 0) continue;
+      var fo = fill.opacity != null ? fill.opacity : 1;
+      if (fo < 0.3) continue;
+      if (!fb[fi]) {
+        var fk = path + "|fill[" + fi + "]";
+        if (!seen[fk]) {
+          seen[fk] = true;
+          findings.push({ layerPath: path, field: "fill[" + fi + "]", rawValue: _toHex(fill.color), nodeType: node.type });
+        }
+      }
+    }
+  }
+  if (Array.isArray(node.strokes) && node.strokes.length > 0) {
+    var sb = bv.strokes || [];
+    for (var si = 0; si < node.strokes.length; si++) {
+      var stroke = node.strokes[si];
+      if (!stroke || stroke.type !== "SOLID") continue;
+      var sa = stroke.color && stroke.color.a != null ? stroke.color.a : 1;
+      if (sa === 0) continue;
+      if (!sb[si]) {
+        var sk = path + "|stroke[" + si + "]";
+        if (!seen[sk]) {
+          seen[sk] = true;
+          findings.push({ layerPath: path, field: "stroke[" + si + "]", rawValue: _toHex(stroke.color), nodeType: node.type });
+        }
+      }
+    }
+    if ("strokeWeight" in node && !bv.strokeWeight) {
+      var sw = node.strokeWeight;
+      if (typeof sw === "number" && sw !== 0 && STRUCTURAL_SIZE_ALLOWLIST.indexOf(sw) === -1) {
+        var swk = path + "|strokeWeight";
+        if (!seen[swk]) {
+          seen[swk] = true;
+          findings.push({ layerPath: path, field: "strokeWeight", rawValue: sw, nodeType: node.type });
+        }
+      }
+    }
+  }
+  var radii = ["cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"];
+  for (var ri = 0; ri < radii.length; ri++) {
+    var rf = radii[ri];
+    if (!(rf in node) || typeof node[rf] !== "number" || node[rf] === 0) continue;
+    if (STRUCTURAL_SIZE_ALLOWLIST.indexOf(node[rf]) === -1 && !bv[rf]) {
+      var rk = path + "|" + rf;
+      if (!seen[rk]) {
+        seen[rk] = true;
+        findings.push({ layerPath: path, field: rf, rawValue: node[rf], nodeType: node.type });
+      }
+    }
+  }
+  if (node.layoutMode && node.layoutMode !== "NONE") {
+    if ("itemSpacing" in node && node.itemSpacing !== 0 && !bv.itemSpacing && STRUCTURAL_SIZE_ALLOWLIST.indexOf(node.itemSpacing) === -1) {
+      var isk = path + "|itemSpacing";
+      if (!seen[isk]) {
+        seen[isk] = true;
+        findings.push({ layerPath: path, field: "itemSpacing", rawValue: node.itemSpacing, nodeType: node.type });
+      }
+    }
+    var pads = ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft"];
+    for (var pi = 0; pi < pads.length; pi++) {
+      var pf = pads[pi];
+      if (!(pf in node) || node[pf] === 0) continue;
+      if (STRUCTURAL_SIZE_ALLOWLIST.indexOf(node[pf]) === -1 && !bv[pf]) {
+        var pk = path + "|" + pf;
+        if (!seen[pk]) {
+          seen[pk] = true;
+          findings.push({ layerPath: path, field: pf, rawValue: node[pf], nodeType: node.type });
+        }
+      }
+    }
+  }
+  if (node.type === "TEXT" && !node.textStyleId) {
+    var tfs = ["fontSize", "lineHeight"];
+    for (var ti = 0; ti < tfs.length; ti++) {
+      var tf = tfs[ti];
+      if (!bv[tf]) {
+        var tv = node[tf];
+        if (typeof tv === "object" && tv !== null) tv = JSON.stringify(tv);
+        var tk = path + "|" + tf;
+        if (!seen[tk]) {
+          seen[tk] = true;
+          findings.push({ layerPath: path, field: tf, rawValue: String(tv), nodeType: "TEXT" });
+        }
+      }
+    }
+  }
+  if (node.children) {
+    for (var ci = 0; ci < node.children.length; ci++) _auditNode(node.children[ci], stopAt, seen, findings);
+  }
+}
+function auditHardcodedValues(componentSet) {
+  var findings = [];
+  var seen = {};
+  var primary = null;
+  if (componentSet.children) {
+    for (var i = 0; i < componentSet.children.length; i++) {
+      if (componentSet.children[i].type === "COMPONENT") {
+        primary = componentSet.children[i];
+        break;
+      }
+    }
+  }
+  var root = primary || componentSet;
+  if (root.children) {
+    for (var ci = 0; ci < root.children.length; ci++) _auditNode(root.children[ci], componentSet, seen, findings);
+  }
+  return findings;
+}
 function scanComponentDrift() {
   var sets = [];
   figma.root.findAll(function(n) {
@@ -2017,7 +2150,12 @@ function scanComponentDrift() {
         };
       });
     }
-    sets.push({ name: set.name, figmaProps });
+    var lint = [];
+    try {
+      lint = auditHardcodedValues(set);
+    } catch (_) {
+    }
+    sets.push({ name: set.name, figmaProps, lint });
   });
   var platform = /mobile/i.test(figma.root.name) ? "mobile" : "web";
   figma.ui.postMessage({
