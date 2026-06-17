@@ -2020,7 +2020,15 @@ function _layerPath(node, stopAt) {
 function _isNoiseLintNode(node) {
   if (node.type === "INSTANCE") return true;
   var name = String(node.name || "").toLowerCase().trim();
-  return /^icon(?:\s+placeholder)?$/.test(name) || /^spinner$/.test(name);
+  if (/^icon(?:\s+placeholder)?$/.test(name) || /^spinner$/.test(name)) return true;
+  if (node.type === "TEXT") {
+    var chars = String(node.characters || "");
+    if (chars.length === 1) {
+      var cp = chars.charCodeAt(0);
+      if (cp > 127 || "+-\xD7\u203A\u2039\u25BE\u25B4\u2212\u2713\u2717\u2022\xB7".indexOf(chars) !== -1) return true;
+    }
+  }
+  return false;
 }
 function _auditNode(node, stopAt, findings, inheritedNoise) {
   var nodeNoise = inheritedNoise || _isNoiseLintNode(node);
@@ -2071,14 +2079,16 @@ function _auditNode(node, stopAt, findings, inheritedNoise) {
     }
   }
   if (node.type === "TEXT" && !node.textStyleId) {
-    var tfs = ["fontSize", "lineHeight"];
-    for (var ti = 0; ti < tfs.length; ti++) {
-      var tf = tfs[ti];
-      if (!bv[tf]) {
-        var tv = node[tf];
-        if (typeof tv === "object" && tv !== null) tv = JSON.stringify(tv);
-        push(tf, String(tv));
+    if (!bv.fontSize) {
+      var fsz = node.fontSize;
+      if (typeof fsz === "number" && STRUCTURAL_SIZE_ALLOWLIST.indexOf(fsz) === -1) push("fontSize", String(fsz));
+    }
+    if (!bv.lineHeight) {
+      var lh = node.lineHeight;
+      if (lh && typeof lh === "object" && lh.unit !== "AUTO") {
+        push("lineHeight", lh.unit + ":" + lh.value);
       }
+      if (typeof lh === "number" && lh !== 0) push("lineHeight", String(lh));
     }
   }
   if (node.children) {

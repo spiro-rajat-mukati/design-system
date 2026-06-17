@@ -184,16 +184,26 @@ On-demand, **read-only** report comparing the Figma component libraries against 
 
 Read-only "Component Drift" report. Every finding (coverage, parity, hardcoded) carries a `noise: boolean` tag — **nothing is dropped**. The classifier demotes low-signal findings to noise rather than filtering them out, so the report is complete and trustworthy (see **L8** in `decisions.md`).
 
-**Classifier rules:**
-- Parity `noise=true` when: code prop kind is `node` or `other` (handlers/children/slots); prop name is in the convenience allowlist (`show label`, `show help`, `show description`, `show count`, `leading icon`, `trailing icon`); or prop encodes into a Figma variant axis rather than existing as a standalone prop (`loading`/`disabled`/`iconOnly`/`fullWidth`).
-- Coverage `noise=true` for internal helper component sets (`INTERNAL_HELPER_NAMES`: `icon placeholder`).
-- Hardcoded-value lint `noise=true` for COMPONENT_SET own gallery-layout fields (`itemSpacing`/`padding*`/`cornerRadius` on the COMPONENT_SET node itself, which hold variant-gallery arrangement values), and for INSTANCE-type nodes and icon/spinner placeholder nodes (noise propagates to all descendants).
+**Classifier rules (parity):** `noise=true` when —
+- Code prop kind is `node` or `other` (handlers/children/slots).
+- Figma prop name is in the convenience allowlist (`show label`, `show help`, `show description`, `show count`, `leading icon`, `trailing icon`).
+- **Figma axis is a known state-encoding axis** (`state`/`State`, `status`/`Status`, `masked`/`Masked`) — these encode into multiple code boolean props rather than a standalone same-named prop (e.g. `State=Loading` → `loading: true`, `State=Disabled` → `disabled: true`, `Status=Error` → `invalid: true`, `Masked` → `secureTextEntry: true`).
+- **Code prop encodes FROM a Figma state axis** (`loading`, `disabled`, `checked`, `indeterminate`, `defaultChecked`, `invalid`, `secureTextEntry`, `iconOnly`, `fullWidth`) — the prop appears in code but not as a Figma variant with the same name.
+
+**Classifier rules (coverage):** `noise=true` for internal helper component sets (`INTERNAL_HELPER_NAMES`: `icon placeholder`).
+
+**Classifier rules (hardcoded-value lint):** `noise=true` for —
+- COMPONENT_SET own gallery-layout fields (`itemSpacing`/`padding*`/`cornerRadius` on the COMPONENT_SET node itself).
+- INSTANCE-type nodes and icon/spinner placeholder nodes (noise propagates to all descendants).
+- **Single-glyph symbol text nodes** (node.characters is a single non-ASCII character, or a known ASCII symbol: `+`, `-`, `×`, `›`, `▾`, etc.) — decorative glyph layers, not tokenizable.
+- `lineHeight` is only flagged when the value is an explicit PIXELS or PERCENT unit — AUTO lineHeight (`{ unit: "AUTO" }`) is whitelisted as Figma's computed default.
+- `fontSize` applies the structural-size allowlist (0, 1, 2, 4, 8, 12, 16, 20, 24, 32, 44, 48) before flagging.
 
 **Report UI:** Three headline pills show **real counts only** (e.g. "2 coverage · 4 parity · 6 hardcoded"). Inside each section, real findings are listed first; noise findings appear in a collapsed `<details class="drift-minor">Show N minor</details>` toggle, de-emphasised at 55% opacity. Genuine gaps → actionable; low-signal → visible but out of the way.
 
 ### Architecture / reuse
 
-`computeComponentDrift(figmaModel, codeManifest)` is a pure, unit-tested comparator in `figma-plugin/src/drift.js` (ESM export) with an inline copy in `ui.js` (bundle:false cannot follow imports — keep the two in sync manually). 52 unit tests in `figma-plugin/test/check-drift.mjs`. New plugin action "Component Drift" beside Diff; network only from the UI thread, traversal/lint in the main thread, comparator pure.
+`computeComponentDrift(figmaModel, codeManifest)` is a pure, unit-tested comparator in `figma-plugin/src/drift.js` (ESM export) with an inline copy in `ui.js` (bundle:false cannot follow imports — keep the two in sync manually). 64 unit tests in `figma-plugin/test/check-drift.mjs`. New plugin action "Component Drift" beside Diff; network only from the UI thread, traversal/lint in the main thread, comparator pure.
 
 ### Phases
 
@@ -201,6 +211,7 @@ Read-only "Component Drift" report. Every finding (coverage, parity, hardcoded) 
 - **B — plugin:** read Figma component model + fetch manifest + coverage & parity comparator + report UI. ✅ shipped
 - **C — plugin:** hardcoded-value lint traversal + whitelist, folded into the report. ✅ shipped
 - **D — real-vs-noise classifier:** `noise: boolean` on every finding; real counts in headline; noise in `<details>` toggle. ✅ shipped 2026-06-18
+- **E — false-positive fixes:** AUTO lineHeight whitelisted; fontSize structural allowlist; single-glyph symbols noise; State/Status/Masked encoded axes noise on both sides. ✅ shipped 2026-06-18
 
 Deferred (fast-follows, not v1): CI gate via the Figma REST API; auto-filed GitHub issues. Rationale recorded as **D16** in `decisions.md`.
 

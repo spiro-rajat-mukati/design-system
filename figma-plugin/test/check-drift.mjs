@@ -373,6 +373,99 @@ console.log("\n── Noise classification ────────────�
 
 /* ══════════════════════════════════════════════════════════ */
 
+console.log("\n── State/Status/Masked encoding ─────────────────────────");
+
+{
+  console.log("\n  Figma State VARIANT (encoding axis) → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { state: variantProp(["Default", "Loading", "Disabled"]) })],
+    makeManifest([codeComp("Button", {
+      loading: { kind: "boolean" },
+      disabled: { kind: "boolean" },
+    }, true)])
+  );
+  const stateIssue = result.issues.find(function(i) { return i.prop === "state" && i.category === "figma-prop-not-in-code"; });
+  assert("Figma state axis emitted as figma-prop-not-in-code", !!stateIssue);
+  assert("Figma state axis noise=true", stateIssue && stateIssue.noise === true);
+}
+
+{
+  console.log("\n  Figma State with uppercase (State) → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Checkbox", { State: variantProp(["Default", "Checked", "Indeterminate", "Disabled"]) })],
+    makeManifest([codeComp("Checkbox", {
+      checked: { kind: "boolean" },
+      indeterminate: { kind: "boolean" },
+      disabled: { kind: "boolean" },
+    }, true)])
+  );
+  const stateIssue = result.issues.find(function(i) { return i.prop === "State" && i.category === "figma-prop-not-in-code"; });
+  assert("Figma State (uppercase) noise=true", stateIssue && stateIssue.noise === true);
+}
+
+{
+  console.log("\n  Figma Status VARIANT (encoding axis) → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("TextInput", { Status: variantProp(["Default", "Error", "Disabled"]) })],
+    makeManifest([codeComp("TextInput", {
+      invalid: { kind: "boolean" },
+    }, true)])
+  );
+  const statusIssue = result.issues.find(function(i) { return i.prop === "Status" && i.category === "figma-prop-not-in-code"; });
+  assert("Figma Status axis noise=true", statusIssue && statusIssue.noise === true);
+}
+
+{
+  console.log("\n  Figma Masked BOOLEAN (encoding axis) → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("TextInput", { Masked: { figmaType: "BOOLEAN", options: null } })],
+    makeManifest([codeComp("TextInput", {
+      secureTextEntry: { kind: "boolean" },
+    }, true)])
+  );
+  const maskedIssue = result.issues.find(function(i) { return i.prop === "Masked" && i.category === "figma-prop-not-in-code"; });
+  assert("Figma Masked boolean noise=true", maskedIssue && maskedIssue.noise === true);
+}
+
+{
+  console.log("\n  Code checked/indeterminate/invalid/secureTextEntry → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Checkbox", {})],
+    makeManifest([codeComp("Checkbox", {
+      checked:         { kind: "boolean" },
+      indeterminate:   { kind: "boolean" },
+      defaultChecked:  { kind: "boolean" },
+      invalid:         { kind: "boolean" },
+      secureTextEntry: { kind: "boolean" },
+    }, true)])
+  );
+  ["checked", "indeterminate", "defaultChecked", "invalid", "secureTextEntry"].forEach(function(propName) {
+    const issue = result.issues.find(function(i) { return i.prop === propName && i.category === "code-prop-not-in-figma"; });
+    assert(propName + " is noise=true", issue && issue.noise === true);
+  });
+}
+
+{
+  console.log("\n  State axis + encoded code props: both sides noise (no real parity):");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {
+      variant: variantProp(["primary", "secondary"]),
+      size: variantProp(["sm", "md", "lg"]),
+      State: variantProp(["Default", "Loading", "Disabled"]),
+    })],
+    makeManifest([codeComp("Button", {
+      variant: { kind: "union", options: ["primary", "secondary"] },
+      size:    { kind: "union", options: ["sm", "md", "lg"] },
+      loading:  { kind: "boolean" },
+      disabled: { kind: "boolean" },
+    }, true)])
+  );
+  assert("realParity=0 when state/encoded props account for all gaps", result.summary.realParity === 0);
+  assert("some parity issues still recorded (noise)", result.summary.parity > 0);
+}
+
+/* ══════════════════════════════════════════════════════════ */
+
 console.log("\n── Results ──────────────────────────────────────────────");
 console.log("  " + passed + " passed, " + failed + " failed");
 if (failed > 0) process.exit(1);

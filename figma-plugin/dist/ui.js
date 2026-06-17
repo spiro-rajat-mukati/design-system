@@ -1809,7 +1809,18 @@ var FIGMA_CONVENIENCE_PROPS = [
   "leading icon",
   "trailing icon"
 ];
-var FIGMA_ENCODED_CODE_PROPS = ["loading", "disabled", "icononly", "fullwidth"];
+var FIGMA_ENCODED_AXES = ["state", "status", "masked"];
+var FIGMA_ENCODED_CODE_PROPS = [
+  "loading",
+  "disabled",
+  "icononly",
+  "fullwidth",
+  "checked",
+  "indeterminate",
+  "defaultchecked",
+  "invalid",
+  "securetextentry"
+];
 var INTERNAL_HELPER_NAMES = ["icon placeholder"];
 function computeComponentDrift(figmaComponents, codeManifest) {
   var issues = [];
@@ -1874,6 +1885,7 @@ function computeComponentDrift(figmaComponents, codeManifest) {
       if (fp.type !== "VARIANT" && fp.type !== "BOOLEAN") return;
       if (!cProps[pk]) {
         var noiseConv = FIGMA_CONVENIENCE_PROPS.indexOf(norm(fp.original)) !== -1;
+        var noiseAxis = FIGMA_ENCODED_AXES.indexOf(norm(fp.original)) !== -1;
         issues.push({
           kind: "parity",
           severity: "warning",
@@ -1881,7 +1893,7 @@ function computeComponentDrift(figmaComponents, codeManifest) {
           component: cc.name,
           prop: fp.original,
           figmaType: fp.type,
-          noise: noiseConv
+          noise: noiseConv || noiseAxis
         });
         return;
       }
