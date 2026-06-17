@@ -218,6 +218,45 @@ Read-only "Component Drift" report. Every finding (coverage, parity, hardcoded) 
 
 Deferred (fast-follows, not v1): CI gate via the Figma REST API; auto-filed GitHub issues. Rationale recorded as **D16** in `decisions.md`.
 
+## Plugin UI redesign — tabbed (planned 2026-06-17)
+
+**UI-layer refactor only — do NOT change any action logic** (the main-thread handlers in `code.js` and the network calls in `ui.js` stay as-is). This restyles/reorganizes the iframe (`ui.html`/UI markup) and re-labels actions. Replaces the long linear button list with a tabbed, context-aware, themed panel. Chosen over a command-palette alternative.
+
+### Layout
+- **Header:** "DesignSync" + a compact connection chip (`repo · branch · PAT ✓`); a gear opens PAT settings.
+- **Context banner:** detect the open file via `figma.root.name` (match "Kijani — Foundations/Web/Mobile/Assets"); show "In <file> — <relevant> actions" and **default to the relevant tab**; dim tabs that don't apply to the current file.
+- **Tabs (segmented):** `Tokens · Styles · Build · Assets · Quality`. Only the active tab's actions render.
+- **Action cards:** each = icon + title + one-line subtitle (≤ ~6 words) + direction glyph (↑ push / ↓ pull / ⇄ diff). The contextual primary action gets an accent border. Destructive actions live under an **"Advanced"** disclosure with a caution accent.
+- **Result console:** monospace, status-colored (success/error), with a spinner + progress while a long action runs (progress posted from the main thread).
+- **PAT settings:** collapsible footer (repo, branch, token entry) — unchanged behavior.
+
+### Tab → action map (with clearer names + subtitles)
+| Tab | Action | Subtitle | Glyph | Flags |
+|---|---|---|---|---|
+| Tokens | Push to GitHub | Open a PR from your Figma edits | ↑ | primary (in Foundations) |
+| Tokens | Pull from GitHub | Overwrite Figma with repo values | ↓ | |
+| Tokens | Diff vs GitHub | Preview changes — no writes | ⇄ | |
+| Tokens | Prune Figma-only variables | Delete vars not in the repo | 🗑 | advanced, destructive |
+| Styles | Ensure text styles (Web / Mobile) | Bind text styles in this file | — | run from Web/Mobile |
+| Styles | Sync text-style variables (Foundations) | Update the semantic type vars | — | run from Foundations |
+| Build | Generate components | Build/refresh component sets | — | |
+| Build | Generate Foundations pages | Build the foundation docs pages | — | |
+| Assets | Export assets → GitHub PR | Push icon/illustration/image sources | ↑ | |
+| Quality | Component drift report | Coverage · parity · hardcoded | — | |
+
+(Resolves the old "Sync vs Pull" ambiguity → three clear directional actions: Push / Pull / Diff. Disambiguates the two text-style actions via subtitles + run-context.)
+
+### Theming & behavior
+- `figma.showUI(__html__, { themeColors: true })`; style everything with `--figma-color-*` vars (bg, bg-secondary, text, text-secondary, border, icon, …) for native light/dark. Inter (Figma default).
+- Icons: **bundle inline SVGs** (no CDN — network is allowlisted to GitHub only).
+- Resizable: `figma.ui.resize()` + a drag handle; persist window size + last-active tab in `clientStorage`.
+- Destructive actions require an inline confirm. Long actions show spinner + console progress.
+
+### Figma plugin-UI constraints (design space)
+Single resizable rectangular window; can't restyle Figma's outer chrome (title bar/close); UI ↔ main thread via `postMessage`; network only from the UI thread within the manifest allowlist; persist prefs via `clientStorage`. Within that, the iframe is full HTML/CSS/JS — near-unlimited visual freedom.
+
+See `decisions.md` D17.
+
 ## Guardrails
 
 - Write `packages/tokens/source/` only; let `build.mjs` + the `tokens-validate` CI build. Never hand-edit generated files.
