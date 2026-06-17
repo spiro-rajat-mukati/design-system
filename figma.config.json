@@ -1,0 +1,13 @@
+{
+  "codeConnect": {
+    "parser": "react",
+    "include": [
+      "packages/web/src/components/**/*.tsx",
+      "packages/mobile/src/components/**/*.tsx"
+    ],
+    "importPaths": {
+      "packages/web/src/components/*": "@kijani/web",
+      "packages/mobile/src/components/*": "@kijani/mobile"
+    }
+  }
+}

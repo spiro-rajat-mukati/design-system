@@ -12,6 +12,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "types": ["@figma/code-connect/figma-types"],
     "paths": {
       "@kijani/tokens": ["../tokens/tokens.native.ts"]
     }
