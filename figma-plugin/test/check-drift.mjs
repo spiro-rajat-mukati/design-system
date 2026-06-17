@@ -1,0 +1,231 @@
+/**
+ * Unit tests for computeComponentDrift.
+ *
+ * Run: node figma-plugin/test/check-drift.mjs
+ */
+
+import { computeComponentDrift } from "../src/drift.js";
+
+let passed = 0;
+let failed = 0;
+
+function assert(label, cond) {
+  if (cond) {
+    console.log("  ✓ " + label);
+    passed++;
+  } else {
+    console.error("  ✗ " + label);
+    failed++;
+  }
+}
+
+function makeManifest(components) {
+  return { platform: "web", generatedAt: "2026-01-01T00:00:00.000Z", components: components };
+}
+
+/* ── helper builders ─────────────────────────────────────────────────── */
+
+function figmaComp(name, figmaProps) {
+  return { name: name, figmaProps: figmaProps || {} };
+}
+
+function codeComp(name, props, codeConnect) {
+  return { name: name, source: "packages/web/src/components/" + name + "/" + name + ".types.ts",
+    platform: "web", props: props || {}, codeConnect: codeConnect !== false };
+}
+
+function variantProp(options) {
+  return { figmaType: "VARIANT", options: options };
+}
+
+function boolProp() {
+  return { figmaType: "BOOLEAN", options: null };
+}
+
+function textProp() {
+  return { figmaType: "TEXT", options: null };
+}
+
+/* ══════════════════════════════════════════════════════════ */
+
+console.log("\n── Coverage ─────────────────────────────────────────────");
+
+{
+  console.log("\n  clean (all matched):");
+  const result = computeComponentDrift(
+    [figmaComp("Button")],
+    makeManifest([codeComp("Button")])
+  );
+  assert("no issues when both match", result.summary.total === 0);
+}
+
+{
+  console.log("\n  figma-only:");
+  const result = computeComponentDrift(
+    [figmaComp("Ghost")],
+    makeManifest([])
+  );
+  const issue = result.issues[0];
+  assert("one issue", result.issues.length === 1);
+  assert("kind=coverage", issue && issue.kind === "coverage");
+  assert("category=figma-only", issue && issue.category === "figma-only");
+  assert("severity=warning", issue && issue.severity === "warning");
+  assert("component name preserved", issue && issue.component === "Ghost");
+}
+
+{
+  console.log("\n  code-only (Field — no Figma component set):");
+  const result = computeComponentDrift(
+    [],
+    makeManifest([codeComp("Field", {}, false)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "code-only"; });
+  assert("code-only issue exists", !!issue);
+  assert("severity=info", issue && issue.severity === "info");
+}
+
+{
+  console.log("\n  no-Code-Connect (matched but codeConnect=false):");
+  const result = computeComponentDrift(
+    [figmaComp("Field")],
+    makeManifest([codeComp("Field", {}, false)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "no-code-connect"; });
+  assert("no-code-connect issue exists", !!issue);
+  assert("severity=info", issue && issue.severity === "info");
+}
+
+{
+  console.log("\n  case-insensitive name matching (mobile: 'Button' vs code 'Button'):");
+  const result = computeComponentDrift(
+    [figmaComp("Button")], // Figma uses same case as code for this test
+    makeManifest([codeComp("Button")])
+  );
+  assert("matched despite same case", result.summary.total === 0);
+}
+
+/* ══════════════════════════════════════════════════════════ */
+
+console.log("\n── Prop parity ──────────────────────────────────────────");
+
+{
+  console.log("\n  Figma VARIANT prop not in code:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { variant: variantProp(["primary", "secondary"]) })],
+    makeManifest([codeComp("Button", {}, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "figma-prop-not-in-code"; });
+  assert("figma-prop-not-in-code exists", !!issue);
+  assert("severity=warning", issue && issue.severity === "warning");
+  assert("prop=variant", issue && issue.prop === "variant");
+  assert("figmaType=VARIANT", issue && issue.figmaType === "VARIANT");
+}
+
+{
+  console.log("\n  Figma BOOLEAN prop not in code:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { iconOnly: boolProp() })],
+    makeManifest([codeComp("Button", {}, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "figma-prop-not-in-code"; });
+  assert("figma-prop-not-in-code for BOOLEAN", !!issue);
+  assert("figmaType=BOOLEAN", issue && issue.figmaType === "BOOLEAN");
+}
+
+{
+  console.log("\n  Figma TEXT prop not in code — should be ignored:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { Label: textProp() })],
+    makeManifest([codeComp("Button", {}, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "figma-prop-not-in-code"; });
+  assert("TEXT props not flagged", !issue);
+}
+
+{
+  console.log("\n  option-missing-in-code (Figma has extra variant option):");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { variant: variantProp(["primary", "ghost"]) })],
+    makeManifest([codeComp("Button", {
+      variant: { kind: "union", options: ["primary"] }
+    }, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "option-missing-in-code"; });
+  assert("option-missing-in-code exists", !!issue);
+  assert("option=ghost", issue && issue.option === "ghost");
+  assert("severity=warning", issue && issue.severity === "warning");
+}
+
+{
+  console.log("\n  option-missing-in-figma (code has extra option):");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { variant: variantProp(["primary"]) })],
+    makeManifest([codeComp("Button", {
+      variant: { kind: "union", options: ["primary", "link"] }
+    }, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "option-missing-in-figma"; });
+  assert("option-missing-in-figma exists", !!issue);
+  assert("option=link", issue && issue.option === "link");
+  assert("severity=info", issue && issue.severity === "info");
+}
+
+{
+  console.log("\n  code union prop not in Figma:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {})],
+    makeManifest([codeComp("Button", {
+      variant: { kind: "union", options: ["primary"] }
+    }, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "code-prop-not-in-figma"; });
+  assert("code-prop-not-in-figma exists", !!issue);
+  assert("prop=variant", issue && issue.prop === "variant");
+  assert("severity=info", issue && issue.severity === "info");
+}
+
+{
+  console.log("\n  mobile case normalization (Figma 'Variant' vs code 'variant'):");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {
+      "Variant": variantProp(["primary", "secondary"]),
+      "Size": variantProp(["sm", "md", "lg"])
+    })],
+    makeManifest([codeComp("Button", {
+      variant: { kind: "union", options: ["primary", "secondary"] },
+      size:    { kind: "union", options: ["sm", "md", "lg"] }
+    }, true)])
+  );
+  // Figma 'Variant' normalizes to 'variant' — should match code 'variant'
+  const parityIssues = result.issues.filter(function(i) { return i.kind === "parity"; });
+  assert("no parity issues when only case differs", parityIssues.length === 0);
+}
+
+{
+  console.log("\n  code 'node' props not flagged as code-prop-not-in-figma:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {})],
+    makeManifest([codeComp("Button", {
+      leadingIcon: { kind: "node" },
+      children:    { kind: "node" }
+    }, true)])
+  );
+  const parityIssues = result.issues.filter(function(i) { return i.kind === "parity"; });
+  assert("node props not flagged", parityIssues.length === 0);
+}
+
+{
+  console.log("\n  summary counts:");
+  const result = computeComponentDrift(
+    [figmaComp("Ghost"), figmaComp("Button", { variant: variantProp(["primary"]) })],
+    makeManifest([codeComp("Field", {}, false), codeComp("Button", {}, true)])
+  );
+  assert("coverage count correct", result.summary.coverage >= 2); // Ghost→figma-only, Field→code-only
+  assert("total >= coverage + parity", result.summary.total === result.summary.coverage + result.summary.parity);
+}
+
+/* ══════════════════════════════════════════════════════════ */
+
+console.log("\n── Results ──────────────────────────────────────────────");
+console.log("  " + passed + " passed, " + failed + " failed");
+if (failed > 0) process.exit(1);

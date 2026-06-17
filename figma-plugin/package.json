@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "dev":   "node build.mjs --watch"
+    "dev":   "node build.mjs --watch",
+    "test:drift": "node test/check-drift.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"

@@ -16,6 +16,7 @@
     "illustrations:check": "node packages/illustrations/check-generated.mjs",
     "manifest:build": "node scripts/build-manifest.mjs",
     "manifest:check": "node scripts/check-manifest.mjs",
+    "plugin:drift-check": "node figma-plugin/test/check-drift.mjs",
     "plugin:build": "npm run build -w @kijani/figma-plugin",
     "plugin:check": "node figma-plugin/test/check-dist.mjs",
     "plugin:roundtrip": "node figma-plugin/test/check-roundtrip.mjs",

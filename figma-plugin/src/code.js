@@ -2338,6 +2338,39 @@ async function exportAssetsScan() {
   figma.ui.postMessage({ type: "export-assets-scan-result", assets: results });
 }
 
+/* ============================================================
+   COMPONENT DRIFT SCAN (Phase B)
+   Reads all COMPONENT_SET nodes in the file and sends their
+   variant/component property metadata to the UI thread for
+   comparison against the committed code manifests.
+   ============================================================ */
+
+function scanComponentDrift() {
+  var sets = [];
+  figma.root.findAll(function(n) { return n.type === "COMPONENT_SET"; }).forEach(function(set) {
+    var figmaProps = {};
+    var defs = set.componentPropertyDefinitions;
+    if (defs) {
+      Object.keys(defs).forEach(function(propName) {
+        var def = defs[propName];
+        figmaProps[propName] = {
+          figmaType: def.type,
+          options: def.variantOptions || null,
+        };
+      });
+    }
+    sets.push({ name: set.name, figmaProps: figmaProps });
+  });
+
+  var platform = /mobile/i.test(figma.root.name) ? "mobile" : "web";
+  figma.ui.postMessage({
+    type: "component-drift-scanned",
+    components: sets,
+    platform: platform,
+    fileName: figma.root.name,
+  });
+}
+
 /* ---------- message router ---------- */
 
 figma.ui.onmessage = async (msg) => {
@@ -2396,6 +2429,8 @@ figma.ui.onmessage = async (msg) => {
       await generateFoundations();
     } else if (msg.type === "export-assets-scan") {
       await exportAssetsScan();
+    } else if (msg.type === "scan-component-drift") {
+      scanComponentDrift();
     } else {
       uiLog("Unknown message: " + msg.type, "warn");
     }
