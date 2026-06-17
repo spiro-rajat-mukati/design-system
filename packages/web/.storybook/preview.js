@@ -31,7 +31,7 @@ const withGlobals = (Story, context) => {
   );
 };
 
-/** @type { import('@storybook/react-webpack5').Preview } */
+/** @type { import('@storybook/react-vite').Preview } */
 const preview = {
   decorators: [withGlobals],
 
