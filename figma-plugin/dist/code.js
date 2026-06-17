@@ -2063,7 +2063,7 @@ function _auditNode(node, stopAt, findings, inheritedNoise) {
       if (typeof sw === "number" && sw !== 0 && STRUCTURAL_SIZE_ALLOWLIST.indexOf(sw) === -1) push("strokeWeight", sw);
     }
   }
-  var radii = ["cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"];
+  var radii = ["topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"];
   for (var ri = 0; ri < radii.length; ri++) {
     var rf = radii[ri];
     if (!(rf in node) || typeof node[rf] !== "number" || node[rf] === 0) continue;

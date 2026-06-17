@@ -31,7 +31,14 @@ function figmaComp(name, figmaProps) {
 
 function codeComp(name, props, codeConnect) {
   return { name: name, source: "packages/web/src/components/" + name + "/" + name + ".types.ts",
-    platform: "web", props: props || {}, codeConnect: codeConnect !== false };
+    platform: "web", props: props || {}, codeConnect: codeConnect !== false, ccMappings: null };
+}
+
+/** Build a codeComp with explicit CC mappings (as parsed from .figma.tsx). */
+function codeCompCC(name, props, figmaMapped, codeMapped) {
+  return { name: name, source: "packages/web/src/components/" + name + "/" + name + ".types.ts",
+    platform: "web", props: props || {}, codeConnect: true,
+    ccMappings: { figmaMapped: figmaMapped || [], codeMapped: codeMapped || [] } };
 }
 
 function variantProp(options) {
@@ -462,6 +469,118 @@ console.log("\n── State/Status/Masked encoding ─────────�
   );
   assert("realParity=0 when state/encoded props account for all gaps", result.summary.realParity === 0);
   assert("some parity issues still recorded (noise)", result.summary.parity > 0);
+}
+
+/* ══════════════════════════════════════════════════════════ */
+
+console.log("\n── Code Connect mapping reconciliation ──────────────────");
+
+{
+  console.log("\n  Figma 'state' in ccFigmaMapped → figma-prop-not-in-code noise=true:");
+  // Button: state→disabled/loading via CC; state has no matching code prop name
+  const result = computeComponentDrift(
+    [figmaComp("Button", { state: variantProp(["Default", "Loading", "Disabled"]) })],
+    makeManifest([codeCompCC("Button",
+      { loading: { kind: "boolean" }, disabled: { kind: "boolean" } },
+      ["state"],          // figmaMapped
+      ["loading", "disabled"] // codeMapped
+    )])
+  );
+  const stateIssue = result.issues.find(function(i) { return i.prop === "state" && i.category === "figma-prop-not-in-code"; });
+  assert("state figma-prop-not-in-code emitted", !!stateIssue);
+  assert("state noise=true via ccFigmaMapped", stateIssue && stateIssue.noise === true);
+}
+
+{
+  console.log("\n  Code 'disabled'/'loading' in ccCodeMapped → code-prop-not-in-figma noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {})],
+    makeManifest([codeCompCC("Button",
+      { loading: { kind: "boolean" }, disabled: { kind: "boolean" } },
+      ["state"],
+      ["loading", "disabled"]
+    )])
+  );
+  const disabledIssue = result.issues.find(function(i) { return i.prop === "disabled" && i.category === "code-prop-not-in-figma"; });
+  const loadingIssue  = result.issues.find(function(i) { return i.prop === "loading"  && i.category === "code-prop-not-in-figma"; });
+  assert("disabled code-prop-not-in-figma emitted", !!disabledIssue);
+  assert("disabled noise=true via ccCodeMapped", disabledIssue && disabledIssue.noise === true);
+  assert("loading noise=true via ccCodeMapped",  loadingIssue && loadingIssue.noise === true);
+}
+
+{
+  console.log("\n  Masked BOOLEAN + secureTextEntry via ccMappings → both noise:");
+  const result = computeComponentDrift(
+    [figmaComp("TextInput", { Masked: { figmaType: "BOOLEAN", options: null } })],
+    makeManifest([codeCompCC("TextInput",
+      { secureTextEntry: { kind: "boolean" } },
+      ["masked"],
+      ["securetextentry"]
+    )])
+  );
+  const maskedIssue = result.issues.find(function(i) { return i.prop === "Masked" && i.category === "figma-prop-not-in-code"; });
+  const steIssue    = result.issues.find(function(i) { return i.prop === "secureTextEntry" && i.category === "code-prop-not-in-figma"; });
+  assert("Masked figma-prop-not-in-code noise=true via ccFigmaMapped", maskedIssue && maskedIssue.noise === true);
+  assert("secureTextEntry code-prop-not-in-figma noise=true via ccCodeMapped", steIssue && steIssue.noise === true);
+}
+
+{
+  console.log("\n  Genuinely unmapped Figma prop stays real:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {
+      state:   variantProp(["Default", "Disabled"]),
+      variant: variantProp(["primary", "danger"]),  // real — not in ccFigmaMapped
+    })],
+    makeManifest([codeCompCC("Button",
+      { disabled: { kind: "boolean" } },
+      ["state"],       // only state is mapped
+      ["disabled"]
+    )])
+  );
+  const variantIssue = result.issues.find(function(i) { return i.prop === "variant" && i.category === "figma-prop-not-in-code"; });
+  assert("unmapped variant stays real (noise=false)", variantIssue && variantIssue.noise === false);
+}
+
+{
+  console.log("\n  Genuinely unmapped code prop stays real:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {})],
+    makeManifest([codeCompCC("Button",
+      { disabled: { kind: "boolean" }, tone: { kind: "union", options: ["neutral", "brand"] } },
+      [],   // no Figma mapped
+      []    // no code mapped
+    )])
+  );
+  const toneIssue = result.issues.find(function(i) { return i.prop === "tone" && i.category === "code-prop-not-in-figma"; });
+  assert("unmapped tone stays real (noise=false)", toneIssue && toneIssue.noise === false);
+}
+
+{
+  console.log("\n  ccMappings=null falls back gracefully (static lists still apply):");
+  // No CC file → ccMappings=null; static FIGMA_ENCODED_AXES still catches state/status/masked
+  const result = computeComponentDrift(
+    [figmaComp("Widget", { State: variantProp(["Default", "Disabled"]) })],
+    makeManifest([codeComp("Widget",    // ccMappings: null (uses static fallback)
+      { disabled: { kind: "boolean" } }, true
+    )])
+  );
+  const stateIssue = result.issues.find(function(i) { return i.prop === "State" && i.category === "figma-prop-not-in-code"; });
+  assert("State noise=true via static fallback when ccMappings=null", stateIssue && stateIssue.noise === true);
+}
+
+{
+  console.log("\n  Checkbox full scenario: state→checked/indeterminate/disabled all noise:");
+  // Mirrors the web/Checkbox.figma.tsx: state→defaultChecked/indeterminate/disabled
+  const result = computeComponentDrift(
+    [figmaComp("Checkbox", { state: variantProp(["unchecked", "checked", "indeterminate", "disabled"]) })],
+    makeManifest([codeCompCC("Checkbox",
+      { defaultChecked: { kind: "boolean" }, indeterminate: { kind: "boolean" }, disabled: { kind: "boolean" } },
+      ["state"],
+      ["defaultchecked", "indeterminate", "disabled"]
+    )])
+  );
+  assert("realParity=0 for Checkbox with full CC coverage", result.summary.realParity === 0);
+  assert("noise parity > 0 (state + 3 code props recorded)", result.summary.parity > 0);
 }
 
 /* ══════════════════════════════════════════════════════════ */

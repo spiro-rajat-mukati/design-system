@@ -243,6 +243,45 @@ function parseComponentTypes(name, compDir) {
   return null;
 }
 
+/* ── Code Connect mapping parser ───────────────────────────────────────── */
+
+/**
+ * Parse a `.figma.tsx` file and extract the Figma↔code prop mappings.
+ *
+ * Returns:
+ *   figmaMapped — normalised Figma prop names that appear as the first arg to
+ *                 figma.enum() / figma.boolean() / figma.instance() / figma.string().
+ *                 When a Figma prop is here it is intentionally mapped, so
+ *                 figma-prop-not-in-code for it is noise.
+ *
+ *   codeMapped  — normalised code prop names that map FROM a Figma prop whose
+ *                 normalised name DIFFERS from the code prop name (e.g. `state`→`disabled`).
+ *                 When a code prop is here, code-prop-not-in-figma for it is noise.
+ *
+ * Regex targets lines like:
+ *   disabled: figma.enum("state", { ... })
+ *   secureTextEntry: figma.boolean("Masked")
+ */
+function parseFigmaConnect(figmaFile) {
+  const src = fs.readFileSync(figmaFile, "utf8");
+  const re = /(\w+)\s*:\s*figma\.(?:enum|boolean|instance|string)\s*\(\s*["']([^"']+)["']/g;
+  const figmaMapped = new Set();
+  const codeMapped  = new Set();
+  let m;
+  while ((m = re.exec(src)) !== null) {
+    const codeProp  = m[1].toLowerCase().trim();
+    const figmaProp = m[2].toLowerCase().trim();
+    figmaMapped.add(figmaProp);
+    // Only add to codeMapped when names differ — same-name pairs already match in
+    // the comparator's fProps/cProps lookup and don't need noise tagging.
+    if (codeProp !== figmaProp) codeMapped.add(codeProp);
+  }
+  return {
+    figmaMapped: Array.from(figmaMapped).sort(),
+    codeMapped:  Array.from(codeMapped).sort(),
+  };
+}
+
 /* ── Manifest builder ──────────────────────────────────────────────────── */
 
 function buildManifest({ platform, srcDir, outFile }) {
@@ -285,15 +324,22 @@ function buildManifest({ platform, srcDir, outFile }) {
 
     const pkgDir = platform === "web" ? "web" : "mobile";
     const typesExists = fs.existsSync(path.join(compDir, `${name}.types.ts`));
+    let ccMappings = null;
+    if (hasFigma) {
+      try { ccMappings = parseFigmaConnect(figmaFile); } catch (e) {
+        console.warn(`[manifest] ccMappings parse error for ${name}: ${e.message}`);
+      }
+    }
     components.push({
       name,
       source: `packages/${pkgDir}/src/components/${name}/${name}${typesExists ? ".types.ts" : ".tsx"}`,
       platform,
       props: parsed.props,
-      codeConnect: fs.existsSync(figmaFile),
+      codeConnect: hasFigma,
+      ccMappings,
     });
 
-    console.log(`[manifest] ${platform}/${name}: ${Object.keys(parsed.props).length} props, codeConnect=${fs.existsSync(figmaFile)}`);
+    console.log(`[manifest] ${platform}/${name}: ${Object.keys(parsed.props).length} props, codeConnect=${hasFigma}, ccMapped=${ccMappings ? ccMappings.figmaMapped.length + "f/" + ccMappings.codeMapped.length + "c" : "none"}`);
   }
 
   const manifest = { platform, generatedAt: new Date().toISOString(), components };
