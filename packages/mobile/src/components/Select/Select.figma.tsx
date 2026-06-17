@@ -7,15 +7,15 @@ figma.connect(
   "https://www.figma.com/design/VQ49OXLtAbwlBBFABLEjrN/x?node-id=101-144",
   {
     props: {
-      size: figma.enum("Size", { SM: "sm", MD: "md", LG: "lg" }),
-      disabled: figma.boolean("Disabled"),
-      placeholder: figma.string("Placeholder"),
+      size: figma.enum("Size", { sm: "sm", md: "md", lg: "lg" }),
+      disabled: figma.enum("Status", { Disabled: true }),
+      value: figma.string("Value"),
     },
-    example: ({ size, disabled, placeholder }) => (
+    example: ({ size, disabled, value }) => (
       <Select
         size={size}
         disabled={disabled}
-        placeholder={placeholder}
+        value={value}
         options={[
           { value: "a", label: "Option A" },
           { value: "b", label: "Option B" },

@@ -7,14 +7,19 @@ figma.connect(
   "https://www.figma.com/design/VQ49OXLtAbwlBBFABLEjrN/x?node-id=65-114",
   {
     props: {
-      checked: figma.enum("State", { Selected: true }),
+      checked: figma.enum("State", { Checked: true }),
       disabled: figma.boolean("Disabled"),
       label: figma.string("Label"),
       description: figma.string("Description"),
-      showDescription: figma.boolean("Show description"),
     },
-    example: ({ checked, disabled, label }) => (
-      <Radio checked={checked} disabled={disabled} value="option" label={label} />
+    example: ({ checked, disabled, label, description }) => (
+      <Radio
+        checked={checked}
+        disabled={disabled}
+        label={label}
+        description={description}
+        value="option"
+      />
     ),
   }
 );

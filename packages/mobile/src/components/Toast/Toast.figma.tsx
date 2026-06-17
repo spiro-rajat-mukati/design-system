@@ -8,19 +8,16 @@ figma.connect(
   {
     props: {
       tone: figma.enum("Tone", {
-        Neutral: "neutral",
-        Info: "info",
-        Success: "success",
-        Warning: "warning",
-        Danger: "danger",
+        neutral: "neutral",
+        info: "info",
+        success: "success",
+        warning: "warning",
+        danger: "danger",
       }),
       title: figma.string("Title"),
       message: figma.string("Message"),
-      showMessage: figma.boolean("Show message"),
     },
     example: ({ tone, title, message }) => (
-      // Wrap your screen in ToastProvider; call useToast().show({ tone, title, message })
-      // to trigger a toast programmatically.
       <ToastProvider>{null}</ToastProvider>
     ),
   }

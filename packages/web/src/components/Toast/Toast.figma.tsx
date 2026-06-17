@@ -1,28 +1,24 @@
 import React from "react";
 import figma from "@figma/code-connect";
-import { ToastProvider, useToast } from "./Toast";
+import { ToastProvider } from "./Toast";
 
-// Toast is triggered imperatively. Map the Figma component set to ToastProvider
-// so Dev Mode shows the setup wrapper + hook usage.
 figma.connect(
   ToastProvider,
   "https://www.figma.com/design/EAv9Vx2mFoBo4wXTVzP0Lv/x?node-id=2-4493",
   {
     props: {
-      tone: figma.enum("Tone", {
-        Info: "info",
-        Success: "success",
-        Warning: "warning",
-        Danger: "danger",
-        Neutral: "neutral",
+      tone: figma.enum("tone", {
+        info: "info",
+        success: "success",
+        warning: "warning",
+        danger: "danger",
+        neutral: "neutral",
       }),
-      dismissible: figma.boolean("Dismissible"),
-      title: figma.string("Title"),
+      dismissible: figma.boolean("dismissible"),
     },
-    example: ({ tone, title }) => (
-      // Wrap your app with ToastProvider; call useToast() to trigger toasts.
+    example: ({ tone, dismissible }) => (
       <ToastProvider>
-        {/* useToast().toast({ tone, title }) */}
+        {null}
       </ToastProvider>
     ),
   }

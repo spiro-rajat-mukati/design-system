@@ -7,12 +7,11 @@ figma.connect(
   "https://www.figma.com/design/VQ49OXLtAbwlBBFABLEjrN/x?node-id=93-201",
   {
     props: {
-      size: figma.enum("Size", { SM: "sm", MD: "md", LG: "lg" }),
-      disabled: figma.boolean("Disabled"),
-      placeholder: figma.string("Placeholder"),
+      size: figma.enum("Size", { sm: "sm", md: "md", lg: "lg" }),
+      disabled: figma.enum("Status", { Disabled: true }),
     },
-    example: ({ size, disabled, placeholder }) => (
-      <NumericInput size={size} disabled={disabled} placeholder={placeholder} />
+    example: ({ size, disabled }) => (
+      <NumericInput size={size} disabled={disabled} />
     ),
   }
 );

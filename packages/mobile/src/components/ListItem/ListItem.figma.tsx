@@ -8,26 +8,21 @@ figma.connect(
   {
     props: {
       variant: figma.enum("Variant", {
-        Default: "default",
-        Inset: "inset",
+        default: "default",
+        inset: "inset",
       }),
       showDivider: figma.boolean("Show divider"),
       disabled: figma.boolean("Disabled"),
       title: figma.string("Title"),
       description: figma.string("Description"),
-      showDescription: figma.boolean("Show description"),
-      leadingContent: figma.instance("Leading content"),
-      trailingContent: figma.instance("Trailing content"),
     },
-    example: ({ variant, showDivider, disabled, title, description, leadingContent, trailingContent }) => (
+    example: ({ variant, showDivider, disabled, title, description }) => (
       <ListItem
         variant={variant}
         showDivider={showDivider}
         disabled={disabled}
         title={title}
         description={description}
-        leadingContent={leadingContent}
-        trailingContent={trailingContent}
       />
     ),
   }

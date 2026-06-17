@@ -8,22 +8,19 @@ figma.connect(
   {
     props: {
       tone: figma.enum("Tone", {
-        Brand: "brand",
-        Success: "success",
-        Warning: "warning",
-        Danger: "danger",
+        brand: "brand",
+        success: "success",
+        warning: "warning",
+        danger: "danger",
       }),
-      size: figma.enum("Size", { XS: "xs", SM: "sm", MD: "md", LG: "lg" }),
-      indeterminate: figma.boolean("Indeterminate"),
+      size: figma.enum("Size", { xs: "xs", sm: "sm", md: "md", lg: "lg" }),
       showValue: figma.boolean("Show value"),
       label: figma.string("Label"),
-      showLabel: figma.boolean("Show label"),
     },
-    example: ({ tone, size, indeterminate, showValue, label }) => (
+    example: ({ tone, size, showValue, label }) => (
       <ProgressBar
         tone={tone}
         size={size}
-        indeterminate={indeterminate}
         showValue={showValue}
         label={label}
         value={60}
