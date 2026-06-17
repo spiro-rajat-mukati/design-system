@@ -2229,12 +2229,15 @@ function computeComponentDrift(figmaComponents, codeManifest) {
     Object.keys(cc.props || {}).forEach(function(p) {
       cProps[norm(p)] = { original: p, kind: cc.props[p].kind, options: cc.props[p].options };
     });
+    var ccFigmaMapped = cc.ccMappings && cc.ccMappings.figmaMapped || [];
+    var ccCodeMapped = cc.ccMappings && cc.ccMappings.codeMapped || [];
     Object.keys(fProps).forEach(function(pk) {
       var fp = fProps[pk];
       if (fp.type !== "VARIANT" && fp.type !== "BOOLEAN") return;
       if (!cProps[pk]) {
         var noiseConv = FIGMA_CONVENIENCE_PROPS.indexOf(norm(fp.original)) !== -1;
         var noiseAxis = FIGMA_ENCODED_AXES.indexOf(norm(fp.original)) !== -1;
+        var noiseCcMapped = ccFigmaMapped.indexOf(norm(fp.original)) !== -1;
         issues.push({
           kind: "parity",
           severity: "warning",
@@ -2242,7 +2245,7 @@ function computeComponentDrift(figmaComponents, codeManifest) {
           component: cc.name,
           prop: fp.original,
           figmaType: fp.type,
-          noise: noiseConv || noiseAxis
+          noise: noiseConv || noiseAxis || noiseCcMapped
         });
         return;
       }
@@ -2289,6 +2292,7 @@ function computeComponentDrift(figmaComponents, codeManifest) {
       if (!fProps[pk]) {
         var noiseByKind = cp.kind === "node" || cp.kind === "other";
         var noiseByName = FIGMA_ENCODED_CODE_PROPS.indexOf(norm(cp.original)) !== -1;
+        var noiseCcMapped = ccCodeMapped.indexOf(norm(cp.original)) !== -1;
         issues.push({
           kind: "parity",
           severity: "info",
@@ -2296,7 +2300,7 @@ function computeComponentDrift(figmaComponents, codeManifest) {
           component: cc.name,
           prop: cp.original,
           codeKind: cp.kind,
-          noise: noiseByKind || noiseByName
+          noise: noiseByKind || noiseByName || noiseCcMapped
         });
       }
     });

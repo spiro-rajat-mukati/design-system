@@ -2424,8 +2424,10 @@ function _auditNode(node, stopAt, findings, inheritedNoise) {
     }
   }
 
-  // Corner radius
-  var radii = ["cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"];
+  // Corner radius — audit per-corner fields only; the uniform cornerRadius shorthand
+  // has no variable binding when corners are bound individually (our case), producing
+  // false positives.  Per-corner fields still surface any genuinely unbound radius.
+  var radii = ["topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"];
   for (var ri = 0; ri < radii.length; ri++) {
     var rf = radii[ri];
     if (!(rf in node) || typeof node[rf] !== "number" || node[rf] === 0) continue;

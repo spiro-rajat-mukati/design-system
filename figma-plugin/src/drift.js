@@ -86,15 +86,21 @@ function computeComponentDrift(figmaComponents, codeManifest) {
       cProps[norm(p)] = { original: p, kind: cc.props[p].kind, options: cc.props[p].options };
     });
 
+    // CC mappings from the .figma.tsx file (when present in the manifest)
+    var ccFigmaMapped = (cc.ccMappings && cc.ccMappings.figmaMapped) || [];
+    var ccCodeMapped  = (cc.ccMappings && cc.ccMappings.codeMapped)  || [];
+
     // Figma VARIANT/BOOLEAN props not in code
     Object.keys(fProps).forEach(function(pk) {
       var fp = fProps[pk];
       if (fp.type !== 'VARIANT' && fp.type !== 'BOOLEAN') return; // TEXT/INSTANCE_SWAP ignored
       if (!cProps[pk]) {
-        var noiseConv = FIGMA_CONVENIENCE_PROPS.indexOf(norm(fp.original)) !== -1;
-        var noiseAxis = FIGMA_ENCODED_AXES.indexOf(norm(fp.original)) !== -1;
+        var noiseConv    = FIGMA_CONVENIENCE_PROPS.indexOf(norm(fp.original)) !== -1;
+        var noiseAxis    = FIGMA_ENCODED_AXES.indexOf(norm(fp.original)) !== -1;
+        var noiseCcMapped = ccFigmaMapped.indexOf(norm(fp.original)) !== -1;
         issues.push({ kind: 'parity', severity: 'warning', category: 'figma-prop-not-in-code',
-          component: cc.name, prop: fp.original, figmaType: fp.type, noise: noiseConv || noiseAxis });
+          component: cc.name, prop: fp.original, figmaType: fp.type,
+          noise: noiseConv || noiseAxis || noiseCcMapped });
         return;
       }
       // Option-level parity (VARIANT ↔ code union)
@@ -124,10 +130,12 @@ function computeComponentDrift(figmaComponents, codeManifest) {
       // Emit for all actionable kinds; skip truly-unknown kinds
       if (cp.kind !== 'union' && cp.kind !== 'boolean' && cp.kind !== 'node' && cp.kind !== 'other') return;
       if (!fProps[pk]) {
-        var noiseByKind = cp.kind === 'node' || cp.kind === 'other';
-        var noiseByName = FIGMA_ENCODED_CODE_PROPS.indexOf(norm(cp.original)) !== -1;
+        var noiseByKind   = cp.kind === 'node' || cp.kind === 'other';
+        var noiseByName   = FIGMA_ENCODED_CODE_PROPS.indexOf(norm(cp.original)) !== -1;
+        var noiseCcMapped = ccCodeMapped.indexOf(norm(cp.original)) !== -1;
         issues.push({ kind: 'parity', severity: 'info', category: 'code-prop-not-in-figma',
-          component: cc.name, prop: cp.original, codeKind: cp.kind, noise: noiseByKind || noiseByName });
+          component: cc.name, prop: cp.original, codeKind: cp.kind,
+          noise: noiseByKind || noiseByName || noiseCcMapped });
       }
     });
   });

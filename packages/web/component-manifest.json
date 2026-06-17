@@ -1,6 +1,6 @@
 {
   "platform": "web",
-  "generatedAt": "2026-06-17T17:07:49.443Z",
+  "generatedAt": "2026-06-17T19:53:10.143Z",
   "components": [
     {
       "name": "Badge",
@@ -48,7 +48,18 @@
           "kind": "node"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "hasdot",
+          "size",
+          "tone",
+          "variant"
+        ],
+        "codeMapped": [
+          "withdot"
+        ]
+      }
     },
     {
       "name": "Button",
@@ -95,7 +106,20 @@
           "kind": "node"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "fullwidth",
+          "icononly",
+          "size",
+          "state",
+          "variant"
+        ],
+        "codeMapped": [
+          "disabled",
+          "loading"
+        ]
+      }
     },
     {
       "name": "ButtonGroup",
@@ -112,7 +136,13 @@
           "kind": "other"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "size"
+        ],
+        "codeMapped": []
+      }
     },
     {
       "name": "Checkbox",
@@ -129,7 +159,17 @@
           "kind": "boolean"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "state"
+        ],
+        "codeMapped": [
+          "defaultchecked",
+          "disabled",
+          "indeterminate"
+        ]
+      }
     },
     {
       "name": "Field",
@@ -164,7 +204,8 @@
           "kind": "node"
         }
       },
-      "codeConnect": false
+      "codeConnect": false,
+      "ccMappings": null
     },
     {
       "name": "Menu",
@@ -181,7 +222,11 @@
           "kind": "other"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [],
+        "codeMapped": []
+      }
     },
     {
       "name": "MultiSelect",
@@ -201,7 +246,17 @@
           "kind": "boolean"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "size",
+          "state"
+        ],
+        "codeMapped": [
+          "disabled",
+          "invalid"
+        ]
+      }
     },
     {
       "name": "NumericInput",
@@ -233,7 +288,17 @@
           "kind": "other"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "size",
+          "state"
+        ],
+        "codeMapped": [
+          "disabled",
+          "invalid"
+        ]
+      }
     },
     {
       "name": "Popover",
@@ -266,7 +331,8 @@
           "kind": "boolean"
         }
       },
-      "codeConnect": false
+      "codeConnect": false,
+      "ccMappings": null
     },
     {
       "name": "ProgressBar",
@@ -320,7 +386,15 @@
           "kind": "other"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "showpercentage",
+          "size",
+          "tone"
+        ],
+        "codeMapped": []
+      }
     },
     {
       "name": "Radio",
@@ -334,7 +408,16 @@
           "kind": "node"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "state"
+        ],
+        "codeMapped": [
+          "defaultchecked",
+          "disabled"
+        ]
+      }
     },
     {
       "name": "Select",
@@ -380,7 +463,17 @@
           "kind": "other"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "size",
+          "state"
+        ],
+        "codeMapped": [
+          "disabled",
+          "invalid"
+        ]
+      }
     },
     {
       "name": "Tabs",
@@ -430,7 +523,14 @@
           "kind": "other"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "size",
+          "variant"
+        ],
+        "codeMapped": []
+      }
     },
     {
       "name": "Tag",
@@ -468,7 +568,16 @@
           "kind": "node"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "removable",
+          "size",
+          "tone",
+          "variant"
+        ],
+        "codeMapped": []
+      }
     },
     {
       "name": "TextInput",
@@ -505,7 +614,18 @@
           "kind": "other"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "clearable",
+          "size",
+          "state"
+        ],
+        "codeMapped": [
+          "disabled",
+          "invalid"
+        ]
+      }
     },
     {
       "name": "Textarea",
@@ -534,14 +654,31 @@
           "kind": "boolean"
         }
       },
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "showcount",
+          "state"
+        ],
+        "codeMapped": [
+          "disabled",
+          "invalid"
+        ]
+      }
     },
     {
       "name": "Toast",
       "source": "packages/web/src/components/Toast/Toast.types.ts",
       "platform": "web",
       "props": {},
-      "codeConnect": true
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "dismissible",
+          "tone"
+        ],
+        "codeMapped": []
+      }
     }
   ]
 }
