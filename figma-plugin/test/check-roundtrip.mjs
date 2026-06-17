@@ -87,6 +87,11 @@ function figmaValMatchesSrc(figmaVal, existingEntry) {
     const n = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(String(figmaVal.value));
     return Math.abs(dim.num - n) < 0.0001;
   }
+  // Opacity: Figma 0–100 → repo 0–1 (L7)
+  if (typeof figmaVal.value === "number" && existingEntry["$type"] === "opacity") {
+    const dp = decimalPlaces(srcStr);
+    return parseFloat((figmaVal.value / 100).toFixed(dp)) === parseFloat(srcStr);
+  }
   if (typeof figmaVal.value === "number") {
     const dp = decimalPlaces(srcStr);
     return parseFloat(figmaVal.value.toFixed(dp)) === parseFloat(srcStr);
@@ -141,7 +146,13 @@ function srcToFigmaVal(entry) {
     return { value: dim.num };
   }
 
-  // Pure number (opacity/number type): Figma FLOAT variable introduces float32 noise
+  // Opacity: Figma stores 0–100 (L7); simulate the ×100 conversion from build.mjs
+  if (entry["$type"] === "opacity") {
+    const num = parseFloat(s);
+    if (!isNaN(num)) return { value: Math.fround(num * 100) };
+  }
+
+  // Pure number (non-opacity): Figma FLOAT variable introduces float32 noise
   const num = parseFloat(s);
   if (!isNaN(num) && String(num) !== "NaN" && s !== "") {
     return { value: Math.fround(num) };
@@ -483,6 +494,36 @@ try {
   console.error("  ✗  Could not run Diff no-op guard: " + e.message);
 }
 
-const grandTotal = failures + byteFailures + diffFailures;
+// ─── Opacity scale guard (L7) ─────────────────────────────────────────────────
+// Verifies that opacity tokens (0–1 in source, ×100 in Figma) round-trip clean:
+// srcToFigmaVal stores ×100 and figmaValMatchesSrc accepts ÷100 back.
+console.log("\nOpacity scale guard (L7)");
+let opacityFailures = 0;
+
+const OPACITY_CASES = [
+  { src: "1",    figma: 100, label: "opacity/100 (100%)" },
+  { src: "0.8",  figma: 80,  label: "opacity/80  (80%)" },
+  { src: "0.6",  figma: 60,  label: "opacity/60  (60%)" },
+  { src: "0.4",  figma: 40,  label: "opacity/40  (40%)" },
+  { src: "0.2",  figma: 20,  label: "opacity/20  (20%)" },
+  { src: "0.1",  figma: 10,  label: "opacity/10  (10%)" },
+  { src: "0.05", figma: 5,   label: "opacity/5   (5%)"  },
+  { src: "0",    figma: 0,   label: "opacity/0   (0%)"  },
+];
+
+for (const { src, figma, label } of OPACITY_CASES) {
+  const entry = { "$value": src, "$type": "opacity" };
+  const stored = srcToFigmaVal(entry);
+  const storedOk = stored.value === figma;
+  const matchOk  = figmaValMatchesSrc(stored, entry);
+  const ok = storedOk && matchOk;
+  if (!ok) opacityFailures++;
+  console.log("  " + (ok ? "✓" : "✗") + "  " + label +
+    "  stored=" + (stored.value ?? ("{alias:" + stored.alias + "}")) +
+    "  matches=" + matchOk +
+    (!storedOk ? "  (expected stored=" + figma + ")" : ""));
+}
+
+const grandTotal = failures + byteFailures + diffFailures + opacityFailures;
 console.log("\n" + (grandTotal === 0 ? "All checks passed." : grandTotal + " check(s) failed.") + "\n");
 if (grandTotal > 0) process.exit(1);
