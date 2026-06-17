@@ -61,6 +61,27 @@ function assembleHtml() {
   // patterns, which would corrupt any JS that contains those sequences (e.g. escapeRe).
   const html = shell.replace(MARKER, () => `<script>\n${script}</script>`);
   writeFileSync("dist/ui.html", html);
+  inlineCreatorImage();
+}
+
+/**
+ * Replace the __CREATOR_IMG__ placeholder in dist/ui.html with a base64 data URL
+ * of assets/creator.jpg so the iframe can display it without a network fetch.
+ * Silently no-ops if the image file doesn't exist yet.
+ */
+function inlineCreatorImage() {
+  const htmlPath = "dist/ui.html";
+  let html = readFileSync(htmlPath, "utf8");
+  const MARKER = "__CREATOR_IMG__";
+  if (!html.includes(MARKER)) return;
+  try {
+    const imgBuf = readFileSync("assets/creator.jpg");
+    const dataUrl = "data:image/jpeg;base64," + imgBuf.toString("base64");
+    html = html.replace(MARKER, dataUrl);
+  } catch (_) {
+    html = html.replace(MARKER, "");
+  }
+  writeFileSync(htmlPath, html);
 }
 
 // ─────────────────────────────────────────────
