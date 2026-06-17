@@ -17,7 +17,7 @@
     "plugin:build": "npm run build -w @kijani/figma-plugin",
     "plugin:check": "node figma-plugin/test/check-dist.mjs",
     "plugin:roundtrip": "node figma-plugin/test/check-roundtrip.mjs",
-    "start": "npm run start -w @kijani/web",
+    "dev": "npm run dev -w @kijani/web",
     "build": "npm run build -w @kijani/web",
     "test": "npm run test -w @kijani/web",
     "storybook": "npm run storybook -w @kijani/web",
