@@ -22,6 +22,10 @@
     "test": "npm run test -w @kijani/web",
     "storybook": "npm run storybook -w @kijani/web",
     "build-storybook": "npm run build-storybook -w @kijani/web",
-    "chromatic": "npm run chromatic -w @kijani/web"
+    "chromatic": "npm run chromatic -w @kijani/web",
+    "code-connect:publish": "figma connect publish --token $FIGMA_ACCESS_TOKEN"
+  },
+  "devDependencies": {
+    "@figma/code-connect": "^1.4.8"
   }
 }

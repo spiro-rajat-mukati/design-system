@@ -1,0 +1,24 @@
+name: Code Connect Publish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/*/src/components/**/*.figma.tsx"
+      - "figma.config.json"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Publish Code Connect
+        run: npx figma connect publish --token ${{ secrets.FIGMA_ACCESS_TOKEN }}
