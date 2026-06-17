@@ -145,6 +145,19 @@
   .ets-var   { font-family:ui-monospace,monospace; font-size:9px; color:var(--fg-muted); line-height:1.6; }
   .ets-missing { border-radius:6px; padding:8px 10px; margin-top:8px; color:var(--removed-fg); font-size:11px; background:var(--removed-bg); }
 
+  /* Component Drift overlay */
+  .drift-summary-pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+  .pill.info  { background:var(--bg-sunken); color:var(--fg-muted); }
+  .drift-section { margin-bottom:14px; }
+  .drift-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:6px; }
+  .drift-row { padding:5px 0; border-bottom:1px solid var(--border); font-size:11px; }
+  .drift-row:last-child { border-bottom:none; }
+  .drift-comp { font-family:ui-monospace,monospace; font-size:10px; font-weight:600; color:var(--fg); margin-bottom:3px; }
+  .drift-issue { padding:2px 0 2px 10px; color:var(--fg-muted); line-height:1.5; }
+  .drift-badge { display:inline-block; padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
+  .drift-badge.warning { background:var(--changed-bg); color:var(--changed-fg); }
+  .drift-badge.info    { background:var(--bg-sunken);  color:var(--fg-muted); }
+
   /* Export Assets overlay */
   .ei-lane { margin-bottom:16px; border-top:1px solid var(--border); padding-top:10px; }
   .ei-lane:first-child { border-top:none; padding-top:0; }
@@ -183,6 +196,9 @@
   <button id="ensure-text-styles" class="secondary">Ensure Text Styles (Web / Mobile)</button>
   <button id="generate-foundations" class="secondary">Generate Foundations pages</button>
   <button id="generate-components" class="secondary">Generate components</button>
+
+  <div class="group-label">Quality</div>
+  <button id="btn-component-drift" class="secondary">Component Drift Report</button>
 
   <div class="group-label">Assets</div>
   <button id="btn-export-assets" class="secondary">Export Assets → GitHub PR</button>
@@ -309,6 +325,15 @@
     <button class="secondary" id="export-assets-scan-btn">Scan</button>
     <button id="export-assets-confirm" disabled>Export PR</button>
   </div>
+</div>
+
+<!-- ═══════════ COMPONENT DRIFT OVERLAY ═══════════ -->
+<div id="drift-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">Component Drift Report</span>
+    <button class="ov-close" id="close-drift" title="Close">✕</button>
+  </div>
+  <div class="ov-body" id="drift-body"><!-- populated by renderDriftReport() --></div>
 </div>
 
 <script src="ui.js"></script>

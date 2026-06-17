@@ -108,7 +108,7 @@ async function ghFetchMeta(repoPath, ref) {
 }
 
 /* ── busy state (all interactive buttons) ── */
-const ALL_BTNS = ['sync-tokens','btn-diff','btn-pull','btn-push','btn-prune','sync-text-styles','ensure-text-styles','generate-foundations','generate-components','btn-export-assets','save-pat'];
+const ALL_BTNS = ['sync-tokens','btn-diff','btn-pull','btn-push','btn-prune','sync-text-styles','ensure-text-styles','generate-foundations','generate-components','btn-component-drift','btn-export-assets','save-pat'];
 function setBusy(busy) {
   for (const id of ALL_BTNS) { const el = document.getElementById(id); if (el) el.disabled = busy; }
 }
@@ -2187,6 +2187,32 @@ window.onmessage = (event) => {
       });
       break;
     }
+    case 'component-drift-scanned': {
+      (async () => {
+        const driftBody = document.getElementById('drift-body');
+        const platform = msg.platform || 'web';
+        const manifestPath = 'packages/' + platform + '/component-manifest.json';
+        driftBody.innerHTML = '<div class="line muted">Fetching ' + esc(manifestPath) + '…</div>';
+        let codeManifest;
+        try {
+          codeManifest = await ghFetch(manifestPath);
+        } catch (e) {
+          driftBody.innerHTML = '<div class="panel-error">Failed to fetch manifest: ' + esc(e.message) + '</div>';
+          setBusy(false);
+          return;
+        }
+        const result = computeComponentDrift(msg.components || [], codeManifest);
+        driftBody.innerHTML = renderDriftReport(result);
+        const s = result.summary;
+        log('Component Drift (' + esc(platform) + ' — ' + esc(msg.fileName || '') + '): ' +
+          s.coverage + ' coverage, ' + s.parity + ' parity, ' + s.total + ' total', s.total > 0 ? 'warn' : 'ok');
+        setBusy(false);
+      })().catch(function(e) {
+        document.getElementById('drift-body').innerHTML = '<div class="panel-error">Unexpected error: ' + esc(e.message) + '</div>';
+        setBusy(false);
+      });
+      break;
+    }
     case 'log':  log(msg.text, msg.kind || 'info'); break;
     // 'sync-done' is sent by uiDone() in code.js on success or error — always unblock UI.
     case 'done':
@@ -2197,6 +2223,176 @@ window.onmessage = (event) => {
       setBusy(false); break;
   }
 };
+
+/* ══════════════════════════════════════════════════════════
+   COMPONENT DRIFT (Phase B)
+   ══════════════════════════════════════════════════════════ */
+
+// Inline copy of figma-plugin/src/drift.js (bundle:false cannot follow imports).
+function computeComponentDrift(figmaComponents, codeManifest) {
+  var issues = [];
+  function norm(s) { return String(s).toLowerCase().trim(); }
+  var figmaByName = {};
+  figmaComponents.forEach(function(c) { figmaByName[norm(c.name)] = c; });
+  var codeByName = {};
+  (codeManifest.components || []).forEach(function(c) { codeByName[norm(c.name)] = c; });
+  Object.keys(figmaByName).forEach(function(k) {
+    if (!codeByName[k]) {
+      issues.push({ kind: 'coverage', severity: 'warning', category: 'figma-only', component: figmaByName[k].name });
+    }
+  });
+  Object.keys(codeByName).forEach(function(k) {
+    if (!figmaByName[k]) {
+      issues.push({ kind: 'coverage', severity: 'info', category: 'code-only', component: codeByName[k].name });
+    }
+  });
+  Object.keys(figmaByName).forEach(function(k) {
+    var fc = figmaByName[k];
+    var cc = codeByName[k];
+    if (!cc) return;
+    if (!cc.codeConnect) {
+      issues.push({ kind: 'coverage', severity: 'info', category: 'no-code-connect', component: cc.name });
+    }
+    var fProps = {};
+    Object.keys(fc.figmaProps || {}).forEach(function(p) {
+      fProps[norm(p)] = { original: p, type: fc.figmaProps[p].figmaType, options: fc.figmaProps[p].options };
+    });
+    var cProps = {};
+    Object.keys(cc.props || {}).forEach(function(p) {
+      cProps[norm(p)] = { original: p, kind: cc.props[p].kind, options: cc.props[p].options };
+    });
+    Object.keys(fProps).forEach(function(pk) {
+      var fp = fProps[pk];
+      if (fp.type !== 'VARIANT' && fp.type !== 'BOOLEAN') return;
+      if (!cProps[pk]) {
+        issues.push({ kind: 'parity', severity: 'warning', category: 'figma-prop-not-in-code', component: cc.name, prop: fp.original, figmaType: fp.type });
+        return;
+      }
+      if (fp.type === 'VARIANT' && fp.options && cProps[pk].kind === 'union' && cProps[pk].options) {
+        var fOpts = {};
+        fp.options.forEach(function(o) { fOpts[norm(o)] = o; });
+        var cOpts = {};
+        cProps[pk].options.forEach(function(o) { cOpts[norm(o)] = o; });
+        Object.keys(fOpts).forEach(function(o) {
+          if (!cOpts[o]) {
+            issues.push({ kind: 'parity', severity: 'warning', category: 'option-missing-in-code', component: cc.name, prop: fp.original, option: fOpts[o] });
+          }
+        });
+        Object.keys(cOpts).forEach(function(o) {
+          if (!fOpts[o]) {
+            issues.push({ kind: 'parity', severity: 'info', category: 'option-missing-in-figma', component: cc.name, prop: fp.original, option: cOpts[o] });
+          }
+        });
+      }
+    });
+    Object.keys(cProps).forEach(function(pk) {
+      var cp = cProps[pk];
+      if (cp.kind !== 'union' && cp.kind !== 'boolean') return;
+      if (!fProps[pk]) {
+        issues.push({ kind: 'parity', severity: 'info', category: 'code-prop-not-in-figma', component: cc.name, prop: cp.original, codeKind: cp.kind });
+      }
+    });
+  });
+  var coverageCount = 0;
+  var parityCount = 0;
+  issues.forEach(function(i) {
+    if (i.kind === 'coverage') coverageCount++;
+    else parityCount++;
+  });
+  return { issues: issues, summary: { coverage: coverageCount, parity: parityCount, total: issues.length } };
+}
+
+/* ── drift report rendering ── */
+
+function severityBadge(severity) {
+  return '<span class="drift-badge ' + severity + '">' + severity + '</span>';
+}
+
+function renderDriftReport(result) {
+  if (result.error) return '<div class="panel-error">' + esc(result.error) + '</div>';
+  var issues = result.issues;
+  var summary = result.summary;
+
+  var html = '<div class="drift-summary-pills">';
+  if (summary.total === 0) {
+    html += '<span class="pill ok">✓ No drift — Figma and code are in sync</span>';
+    html += '</div>';
+    return html;
+  }
+  if (summary.coverage > 0) html += '<span class="pill changed">' + summary.coverage + ' coverage</span>';
+  if (summary.parity > 0)   html += '<span class="pill warning changed">' + summary.parity + ' parity</span>';
+  html += '<span class="pill muted-pill">' + summary.total + ' total</span>';
+  html += '</div>';
+
+  // Coverage section
+  var covIssues = issues.filter(function(i) { return i.kind === 'coverage'; });
+  if (covIssues.length > 0) {
+    html += '<div class="drift-section">';
+    html += '<div class="drift-section-title">Coverage (' + covIssues.length + ')</div>';
+    covIssues.forEach(function(i) {
+      var label = i.category === 'figma-only'      ? 'In Figma, not in code library'
+                : i.category === 'code-only'       ? 'In code, no Figma component set'
+                : i.category === 'no-code-connect' ? 'No Code Connect configured'
+                : i.category;
+      html += '<div class="drift-row">';
+      html += '<div class="drift-comp">' + esc(i.component) + '</div>';
+      html += '<div class="drift-issue">' + severityBadge(i.severity) + ' ' + esc(label) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Parity section — group by component
+  var parIssues = issues.filter(function(i) { return i.kind === 'parity'; });
+  if (parIssues.length > 0) {
+    html += '<div class="drift-section">';
+    html += '<div class="drift-section-title">Prop / variant parity (' + parIssues.length + ')</div>';
+    var byComp = {};
+    parIssues.forEach(function(i) {
+      if (!byComp[i.component]) byComp[i.component] = [];
+      byComp[i.component].push(i);
+    });
+    Object.keys(byComp).sort().forEach(function(comp) {
+      html += '<div class="drift-row">';
+      html += '<div class="drift-comp">' + esc(comp) + '</div>';
+      byComp[comp].forEach(function(i) {
+        var desc = '';
+        if (i.category === 'figma-prop-not-in-code') {
+          desc = 'Figma ' + i.figmaType + ' "' + esc(i.prop) + '" has no code counterpart';
+        } else if (i.category === 'code-prop-not-in-figma') {
+          desc = 'Code ' + i.codeKind + ' "' + esc(i.prop) + '" not in Figma';
+        } else if (i.category === 'option-missing-in-code') {
+          desc = '"' + esc(i.prop) + '": Figma option "' + esc(i.option) + '" not in code union';
+        } else if (i.category === 'option-missing-in-figma') {
+          desc = '"' + esc(i.prop) + '": code option "' + esc(i.option) + '" not in Figma variants';
+        } else {
+          desc = esc(i.category);
+        }
+        html += '<div class="drift-issue">' + severityBadge(i.severity) + ' ' + desc + '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  return html;
+}
+
+/* ── drift panel wire-up ── */
+
+function closeDriftPanel() {
+  document.getElementById('drift-panel').hidden = true;
+  setBusy(false);
+}
+
+document.getElementById('close-drift').addEventListener('click', closeDriftPanel);
+
+document.getElementById('btn-component-drift').addEventListener('click', function() {
+  document.getElementById('drift-body').innerHTML = '<div class="line muted">Scanning component sets…</div>';
+  document.getElementById('drift-panel').hidden = false;
+  setBusy(true);
+  parent.postMessage({ pluginMessage: { type: 'scan-component-drift' } }, '*');
+});
 
 /* ── init ── */
 parent.postMessage({ pluginMessage: { type: 'get-pat' } }, '*');
