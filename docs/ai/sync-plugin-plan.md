@@ -224,25 +224,33 @@ Deferred (fast-follows, not v1): CI gate via the Figma REST API; auto-filed GitH
 
 ### Layout
 - **Header:** "DesignSync" + a compact connection chip (`repo · branch · PAT ✓`); a gear opens PAT settings.
-- **Context banner:** detect the open file via `figma.root.name` (match "Kijani — Foundations/Web/Mobile/Assets"); show "In <file> — <relevant> actions" and **default to the relevant tab**; dim tabs that don't apply to the current file.
-- **Tabs (segmented):** `Tokens · Styles · Components · Assets`. Only the active tab's actions render.
-- **Action cards:** each = icon + title + one-line subtitle (≤ ~6 words) + direction glyph (↑ push / ↓ pull / ⇄ diff) where directional — no glyph for non-directional actions. The contextual primary action gets an accent border. Destructive actions live under an **"Advanced"** disclosure with a caution accent.
+- **Context banner:** detect the open file via `figma.root.name` (match "Kijani — Foundations/Web/Mobile/Assets"); show "In <file> — <relevant> actions" as a full-width pill and **default to the relevant tab**; dim tabs that don't apply to the current file with a hover `title` tooltip explaining which file to open.
+- **Tabs (segmented):** `Tokens · Styles · Components · Assets`. Only the active tab's actions render. Dimmed tabs have `cursor: not-allowed` + a tooltip (e.g. "Assets actions run from the Kijani — Assets file — open it to use this tab.").
+- **Action cards:** each = icon + title + one-line subtitle (≤ ~6 words). No direction glyphs anywhere — the left icon already conveys direction. Destructive actions live under an **"Advanced"** disclosure with a caution accent. All cards render identically (no contextual accent border).
 - **Result console:** monospace, status-colored (success/error), with a spinner + progress while a long action runs (progress posted from the main thread).
 - **PAT settings:** collapsible footer (repo, branch, token entry) — unchanged behavior.
 
 ### Tab → action map (with clearer names + subtitles)
-| Tab | Action | Subtitle | Glyph | Flags |
-|---|---|---|---|---|
-| Tokens | Push to GitHub | Open a PR from your Figma edits | ↑ | primary (in Foundations) |
-| Tokens | Pull from GitHub | Overwrite Figma with repo values | ↓ | |
-| Tokens | Diff vs GitHub | Preview changes — no writes | ⇄ | |
-| Tokens | Prune Figma-only variables | Delete vars not in the repo | | advanced, destructive |
-| Styles | Ensure text styles (Web / Mobile) | Bind text styles in this file | | run from Web/Mobile |
-| Styles | Sync text-style variables (Foundations) | Update the semantic type vars | | run from Foundations |
-| Components | Generate components | Build/refresh component sets | | |
-| Components | Generate Foundations pages | Build the foundation docs pages | | |
-| Components | Component drift report | Coverage · parity · hardcoded | | |
-| Assets | Export assets → GitHub PR | Push icon/illustration/image sources | ↑ | |
+| Tab | Action | Subtitle | Flags |
+|---|---|---|---|
+| Tokens | Push to GitHub | Open a PR from your Figma edits | |
+| Tokens | Pull from GitHub | Overwrite Figma with repo values | |
+| Tokens | Diff vs GitHub | Preview changes — no writes | |
+| Tokens | Prune Figma-only variables | Delete vars not in the repo | advanced, destructive |
+| Styles | Ensure text styles (Web / Mobile) | Bind text styles in this file | run from Web/Mobile |
+| Styles | Sync text-style variables (Foundations) | Update the semantic type vars | run from Foundations |
+| Components | Generate components | Build/refresh component sets | |
+| Components | Generate Foundations pages | Build the foundation docs pages | |
+| Components | Component drift report | Coverage · parity · hardcoded | |
+| Assets | Export assets → GitHub PR | Push icon/illustration/image sources | |
+
+### Disabled-tab tooltip copy
+| Tab | Tooltip |
+|---|---|
+| Tokens | Tokens actions run from the Foundations file — open it to use this tab. |
+| Styles | Styles actions run from Foundations, Web, or Mobile files — open one to use this tab. |
+| Components | Components actions run from a Web or Mobile file — open one to use this tab. |
+| Assets | Assets actions run from the Kijani — Assets file — open it to use this tab. |
 
 (Resolves the old "Sync vs Pull" ambiguity → three clear directional actions: Push / Pull / Diff. Disambiguates the two text-style actions via subtitles + run-context. Build + Quality tabs merged into Components.)
 

@@ -81,6 +81,12 @@ var FILE_CTX = [
   { re: /mobile/i,     tab: 'styles',     tabs: ['styles','components'],              label: 'styles & components' },
   { re: /web/i,        tab: 'styles',     tabs: ['styles','components'],              label: 'styles & components' },
 ];
+var TAB_TOOLTIPS = {
+  tokens:     'Tokens actions run from the Foundations file — open it to use this tab.',
+  styles:     'Styles actions run from Foundations, Web, or Mobile files — open one to use this tab.',
+  components: 'Components actions run from a Web or Mobile file — open one to use this tab.',
+  assets:     'Assets actions run from the Kijani — Assets file — open it to use this tab.',
+};
 function updateContextBanner(fileName) {
   var banner = document.getElementById('ctx-banner');
   var text   = document.getElementById('ctx-text');
@@ -94,13 +100,17 @@ function updateContextBanner(fileName) {
     banner.hidden = false;
     var prefs = loadPrefs();
     if (!prefs.lastTab) showTab(matched.tab);
-    var allTabs = ['tokens','styles','components','assets'];
     document.querySelectorAll('.tab-btn').forEach(function(btn) {
-      btn.classList.toggle('dim', matched.tabs.indexOf(btn.dataset.tab) === -1);
+      var isDim = matched.tabs.indexOf(btn.dataset.tab) === -1;
+      btn.classList.toggle('dim', isDim);
+      btn.title = isDim ? (TAB_TOOLTIPS[btn.dataset.tab] || '') : '';
     });
   } else {
     banner.hidden = true;
-    document.querySelectorAll('.tab-btn').forEach(function(btn) { btn.classList.remove('dim'); });
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.classList.remove('dim');
+      btn.title = '';
+    });
   }
 }
 
