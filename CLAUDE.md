@@ -26,6 +26,7 @@ Two more surfaces: **`figma-plugin/`** is the DesignSync plugin that keeps Figma
 6. Touch targets meet platform minimums — ≥ 44px on mobile (handled in the mobile library's tokens).
 7. TypeScript types are not optional. Props named consistently with the existing API surface.
 8. Accessibility is a build error, not a follow-up ticket.
+9. When emitting Figma variables or editing the token build, follow the **Figma variable representation — conversion rules** in `docs/ai/decisions.md` (opacity ×100, line-height→px, dimensions strip `px`, color→RGBA). Before binding/emitting a new token `$type` as a Figma variable, read back a test binding to confirm Figma's scale — never hand-fix a scale mismatch in Figma; fix it in `build.mjs` + the plugin.
 
 ## Agent operating mode (autonomous / solo)
 
