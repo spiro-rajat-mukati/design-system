@@ -104,24 +104,26 @@ body {
 
 /* ══ Context banner ════════════════════════════════════════════════════ */
 .ctx-banner {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   padding: 5px 12px;
-  background: var(--figma-color-bg-secondary);
+  background: var(--figma-color-bg);
   border-bottom: 1px solid var(--figma-color-border);
-  font-size: 11px;
-  color: var(--figma-color-text-secondary);
   flex-shrink: 0;
 }
 .ctx-banner[hidden] { display: none; }
-.ctx-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--figma-color-bg-brand, #3C61DD);
-  flex-shrink: 0;
+.ctx-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 6px;
+  border-radius: 4px;
+  background: var(--figma-color-bg-selected, rgba(60,97,221,.10));
+  color: var(--figma-color-text-brand, #3C61DD);
+  font-size: 11px;
+  font-weight: 500;
+  max-width: 100%;
+  overflow: hidden;
 }
+.ctx-pill svg { flex-shrink: 0; }
 #ctx-text {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -140,6 +142,7 @@ body {
   padding: 8px 2px;
   border: none;
   border-bottom: 2px solid transparent;
+  border-radius: 0;
   background: none;
   font-family: inherit;
   font-size: 11px;
@@ -158,6 +161,7 @@ body {
 .tab-btn.active {
   color: var(--figma-color-bg-brand, #3C61DD);
   border-bottom-color: var(--figma-color-bg-brand, #3C61DD);
+  border-radius: 0;
 }
 .tab-btn.dim { opacity: 0.35; pointer-events: none; }
 
@@ -195,8 +199,8 @@ body {
 .action-card.primary { border-color: var(--figma-color-bg-brand, #3C61DD); }
 .action-card.caution { border-color: var(--figma-color-text-danger, #B91C1C); }
 .card-icon {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -507,25 +511,29 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
     <span id="pat-status">…</span>
   </div>
   <button class="ds-gear" id="gear-btn" title="PAT settings" aria-label="PAT settings">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M6.3 1.5a2 2 0 0 1 3.4 0l.18.33c.26.46.8.7 1.31.58l.37-.08a2 2 0 0 1 2.3 1.54l.14.62a2 2 0 0 1-1.05 2.2l-.33.17a1.77 1.77 0 0 0 0 3.28l.33.17a2 2 0 0 1 1.05 2.2l-.14.62a2 2 0 0 1-2.3 1.54l-.37-.08a1.77 1.77 0 0 0-1.31.58l-.18.33a2 2 0 0 1-3.4 0l-.18-.33a1.77 1.77 0 0 0-1.31-.58l-.37.08A2 2 0 0 1 2.14 13l-.14-.62a2 2 0 0 1 1.05-2.2l.33-.17a1.77 1.77 0 0 0 0-3.28l-.33-.17A2 2 0 0 1 2 4.37l.14-.62A2 2 0 0 1 4.44 2.2l.37.08c.51.12 1.05-.12 1.31-.58L6.3 1.5ZM8 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
     </svg>
   </button>
 </header>
 
 <!-- ═══════════ CONTEXT BANNER ═══════════════════════════════════════════ -->
 <div class="ctx-banner" id="ctx-banner" hidden>
-  <span class="ctx-dot"></span>
-  <span id="ctx-text"></span>
+  <div class="ctx-pill">
+    <svg class="ctx-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M2 1h5.5L9 2.5V11H2V1zm1.5 1.5v7h4V4H5.5V2.5H3.5zm2 0v1H7l-1.5-1z"/>
+    </svg>
+    <span id="ctx-text"></span>
+  </div>
 </div>
 
 <!-- ═══════════ TAB BAR ══════════════════════════════════════════════════ -->
 <nav class="ds-tabbar" role="tablist" aria-label="Plugin sections">
-  <button class="tab-btn active" data-tab="tokens"  role="tab" aria-selected="true"  aria-controls="panel-tokens">Tokens</button>
-  <button class="tab-btn"        data-tab="styles"  role="tab" aria-selected="false" aria-controls="panel-styles">Styles</button>
-  <button class="tab-btn"        data-tab="build"   role="tab" aria-selected="false" aria-controls="panel-build">Build</button>
-  <button class="tab-btn"        data-tab="assets"  role="tab" aria-selected="false" aria-controls="panel-assets">Assets</button>
-  <button class="tab-btn"        data-tab="quality" role="tab" aria-selected="false" aria-controls="panel-quality">Quality</button>
+  <button class="tab-btn active" data-tab="tokens"     role="tab" aria-selected="true"  aria-controls="panel-tokens">Tokens</button>
+  <button class="tab-btn"        data-tab="styles"     role="tab" aria-selected="false" aria-controls="panel-styles">Styles</button>
+  <button class="tab-btn"        data-tab="components" role="tab" aria-selected="false" aria-controls="panel-components">Components</button>
+  <button class="tab-btn"        data-tab="assets"     role="tab" aria-selected="false" aria-controls="panel-assets">Assets</button>
 </nav>
 
 <!-- ═══════════ TAB PANELS ═══════════════════════════════════════════════ -->
@@ -536,7 +544,7 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
 
     <button class="action-card primary" id="btn-push">
       <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 1.5L12.5 6H9.5v6H6.5V6H3.5L8 1.5Z"/>
           <rect x="2" y="13.5" width="12" height="1.5" rx=".75"/>
         </svg>
@@ -550,7 +558,7 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
 
     <button class="action-card" id="btn-pull">
       <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 14.5L3.5 10H6.5V4h3v6h3L8 14.5Z"/>
           <rect x="2" y="1" width="12" height="1.5" rx=".75"/>
         </svg>
@@ -564,7 +572,7 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
 
     <button class="action-card" id="btn-diff">
       <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 5.5L5.5 2.5V4.5H13v2H5.5V8.5L2 5.5ZM14 10.5L10.5 13.5V11.5H3v-2h7.5V7.5L14 10.5Z"/>
         </svg>
       </span>
@@ -581,7 +589,7 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
         <p class="adv-warn">Destructive — review the preview before applying.</p>
         <button class="action-card caution" id="btn-prune">
           <span class="card-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M6.5 1h3v1.5H13V4H3V2.5h3.5V1ZM5 5.5h6l-.65 9H5.65L5 5.5ZM7 7v5.5h.5V7H7Zm1.5 0v5.5h.5V7H8.5Z"/>
             </svg>
           </span>
@@ -589,7 +597,6 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
             <div class="card-title">Prune Figma-only variables</div>
             <div class="card-subtitle">Delete vars not in the repo</div>
           </div>
-          <span class="card-glyph" aria-hidden="true">🗑</span>
         </button>
       </div>
     </details>
@@ -604,7 +611,7 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
 
     <button class="action-card" id="ensure-text-styles">
       <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path d="M2.5 2.5h11v2.5H9.5v9h-3v-9H2.5V2.5Z"/>
         </svg>
       </span>
@@ -612,12 +619,11 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
         <div class="card-title">Ensure text styles</div>
         <div class="card-subtitle">Bind text styles in this file · Web / Mobile</div>
       </div>
-      <span class="card-glyph" aria-hidden="true">—</span>
     </button>
 
     <button class="action-card" id="sync-text-styles">
       <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path d="M11.5 4L14 6.5H9.5V5H6V4H11.5ZM4.5 12L2 9.5H6.5V11H10v1H4.5Z"/>
           <rect x="6.5" y="7" width="3" height="1.5" rx=".5"/>
         </svg>
@@ -626,17 +632,16 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
         <div class="card-title">Sync text-style variables</div>
         <div class="card-subtitle">Update the semantic type vars · Foundations</div>
       </div>
-      <span class="card-glyph" aria-hidden="true">—</span>
     </button>
 
   </div><!-- #panel-styles -->
 
-  <!-- ── Build ───────────────────────────────────────────────────────── -->
-  <div class="tab-panel" id="panel-build" role="tabpanel" aria-labelledby="tab-build">
+  <!-- ── Components ─────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="panel-components" role="tabpanel" aria-labelledby="tab-components">
 
     <button class="action-card" id="generate-components">
       <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M8 1.5L14.5 8L8 14.5L1.5 8L8 1.5ZM8 4L4 8L8 12L12 8L8 4Z"/>
         </svg>
       </span>
@@ -644,12 +649,11 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
         <div class="card-title">Generate components</div>
         <div class="card-subtitle">Build / refresh component sets</div>
       </div>
-      <span class="card-glyph" aria-hidden="true">—</span>
     </button>
 
     <button class="action-card" id="generate-foundations">
       <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M4 1.5h6.5L13 4v10.5H4V1.5ZM5.5 3v10h6V5H9.5V3H5.5ZM9.5 3v1.5H11L9.5 3Z"/>
           <rect x="6.5" y="7" width="3" height="1" rx=".5"/>
           <rect x="6.5" y="9" width="4" height="1" rx=".5"/>
@@ -660,17 +664,28 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
         <div class="card-title">Generate Foundations pages</div>
         <div class="card-subtitle">Build the foundation docs pages</div>
       </div>
-      <span class="card-glyph" aria-hidden="true">—</span>
     </button>
 
-  </div><!-- #panel-build -->
+    <button class="action-card" id="btn-component-drift">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M7 2a5 5 0 1 0 3.1 8.93l2.98 2.98 1.06-1.06-2.98-2.98A5 5 0 0 0 7 2Zm-3.5 5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0Z"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Component drift report</div>
+        <div class="card-subtitle">Coverage · parity · hardcoded</div>
+      </div>
+    </button>
+
+  </div><!-- #panel-components -->
 
   <!-- ── Assets ──────────────────────────────────────────────────────── -->
   <div class="tab-panel" id="panel-assets" role="tabpanel" aria-labelledby="tab-assets">
 
     <button class="action-card" id="btn-export-assets">
       <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 1.5L12.5 6H9.5v4.5H6.5V6H3.5L8 1.5Z"/>
           <path fill-rule="evenodd" clip-rule="evenodd" d="M2 11.5h12V13H2v-1.5Z"/>
         </svg>
@@ -683,24 +698,6 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
     </button>
 
   </div><!-- #panel-assets -->
-
-  <!-- ── Quality ─────────────────────────────────────────────────────── -->
-  <div class="tab-panel" id="panel-quality" role="tabpanel" aria-labelledby="tab-quality">
-
-    <button class="action-card" id="btn-component-drift">
-      <span class="card-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M7 2a5 5 0 1 0 3.1 8.93l2.98 2.98 1.06-1.06-2.98-2.98A5 5 0 0 0 7 2Zm-3.5 5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0Z"/>
-        </svg>
-      </span>
-      <div class="card-content">
-        <div class="card-title">Component drift report</div>
-        <div class="card-subtitle">Coverage · parity · hardcoded</div>
-      </div>
-      <span class="card-glyph" aria-hidden="true">—</span>
-    </button>
-
-  </div><!-- #panel-quality -->
 
 </div><!-- .tab-panels -->
 
