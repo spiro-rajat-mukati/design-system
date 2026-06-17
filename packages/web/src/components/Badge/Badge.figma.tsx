@@ -22,7 +22,7 @@ figma.connect(
         danger: "danger",
       }),
       size: figma.enum("size", { xs: "xs", sm: "sm", md: "md" }),
-      withDot: figma.boolean("hasDot"),
+      withDot: figma.boolean("With dot"),
     },
     example: ({ variant, tone, size, withDot }) => (
       <Badge variant={variant} tone={tone} size={size} withDot={withDot}>
