@@ -8,21 +8,10 @@ figma.connect(
   "https://www.figma.com/design/EAv9Vx2mFoBo4wXTVzP0Lv/x?node-id=2-2877",
   {
     props: {
-      variant: figma.enum("Variant", {
-        Primary: "primary",
-        Secondary: "secondary",
-        Tertiary: "tertiary",
-      }),
-      size: figma.enum("Size", {
-        XS: "xs",
-        SM: "sm",
-        MD: "md",
-        LG: "lg",
-        XL: "xl",
-      }),
+      size: figma.enum("size", { sm: "sm", md: "md", lg: "lg" }),
     },
-    example: ({ variant, size }) => (
-      <ButtonGroup variant={variant} size={size}>
+    example: ({ size }) => (
+      <ButtonGroup size={size}>
         <Button>Action</Button>
         <Button>Action</Button>
       </ButtonGroup>

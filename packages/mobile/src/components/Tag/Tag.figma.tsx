@@ -8,30 +8,28 @@ figma.connect(
   {
     props: {
       variant: figma.enum("Variant", {
-        Soft: "soft",
-        Outline: "outline",
-        Solid: "solid",
+        soft: "soft",
+        solid: "solid",
+        outline: "outline",
       }),
       tone: figma.enum("Tone", {
-        Neutral: "neutral",
-        Brand: "brand",
-        Success: "success",
-        Warning: "warning",
-        Danger: "danger",
-        Info: "info",
+        neutral: "neutral",
+        brand: "brand",
+        success: "success",
+        warning: "warning",
+        danger: "danger",
+        info: "info",
       }),
-      size: figma.enum("Size", { SM: "sm", MD: "md" }),
+      size: figma.enum("Size", { sm: "sm", md: "md" }),
       removable: figma.boolean("Removable"),
-      disabled: figma.boolean("Disabled"),
       label: figma.string("Label"),
     },
-    example: ({ variant, tone, size, removable, disabled, label }) => (
+    example: ({ variant, tone, size, removable, label }) => (
       <Tag
         variant={variant}
         tone={tone}
         size={size}
         removable={removable}
-        disabled={disabled}
         label={label}
       />
     ),

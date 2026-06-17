@@ -7,25 +7,21 @@ figma.connect(
   "https://www.figma.com/design/EAv9Vx2mFoBo4wXTVzP0Lv/x?node-id=2-5871",
   {
     props: {
-      shape: figma.enum("Shape", { Linear: "linear", Circular: "circular" }),
-      size: figma.enum("Size", { XS: "xs", SM: "sm", MD: "md", LG: "lg" }),
-      tone: figma.enum("Tone", {
-        Brand: "brand",
-        Success: "success",
-        Warning: "warning",
-        Danger: "danger",
+      size: figma.enum("size", { xs: "xs", sm: "sm", md: "md", lg: "lg" }),
+      tone: figma.enum("tone", {
+        brand: "brand",
+        success: "success",
+        warning: "warning",
+        danger: "danger",
       }),
-      showPercentage: figma.boolean("Show percentage"),
-      showLabel: figma.boolean("Show label"),
-      label: figma.string("Label"),
+      showPercentage: figma.boolean("showPercentage"),
     },
-    example: ({ shape, size, tone, showPercentage, label }) => (
+    example: ({ size, tone, showPercentage }) => (
       <ProgressBar
-        shape={shape}
         size={size}
         tone={tone}
         showPercentage={showPercentage}
-        label={label}
+        label="Loading"
         value={75}
         max={100}
       />

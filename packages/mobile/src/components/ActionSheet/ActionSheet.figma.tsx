@@ -6,22 +6,15 @@ figma.connect(
   ActionSheet,
   "https://www.figma.com/design/VQ49OXLtAbwlBBFABLEjrN/x?node-id=106-114",
   {
-    props: {
-      title: figma.string("Title"),
-      message: figma.string("Message"),
-      showTitle: figma.boolean("Show title"),
-      showMessage: figma.boolean("Show message"),
-      cancelLabel: figma.string("Cancel label"),
-    },
-    example: ({ title, message, cancelLabel }) => (
+    props: {},
+    example: () => (
       <ActionSheet
         visible={true}
         onClose={() => {}}
-        title={title}
-        message={message}
-        cancelLabel={cancelLabel}
+        title="Title"
         items={[
           { label: "Action", onPress: () => {} },
+          { label: "Destructive action", onPress: () => {}, destructive: true },
         ]}
       />
     ),

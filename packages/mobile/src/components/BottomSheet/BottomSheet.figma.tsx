@@ -6,17 +6,12 @@ figma.connect(
   BottomSheet,
   "https://www.figma.com/design/VQ49OXLtAbwlBBFABLEjrN/x?node-id=106-129",
   {
-    props: {
-      showHandle: figma.boolean("Show handle"),
-      title: figma.string("Title"),
-      showTitle: figma.boolean("Show title"),
-    },
-    example: ({ showHandle, title }) => (
+    props: {},
+    example: () => (
       <BottomSheet
         visible={true}
         onClose={() => {}}
-        showHandle={showHandle}
-        title={title}
+        title="Title"
         snapPoints={["50%", "90%"]}
       >
         {null}

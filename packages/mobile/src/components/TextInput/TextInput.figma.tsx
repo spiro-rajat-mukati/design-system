@@ -7,27 +7,21 @@ figma.connect(
   "https://www.figma.com/design/VQ49OXLtAbwlBBFABLEjrN/x?node-id=79-114",
   {
     props: {
-      size: figma.enum("Size", { SM: "sm", MD: "md", LG: "lg" }),
+      size: figma.enum("Size", { sm: "sm", md: "md", lg: "lg" }),
       invalid: figma.enum("Status", { Error: true }),
       disabled: figma.enum("Status", { Disabled: true }),
-      clearable: figma.boolean("Clearable"),
       secureTextEntry: figma.boolean("Masked"),
-      leadingIcon: figma.instance("Leading icon"),
-      trailingIcon: figma.instance("Trailing icon"),
-      placeholder: figma.string("Placeholder"),
-      value: figma.string("Value"),
+      leadingIcon: figma.instance("Leading icon swap"),
+      defaultValue: figma.string("Value"),
     },
-    example: ({ size, invalid, disabled, clearable, secureTextEntry, leadingIcon, trailingIcon, placeholder, value }) => (
+    example: ({ size, invalid, disabled, secureTextEntry, leadingIcon, defaultValue }) => (
       <TextInput
         size={size}
         invalid={invalid}
         disabled={disabled}
-        clearable={clearable}
         secureTextEntry={secureTextEntry}
         leadingIcon={leadingIcon}
-        trailingIcon={trailingIcon}
-        placeholder={placeholder}
-        defaultValue={value}
+        defaultValue={defaultValue}
       />
     ),
   }

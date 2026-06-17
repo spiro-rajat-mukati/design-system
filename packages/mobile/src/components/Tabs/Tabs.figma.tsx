@@ -8,22 +8,26 @@ figma.connect(
   {
     props: {
       variant: figma.enum("Variant", {
-        Underline: "underline",
-        Pill: "pill",
+        underline: "underline",
+        pill: "pill",
       }),
-      size: figma.enum("Size", { SM: "sm", MD: "md", LG: "lg" }),
-      disabled: figma.boolean("Disabled"),
+      size: figma.enum("Size", { sm: "sm", md: "md", lg: "lg" }),
+      tab1: figma.string("Tab 1"),
+      tab2: figma.string("Tab 2"),
+      tab3: figma.string("Tab 3"),
+      tab4: figma.string("Tab 4"),
     },
-    example: ({ variant, size, disabled }) => (
+    example: ({ variant, size, tab1, tab2, tab3, tab4 }) => (
       <Tabs
         variant={variant}
         size={size}
-        disabled={disabled}
         items={[
-          { value: "one", label: "Tab 1" },
-          { value: "two", label: "Tab 2" },
+          { value: "tab1", label: tab1 },
+          { value: "tab2", label: tab2 },
+          { value: "tab3", label: tab3 },
+          { value: "tab4", label: tab4 },
         ]}
-        defaultValue="one"
+        defaultValue="tab1"
       />
     ),
   }

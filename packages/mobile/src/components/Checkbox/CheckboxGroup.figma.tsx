@@ -8,15 +8,13 @@ figma.connect(
   {
     props: {
       orientation: figma.enum("Orientation", {
-        Vertical: "vertical",
-        Horizontal: "horizontal",
+        vertical: "vertical",
+        horizontal: "horizontal",
       }),
-      disabled: figma.boolean("Disabled"),
     },
-    example: ({ orientation, disabled }) => (
+    example: ({ orientation }) => (
       <CheckboxGroup
         orientation={orientation}
-        disabled={disabled}
         options={[
           { value: "a", label: "Option A" },
           { value: "b", label: "Option B" },

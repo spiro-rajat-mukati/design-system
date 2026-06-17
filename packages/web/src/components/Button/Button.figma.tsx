@@ -7,41 +7,36 @@ figma.connect(
   "https://www.figma.com/design/EAv9Vx2mFoBo4wXTVzP0Lv/x?node-id=2-121",
   {
     props: {
-      variant: figma.enum("Variant", {
-        Primary: "primary",
-        Secondary: "secondary",
-        Tertiary: "tertiary",
-        Destructive: "destructive",
-        "Destructive Secondary": "destructive-secondary",
-        Link: "link",
+      variant: figma.enum("variant", {
+        primary: "primary",
+        secondary: "secondary",
+        tertiary: "tertiary",
+        destructive: "destructive",
+        "destructive-secondary": "destructive-secondary",
+        link: "link",
       }),
-      size: figma.enum("Size", {
-        XS: "xs",
-        SM: "sm",
-        MD: "md",
-        LG: "lg",
-        XL: "xl",
+      size: figma.enum("size", {
+        xs: "xs",
+        sm: "sm",
+        md: "md",
+        lg: "lg",
+        xl: "xl",
       }),
-      loading: figma.enum("State", { Loading: true }),
-      disabled: figma.enum("State", { Disabled: true }),
-      iconOnly: figma.boolean("Icon only"),
-      fullWidth: figma.boolean("Full width"),
-      children: figma.string("Label"),
-      leadingIcon: figma.instance("Leading icon"),
-      trailingIcon: figma.instance("Trailing icon"),
+      disabled: figma.enum("state", { disabled: true }),
+      loading: figma.enum("state", { loading: true }),
+      iconOnly: figma.boolean("iconOnly"),
+      fullWidth: figma.boolean("fullWidth"),
     },
-    example: ({ variant, size, loading, disabled, iconOnly, fullWidth, children, leadingIcon, trailingIcon }) => (
+    example: ({ variant, size, disabled, loading, iconOnly, fullWidth }) => (
       <Button
         variant={variant}
         size={size}
-        loading={loading}
         disabled={disabled}
+        loading={loading}
         iconOnly={iconOnly}
         fullWidth={fullWidth}
-        leadingIcon={leadingIcon}
-        trailingIcon={trailingIcon}
       >
-        {children}
+        Label
       </Button>
     ),
   }

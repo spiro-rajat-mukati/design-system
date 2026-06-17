@@ -7,35 +7,25 @@ figma.connect(
   "https://www.figma.com/design/EAv9Vx2mFoBo4wXTVzP0Lv/x?node-id=2-3813",
   {
     props: {
-      variant: figma.enum("Variant", {
-        Solid: "solid",
-        Soft: "soft",
-        Outline: "outline",
+      variant: figma.enum("variant", {
+        solid: "solid",
+        soft: "soft",
+        outline: "outline",
       }),
-      tone: figma.enum("Tone", {
-        Neutral: "neutral",
-        Brand: "brand",
-        Info: "info",
-        Success: "success",
-        Warning: "warning",
-        Danger: "danger",
+      tone: figma.enum("tone", {
+        neutral: "neutral",
+        brand: "brand",
+        info: "info",
+        success: "success",
+        warning: "warning",
+        danger: "danger",
       }),
-      size: figma.enum("Size", { XS: "xs", SM: "sm", MD: "md" }),
-      removable: figma.boolean("Removable"),
-      selected: figma.boolean("Selected"),
-      leadingIcon: figma.instance("Leading icon"),
-      children: figma.string("Label"),
+      size: figma.enum("size", { xs: "xs", sm: "sm", md: "md" }),
+      removable: figma.boolean("removable"),
     },
-    example: ({ variant, tone, size, removable, selected, leadingIcon, children }) => (
-      <Tag
-        variant={variant}
-        tone={tone}
-        size={size}
-        removable={removable}
-        selected={selected}
-        leadingIcon={leadingIcon}
-      >
-        {children}
+    example: ({ variant, tone, size, removable }) => (
+      <Tag variant={variant} tone={tone} size={size} removable={removable}>
+        Label
       </Tag>
     ),
   }

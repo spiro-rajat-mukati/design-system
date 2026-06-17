@@ -10,16 +10,14 @@ figma.connect(
       invalid: figma.enum("Status", { Error: true }),
       disabled: figma.enum("Status", { Disabled: true }),
       showCount: figma.boolean("Show count"),
-      placeholder: figma.string("Placeholder"),
-      value: figma.string("Value"),
+      defaultValue: figma.string("Value"),
     },
-    example: ({ invalid, disabled, showCount, placeholder, value }) => (
+    example: ({ invalid, disabled, showCount, defaultValue }) => (
       <Textarea
         invalid={invalid}
         disabled={disabled}
         showCount={showCount}
-        placeholder={placeholder}
-        defaultValue={value}
+        defaultValue={defaultValue}
       />
     ),
   }

@@ -8,36 +8,32 @@ figma.connect(
   {
     props: {
       variant: figma.enum("Variant", {
-        Primary: "primary",
-        Secondary: "secondary",
-        Tertiary: "tertiary",
-        Destructive: "destructive",
-        "Destructive Secondary": "destructive-secondary",
-        Link: "link",
+        primary: "primary",
+        secondary: "secondary",
+        tertiary: "tertiary",
+        destructive: "destructive",
+        "destructive-secondary": "destructive-secondary",
+        link: "link",
       }),
       size: figma.enum("Size", {
-        XS: "xs",
-        SM: "sm",
-        MD: "md",
-        LG: "lg",
-        XL: "xl",
+        xs: "xs",
+        sm: "sm",
+        md: "md",
+        lg: "lg",
+        xl: "xl",
       }),
-      loading: figma.enum("State", { Loading: true }),
       disabled: figma.enum("State", { Disabled: true }),
-      iconOnly: figma.boolean("Icon only"),
-      fullWidth: figma.boolean("Full width"),
+      loading: figma.enum("State", { Loading: true }),
+      leadingIcon: figma.instance("Leading icon swap"),
+      trailingIcon: figma.instance("Trailing icon swap"),
       children: figma.string("Label"),
-      leadingIcon: figma.instance("Leading icon"),
-      trailingIcon: figma.instance("Trailing icon"),
     },
-    example: ({ variant, size, loading, disabled, iconOnly, fullWidth, children, leadingIcon, trailingIcon }) => (
+    example: ({ variant, size, disabled, loading, leadingIcon, trailingIcon, children }) => (
       <Button
         variant={variant}
         size={size}
-        loading={loading}
         disabled={disabled}
-        iconOnly={iconOnly}
-        fullWidth={fullWidth}
+        loading={loading}
         leadingIcon={leadingIcon}
         trailingIcon={trailingIcon}
       >

@@ -7,10 +7,8 @@ figma.connect(
   Menu,
   "https://www.figma.com/design/EAv9Vx2mFoBo4wXTVzP0Lv/x?node-id=2-5608",
   {
-    props: {
-      trigger: figma.instance("Trigger"),
-    },
-    example: ({ trigger }) => (
+    props: {},
+    example: () => (
       <Menu
         trigger={<Button>Open menu</Button>}
         items={[

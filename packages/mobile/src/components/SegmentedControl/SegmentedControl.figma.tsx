@@ -7,19 +7,20 @@ figma.connect(
   "https://www.figma.com/design/VQ49OXLtAbwlBBFABLEjrN/x?node-id=95-145",
   {
     props: {
-      size: figma.enum("Size", { SM: "sm", MD: "md", LG: "lg" }),
-      disabled: figma.boolean("Disabled"),
+      size: figma.enum("Size", { sm: "sm", md: "md", lg: "lg" }),
+      tab1: figma.string("Tab 1"),
+      tab2: figma.string("Tab 2"),
+      tab3: figma.string("Tab 3"),
     },
-    example: ({ size, disabled }) => (
+    example: ({ size, tab1, tab2, tab3 }) => (
       <SegmentedControl
         size={size}
-        disabled={disabled}
         options={[
-          { value: "a", label: "Option A" },
-          { value: "b", label: "Option B" },
-          { value: "c", label: "Option C" },
+          { value: "tab1", label: tab1 },
+          { value: "tab2", label: tab2 },
+          { value: "tab3", label: tab3 },
         ]}
-        defaultValue="a"
+        defaultValue="tab1"
       />
     ),
   }

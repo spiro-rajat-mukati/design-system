@@ -9,18 +9,16 @@ figma.connect(
   {
     props: {
       label: figma.string("Label"),
-      helperText: figma.string("Helper text"),
-      errorText: figma.string("Error text"),
-      showLabel: figma.boolean("Show label"),
-      showHelperText: figma.boolean("Show helper"),
+      description: figma.string("Description"),
+      helperText: figma.string("Footer text"),
       required: figma.boolean("Required"),
       disabled: figma.boolean("Disabled"),
     },
-    example: ({ label, helperText, errorText, required, disabled }) => (
+    example: ({ label, description, helperText, required, disabled }) => (
       <Field
         label={label}
+        description={description}
         helperText={helperText}
-        errorText={errorText}
         required={required}
         disabled={disabled}
       >

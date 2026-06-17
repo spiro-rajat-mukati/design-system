@@ -7,25 +7,12 @@ figma.connect(
   "https://www.figma.com/design/EAv9Vx2mFoBo4wXTVzP0Lv/x?node-id=2-3511",
   {
     props: {
-      invalid: figma.enum("Status", { Error: true }),
-      disabled: figma.enum("Status", { Disabled: true }),
-      showCount: figma.boolean("Show count"),
-      resize: figma.enum("Resize", {
-        Vertical: "vertical",
-        None: "none",
-      }),
-      placeholder: figma.string("Placeholder"),
-      value: figma.string("Value"),
+      invalid: figma.enum("state", { error: true }),
+      disabled: figma.enum("state", { disabled: true }),
+      showCount: figma.boolean("showCount"),
     },
-    example: ({ invalid, disabled, showCount, resize, placeholder, value }) => (
-      <Textarea
-        invalid={invalid}
-        disabled={disabled}
-        showCount={showCount}
-        resize={resize}
-        placeholder={placeholder}
-        defaultValue={value}
-      />
+    example: ({ invalid, disabled, showCount }) => (
+      <Textarea invalid={invalid} disabled={disabled} showCount={showCount} />
     ),
   }
 );

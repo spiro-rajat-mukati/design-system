@@ -6,17 +6,9 @@ figma.connect(
   SafeAreaWrapper,
   "https://www.figma.com/design/VQ49OXLtAbwlBBFABLEjrN/x?node-id=106-135",
   {
-    props: {
-      surface: figma.enum("Surface", {
-        Default: "default",
-        Raised: "raised",
-        Sunken: "sunken",
-        Inverse: "inverse",
-        Brand: "brand",
-      }),
-    },
-    example: ({ surface }) => (
-      <SafeAreaWrapper surface={surface} edges={["top", "bottom"]}>
+    props: {},
+    example: () => (
+      <SafeAreaWrapper edges={["top", "bottom"]}>
         {null}
       </SafeAreaWrapper>
     ),
