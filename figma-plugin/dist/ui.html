@@ -51,38 +51,18 @@ body {
 .ds-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   padding: 0 10px 0 12px;
   height: 40px;
-  border-bottom: 1px solid var(--figma-color-border);
   flex-shrink: 0;
 }
 .ds-logo {
   font-size: 13px;
   font-weight: 600;
   color: var(--figma-color-text);
-  flex-shrink: 0;
+  flex: 1;
   letter-spacing: -0.01em;
 }
-.ds-chip {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  font-size: 10px;
-  color: var(--figma-color-text-secondary);
-  min-width: 0;
-}
-.chip-repo {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: ui-monospace, monospace;
-}
-.chip-sep { color: var(--figma-color-text-secondary); margin: 0 3px; flex-shrink: 0; }
-#pat-status { flex-shrink: 0; }
-.pat-ok  { color: var(--figma-color-text-success,  #15803D); font-weight: 600; }
-.pat-err { color: var(--figma-color-text-danger,   #B91C1C); font-weight: 600; }
 .ds-gear {
   flex-shrink: 0;
   width: 26px;
@@ -98,9 +78,37 @@ body {
   padding: 0;
   font-family: inherit;
   transition: background 0.1s;
-  opacity: 1;
 }
-.ds-gear:hover { background: var(--figma-color-bg-secondary); color: var(--figma-color-text); opacity: 1; }
+.ds-gear:hover { background: var(--figma-color-bg-secondary); color: var(--figma-color-text); }
+
+/* ══ Status bar ════════════════════════════════════════════════════════ */
+.ds-status {
+  padding: 0 12px 7px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--figma-color-border);
+}
+.status-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--figma-color-bg-secondary);
+  font-size: 10px;
+  font-family: ui-monospace, monospace;
+  color: var(--figma-color-text-secondary);
+  overflow: hidden;
+}
+.chip-repo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+.chip-sep { flex-shrink: 0; }
+#pat-status { flex-shrink: 0; }
+.pat-ok  { color: var(--figma-color-text-success,  #15803D); font-weight: 600; }
+.pat-err { color: var(--figma-color-text-danger,   #B91C1C); font-weight: 600; }
 
 /* ══ Context banner ════════════════════════════════════════════════════ */
 .ctx-banner {
@@ -163,6 +171,25 @@ body {
   border-radius: 0;
 }
 .tab-btn.dim { opacity: 0.4; cursor: not-allowed; }
+
+/* ══ Tab tooltip popover ═══════════════════════════════════════════════ */
+.ds-tabbar { position: relative; }
+.tab-tooltip {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 4px;
+  right: 4px;
+  z-index: 50;
+  background: var(--figma-color-bg-inverse, rgba(28,28,28,0.96));
+  color: var(--figma-color-text-oninverse, #F0F0F0);
+  font-size: 10.5px;
+  line-height: 1.45;
+  padding: 6px 9px;
+  border-radius: 5px;
+  pointer-events: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+}
+.tab-tooltip[hidden] { display: none; }
 
 /* ══ Tab panels ════════════════════════════════════════════════════════ */
 .tab-panels {
@@ -375,6 +402,32 @@ button.small { padding: 6px 10px; font-size: 11px; }
 /* ══ Inline code ═══════════════════════════════════════════════════════ */
 code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-sunken); padding:1px 4px; border-radius:3px; }
 
+/* ══ Info panel ═══════════════════════════════════════════════════════ */
+.info-section {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--figma-color-border);
+}
+.info-section:last-child { border-bottom: none; padding-bottom: 0; }
+.info-tagline { font-size: 12px; color: var(--figma-color-text); line-height: 1.5; }
+.info-label   { font-size: 11px; color: var(--figma-color-text-secondary); line-height: 1.5; }
+.info-hint {
+  font-size: 11px;
+  color: var(--figma-color-text-secondary);
+  line-height: 1.5;
+  padding: 7px 9px;
+  border-radius: 5px;
+  background: var(--figma-color-bg-secondary);
+  margin-top: 6px;
+}
+.info-link { color: var(--figma-color-text-brand, #3C61DD); text-decoration: none; }
+.info-link:hover { text-decoration: underline; }
+.info-version {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--figma-color-text-secondary);
+  margin-top: 3px;
+}
+
 /* ══ Overlays ══════════════════════════════════════════════════════════ */
 .overlay { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; z-index:20; }
 .overlay[hidden] { display:none; }
@@ -501,11 +554,12 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
 <!-- ═══════════ HEADER ═══════════════════════════════════════════════════ -->
 <header class="ds-header">
   <span class="ds-logo">DesignSync</span>
-  <div class="ds-chip">
-    <span class="chip-repo">spiro-rajat-mukati/design-system · main</span>
-    <span class="chip-sep">·</span>
-    <span id="pat-status">…</span>
-  </div>
+  <button class="ds-gear" id="info-btn" title="About DesignSync" aria-label="About DesignSync">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 16v-4M12 8h.01"/>
+    </svg>
+  </button>
   <button class="ds-gear" id="gear-btn" title="PAT settings" aria-label="PAT settings">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="3"/>
@@ -513,6 +567,15 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
     </svg>
   </button>
 </header>
+
+<!-- ═══════════ STATUS BAR ════════════════════════════════════════════════ -->
+<div class="ds-status">
+  <div class="status-chip">
+    <span class="chip-repo">spiro-rajat-mukati/design-system · main</span>
+    <span class="chip-sep">·</span>
+    <span id="pat-status">…</span>
+  </div>
+</div>
 
 <!-- ═══════════ CONTEXT BANNER ═══════════════════════════════════════════ -->
 <div class="ctx-banner" id="ctx-banner" hidden>
@@ -530,6 +593,7 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
   <button class="tab-btn"        data-tab="styles"     role="tab" aria-selected="false" aria-controls="panel-styles">Styles</button>
   <button class="tab-btn"        data-tab="components" role="tab" aria-selected="false" aria-controls="panel-components">Components</button>
   <button class="tab-btn"        data-tab="assets"     role="tab" aria-selected="false" aria-controls="panel-assets">Assets</button>
+  <div id="tab-tooltip" class="tab-tooltip" hidden aria-hidden="true"></div>
 </nav>
 
 <!-- ═══════════ TAB PANELS ═══════════════════════════════════════════════ -->
@@ -830,6 +894,37 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
   <div class="ov-body" id="drift-body"><!-- populated by renderDriftReport() --></div>
 </div>
 
+<!-- ═══════════ INFO PANEL ════════════════════════════════════════════════ -->
+<div id="info-panel" class="overlay" hidden>
+  <div class="ov-header">
+    <span class="ov-title">About DesignSync</span>
+    <button class="ov-close" id="close-info" title="Close">✕</button>
+  </div>
+  <div class="ov-body">
+    <div class="info-section">
+      <div class="info-tagline">Keeps the Kijani Figma libraries and the GitHub repo in sync — tokens, text styles, components, assets, and drift checks.</div>
+      <div class="info-hint">
+        Run <strong>Tokens</strong> actions from <strong>Foundations</strong> ·
+        <strong>Styles</strong> &amp; <strong>Components</strong> from <strong>Web</strong> or <strong>Mobile</strong> ·
+        <strong>Assets</strong> from <strong>Kijani — Assets</strong>
+      </div>
+    </div>
+    <div class="info-section">
+      <div class="info-label">Created by <strong>Rajat Mukati</strong> for the Kijani Design System.</div>
+      <div class="info-version" id="plugin-version-line">v0.1.0</div>
+    </div>
+    <div class="info-section">
+      <div class="info-label">
+        <a href="https://github.com/spiro-rajat-mukati/design-system" class="info-link" target="_blank" rel="noopener noreferrer">spiro-rajat-mukati/design-system</a>
+      </div>
+      <div class="info-label" style="margin-top:5px">
+        Issues &amp; feedback:
+        <a href="https://github.com/spiro-rajat-mukati/design-system/issues" class="info-link" target="_blank" rel="noopener noreferrer">open an issue ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 window.addEventListener("error", (e) => {
   try {
@@ -860,6 +955,7 @@ window.addEventListener("unhandledrejection", (e) => {
 });
 const REPO = "spiro-rajat-mukati/design-system";
 const BRANCH = "main";
+const PLUGIN_VERSION = "0.1.0";
 const SPECS = [
   "Button",
   "Badge",
@@ -926,13 +1022,19 @@ var FILE_CTX = [
   { re: /mobile/i, tab: "styles", tabs: ["styles", "components"], label: "styles & components" },
   { re: /web/i, tab: "styles", tabs: ["styles", "components"], label: "styles & components" }
 ];
-var TAB_TOOLTIPS = {
-  tokens: "Tokens actions run from the Foundations file \u2014 open it to use this tab.",
-  styles: "Styles actions run from Foundations, Web, or Mobile files \u2014 open one to use this tab.",
-  components: "Components actions run from a Web or Mobile file \u2014 open one to use this tab.",
-  assets: "Assets actions run from the Kijani \u2014 Assets file \u2014 open it to use this tab."
+var TAB_HOME_FILES = {
+  tokens: "Foundations",
+  styles: "Foundations, Web, or Mobile",
+  components: "Web or Mobile",
+  assets: "Kijani \u2014 Assets"
 };
+var currentFileName = null;
+function tabDimTooltip(tabId, fileName) {
+  var label = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+  return label + " actions aren't available in " + fileName + ". Open " + (TAB_HOME_FILES[tabId] || tabId) + " to use them.";
+}
 function updateContextBanner(fileName) {
+  currentFileName = fileName || null;
   var banner = document.getElementById("ctx-banner");
   var text = document.getElementById("ctx-text");
   if (!banner || !fileName) {
@@ -952,15 +1054,12 @@ function updateContextBanner(fileName) {
     var prefs = loadPrefs();
     if (!prefs.lastTab) showTab(matched.tab);
     document.querySelectorAll(".tab-btn").forEach(function(btn) {
-      var isDim = matched.tabs.indexOf(btn.dataset.tab) === -1;
-      btn.classList.toggle("dim", isDim);
-      btn.title = isDim ? TAB_TOOLTIPS[btn.dataset.tab] || "" : "";
+      btn.classList.toggle("dim", matched.tabs.indexOf(btn.dataset.tab) === -1);
     });
   } else {
     banner.hidden = true;
     document.querySelectorAll(".tab-btn").forEach(function(btn) {
       btn.classList.remove("dim");
-      btn.title = "";
     });
   }
 }
@@ -2372,17 +2471,46 @@ document.getElementById("export-assets-confirm").addEventListener("click", async
   }
   setBusy(false);
 });
-document.querySelectorAll(".tab-btn").forEach(function(btn) {
-  btn.addEventListener("click", function() {
-    if (!btn.classList.contains("dim")) showTab(btn.dataset.tab);
+(function() {
+  var tooltip = document.getElementById("tab-tooltip");
+  document.querySelectorAll(".tab-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      if (!btn.classList.contains("dim")) showTab(btn.dataset.tab);
+    });
+    btn.addEventListener("mouseenter", function() {
+      if (!btn.classList.contains("dim") || !tooltip) return;
+      var file = currentFileName || "this file";
+      tooltip.textContent = tabDimTooltip(btn.dataset.tab, file);
+      tooltip.hidden = false;
+    });
+    btn.addEventListener("mouseleave", function() {
+      if (tooltip) tooltip.hidden = true;
+    });
   });
-});
+})();
 (function() {
   var gear = document.getElementById("gear-btn");
   if (gear) gear.addEventListener("click", function() {
     var ps = document.getElementById("pat-settings");
     if (ps) ps.open = !ps.open;
   });
+})();
+(function() {
+  var infoBtn = document.getElementById("info-btn");
+  var infoPanel = document.getElementById("info-panel");
+  var closeInfo = document.getElementById("close-info");
+  var verEl = document.getElementById("plugin-version-line");
+  if (verEl) verEl.textContent = "v" + PLUGIN_VERSION;
+  if (infoBtn && infoPanel) {
+    infoBtn.addEventListener("click", function() {
+      infoPanel.hidden = !infoPanel.hidden;
+    });
+  }
+  if (closeInfo && infoPanel) {
+    closeInfo.addEventListener("click", function() {
+      infoPanel.hidden = true;
+    });
+  }
 })();
 (function() {
   var handle = document.getElementById("drag-handle");

@@ -27,6 +27,7 @@ window.addEventListener("unhandledrejection", (e) => {
 });
 const REPO = "spiro-rajat-mukati/design-system";
 const BRANCH = "main";
+const PLUGIN_VERSION = "0.1.0";
 const SPECS = [
   "Button",
   "Badge",
@@ -93,13 +94,19 @@ var FILE_CTX = [
   { re: /mobile/i, tab: "styles", tabs: ["styles", "components"], label: "styles & components" },
   { re: /web/i, tab: "styles", tabs: ["styles", "components"], label: "styles & components" }
 ];
-var TAB_TOOLTIPS = {
-  tokens: "Tokens actions run from the Foundations file \u2014 open it to use this tab.",
-  styles: "Styles actions run from Foundations, Web, or Mobile files \u2014 open one to use this tab.",
-  components: "Components actions run from a Web or Mobile file \u2014 open one to use this tab.",
-  assets: "Assets actions run from the Kijani \u2014 Assets file \u2014 open it to use this tab."
+var TAB_HOME_FILES = {
+  tokens: "Foundations",
+  styles: "Foundations, Web, or Mobile",
+  components: "Web or Mobile",
+  assets: "Kijani \u2014 Assets"
 };
+var currentFileName = null;
+function tabDimTooltip(tabId, fileName) {
+  var label = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+  return label + " actions aren't available in " + fileName + ". Open " + (TAB_HOME_FILES[tabId] || tabId) + " to use them.";
+}
 function updateContextBanner(fileName) {
+  currentFileName = fileName || null;
   var banner = document.getElementById("ctx-banner");
   var text = document.getElementById("ctx-text");
   if (!banner || !fileName) {
@@ -119,15 +126,12 @@ function updateContextBanner(fileName) {
     var prefs = loadPrefs();
     if (!prefs.lastTab) showTab(matched.tab);
     document.querySelectorAll(".tab-btn").forEach(function(btn) {
-      var isDim = matched.tabs.indexOf(btn.dataset.tab) === -1;
-      btn.classList.toggle("dim", isDim);
-      btn.title = isDim ? TAB_TOOLTIPS[btn.dataset.tab] || "" : "";
+      btn.classList.toggle("dim", matched.tabs.indexOf(btn.dataset.tab) === -1);
     });
   } else {
     banner.hidden = true;
     document.querySelectorAll(".tab-btn").forEach(function(btn) {
       btn.classList.remove("dim");
-      btn.title = "";
     });
   }
 }
@@ -1539,17 +1543,46 @@ document.getElementById("export-assets-confirm").addEventListener("click", async
   }
   setBusy(false);
 });
-document.querySelectorAll(".tab-btn").forEach(function(btn) {
-  btn.addEventListener("click", function() {
-    if (!btn.classList.contains("dim")) showTab(btn.dataset.tab);
+(function() {
+  var tooltip = document.getElementById("tab-tooltip");
+  document.querySelectorAll(".tab-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      if (!btn.classList.contains("dim")) showTab(btn.dataset.tab);
+    });
+    btn.addEventListener("mouseenter", function() {
+      if (!btn.classList.contains("dim") || !tooltip) return;
+      var file = currentFileName || "this file";
+      tooltip.textContent = tabDimTooltip(btn.dataset.tab, file);
+      tooltip.hidden = false;
+    });
+    btn.addEventListener("mouseleave", function() {
+      if (tooltip) tooltip.hidden = true;
+    });
   });
-});
+})();
 (function() {
   var gear = document.getElementById("gear-btn");
   if (gear) gear.addEventListener("click", function() {
     var ps = document.getElementById("pat-settings");
     if (ps) ps.open = !ps.open;
   });
+})();
+(function() {
+  var infoBtn = document.getElementById("info-btn");
+  var infoPanel = document.getElementById("info-panel");
+  var closeInfo = document.getElementById("close-info");
+  var verEl = document.getElementById("plugin-version-line");
+  if (verEl) verEl.textContent = "v" + PLUGIN_VERSION;
+  if (infoBtn && infoPanel) {
+    infoBtn.addEventListener("click", function() {
+      infoPanel.hidden = !infoPanel.hidden;
+    });
+  }
+  if (closeInfo && infoPanel) {
+    closeInfo.addEventListener("click", function() {
+      infoPanel.hidden = true;
+    });
+  }
 })();
 (function() {
   var handle = document.getElementById("drag-handle");
