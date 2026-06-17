@@ -10,7 +10,7 @@
   --button-letter-spacing: var(--letter-spacing-normal);
   --button-icon-gap: var(--space-2);
   --button-transition: background-color var(--duration-base) var(--ease-in-out), color var(--duration-base) var(--ease-in-out), border-color var(--duration-base) var(--ease-in-out), box-shadow var(--duration-fast) var(--ease-out);
-  --button-disabled-opacity: var(--opacity-60);
+  --button-disabled-opacity: var(--opacity-100);
   --button-focus-ring: 0 0 0 2px var(--color-surface-default), 0 0 0 4px var(--color-border-focus);
   --button-height-xs: 24px;
   --button-height-sm: 32px;

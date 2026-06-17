@@ -513,7 +513,7 @@ export const themes = {
     "letter-spacing": "0",
     "icon-gap": "8px",
     "transition": "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 100ms cubic-bezier(0, 0, 0.2, 1)",
-    "disabled-opacity": "0.6",
+    "disabled-opacity": "1",
     "focus-ring": "0 0 0 2px #FFFFFF, 0 0 0 4px #3C61DD",
     "height": {
       "xs": "24px",
@@ -1317,7 +1317,7 @@ export const themes = {
     "letter-spacing": "0",
     "icon-gap": "8px",
     "transition": "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 100ms cubic-bezier(0, 0, 0.2, 1)",
-    "disabled-opacity": "0.6",
+    "disabled-opacity": "1",
     "focus-ring": "0 0 0 2px #1A1F23, 0 0 0 4px #6F8AE8",
     "height": {
       "xs": "24px",

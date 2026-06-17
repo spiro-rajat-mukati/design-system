@@ -849,22 +849,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "opacity/60"
+          "alias": "opacity/100"
         },
         "dark-web": {
-          "alias": "opacity/60"
+          "alias": "opacity/100"
         },
         "light-ios": {
-          "alias": "opacity/60"
+          "alias": "opacity/100"
         },
         "dark-ios": {
-          "alias": "opacity/60"
+          "alias": "opacity/100"
         },
         "light-android": {
-          "alias": "opacity/60"
+          "alias": "opacity/100"
         },
         "dark-android": {
-          "alias": "opacity/60"
+          "alias": "opacity/100"
         }
       }
     },
