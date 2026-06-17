@@ -161,6 +161,12 @@
   .drift-lint-row { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
   .drift-lint-val { font-family:ui-monospace,monospace; font-size:10px; color:var(--fg); }
   .drift-lint-path { font-size:10px; color:var(--fg-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
+  .drift-row.noise { opacity:0.55; }
+  .drift-minor { margin-top:4px; }
+  .drift-minor > summary { font-size:10px; color:var(--fg-muted); cursor:pointer; padding:3px 0; list-style:none; }
+  .drift-minor > summary::before { content:'▸ '; }
+  .drift-minor[open] > summary::before { content:'▾ '; }
+  .drift-minor > summary:hover { color:var(--fg); }
 
   /* Export Assets overlay */
   .ei-lane { margin-bottom:16px; border-top:1px solid var(--border); padding-top:10px; }
@@ -2144,6 +2150,16 @@ window.onmessage = (event) => {
       break;
   }
 };
+var FIGMA_CONVENIENCE_PROPS = [
+  "show label",
+  "show help",
+  "show description",
+  "show count",
+  "leading icon",
+  "trailing icon"
+];
+var FIGMA_ENCODED_CODE_PROPS = ["loading", "disabled", "icononly", "fullwidth"];
+var INTERNAL_HELPER_NAMES = ["icon placeholder"];
 function computeComponentDrift(figmaComponents, codeManifest) {
   var issues = [];
   function norm(s) {
@@ -2159,12 +2175,26 @@ function computeComponentDrift(figmaComponents, codeManifest) {
   });
   Object.keys(figmaByName).forEach(function(k) {
     if (!codeByName[k]) {
-      issues.push({ kind: "coverage", severity: "warning", category: "figma-only", component: figmaByName[k].name });
+      var name = figmaByName[k].name;
+      issues.push({
+        kind: "coverage",
+        severity: "warning",
+        category: "figma-only",
+        component: name,
+        noise: INTERNAL_HELPER_NAMES.indexOf(norm(name)) !== -1
+      });
     }
   });
   Object.keys(codeByName).forEach(function(k) {
     if (!figmaByName[k]) {
-      issues.push({ kind: "coverage", severity: "info", category: "code-only", component: codeByName[k].name });
+      var name = codeByName[k].name;
+      issues.push({
+        kind: "coverage",
+        severity: "info",
+        category: "code-only",
+        component: name,
+        noise: INTERNAL_HELPER_NAMES.indexOf(norm(name)) !== -1
+      });
     }
   });
   Object.keys(figmaByName).forEach(function(k) {
@@ -2172,7 +2202,13 @@ function computeComponentDrift(figmaComponents, codeManifest) {
     var cc = codeByName[k];
     if (!cc) return;
     if (!cc.codeConnect) {
-      issues.push({ kind: "coverage", severity: "info", category: "no-code-connect", component: cc.name });
+      issues.push({
+        kind: "coverage",
+        severity: "info",
+        category: "no-code-connect",
+        component: cc.name,
+        noise: false
+      });
     }
     var fProps = {};
     Object.keys(fc.figmaProps || {}).forEach(function(p) {
@@ -2186,7 +2222,16 @@ function computeComponentDrift(figmaComponents, codeManifest) {
       var fp = fProps[pk];
       if (fp.type !== "VARIANT" && fp.type !== "BOOLEAN") return;
       if (!cProps[pk]) {
-        issues.push({ kind: "parity", severity: "warning", category: "figma-prop-not-in-code", component: cc.name, prop: fp.original, figmaType: fp.type });
+        var noiseConv = FIGMA_CONVENIENCE_PROPS.indexOf(norm(fp.original)) !== -1;
+        issues.push({
+          kind: "parity",
+          severity: "warning",
+          category: "figma-prop-not-in-code",
+          component: cc.name,
+          prop: fp.original,
+          figmaType: fp.type,
+          noise: noiseConv
+        });
         return;
       }
       if (fp.type === "VARIANT" && fp.options && cProps[pk].kind === "union" && cProps[pk].options) {
@@ -2200,34 +2245,131 @@ function computeComponentDrift(figmaComponents, codeManifest) {
         });
         Object.keys(fOpts).forEach(function(o) {
           if (!cOpts[o]) {
-            issues.push({ kind: "parity", severity: "warning", category: "option-missing-in-code", component: cc.name, prop: fp.original, option: fOpts[o] });
+            issues.push({
+              kind: "parity",
+              severity: "warning",
+              category: "option-missing-in-code",
+              component: cc.name,
+              prop: fp.original,
+              option: fOpts[o],
+              noise: false
+            });
           }
         });
         Object.keys(cOpts).forEach(function(o) {
           if (!fOpts[o]) {
-            issues.push({ kind: "parity", severity: "info", category: "option-missing-in-figma", component: cc.name, prop: fp.original, option: cOpts[o] });
+            issues.push({
+              kind: "parity",
+              severity: "info",
+              category: "option-missing-in-figma",
+              component: cc.name,
+              prop: fp.original,
+              option: cOpts[o],
+              noise: false
+            });
           }
         });
       }
     });
     Object.keys(cProps).forEach(function(pk) {
       var cp = cProps[pk];
-      if (cp.kind !== "union" && cp.kind !== "boolean") return;
+      if (cp.kind !== "union" && cp.kind !== "boolean" && cp.kind !== "node" && cp.kind !== "other") return;
       if (!fProps[pk]) {
-        issues.push({ kind: "parity", severity: "info", category: "code-prop-not-in-figma", component: cc.name, prop: cp.original, codeKind: cp.kind });
+        var noiseByKind = cp.kind === "node" || cp.kind === "other";
+        var noiseByName = FIGMA_ENCODED_CODE_PROPS.indexOf(norm(cp.original)) !== -1;
+        issues.push({
+          kind: "parity",
+          severity: "info",
+          category: "code-prop-not-in-figma",
+          component: cc.name,
+          prop: cp.original,
+          codeKind: cp.kind,
+          noise: noiseByKind || noiseByName
+        });
       }
     });
   });
-  var coverageCount = 0;
-  var parityCount = 0;
+  var coverageCount = 0, parityCount = 0, realCoverage = 0, realParity = 0;
   issues.forEach(function(i) {
-    if (i.kind === "coverage") coverageCount++;
-    else parityCount++;
+    if (i.kind === "coverage") {
+      coverageCount++;
+      if (!i.noise) realCoverage++;
+    } else {
+      parityCount++;
+      if (!i.noise) realParity++;
+    }
   });
-  return { issues, summary: { coverage: coverageCount, parity: parityCount, total: issues.length } };
+  return { issues, summary: {
+    coverage: coverageCount,
+    parity: parityCount,
+    total: issues.length,
+    realCoverage,
+    realParity
+  } };
 }
 function severityBadge(severity) {
   return '<span class="drift-badge ' + severity + '">' + severity + "</span>";
+}
+function renderCoverageRow(i, isNoise) {
+  var label = i.category === "figma-only" ? "In Figma, not in code library" : i.category === "code-only" ? "In code, no Figma component set" : i.category === "no-code-connect" ? "No Code Connect configured" : i.category;
+  var cls = "drift-row" + (isNoise ? " noise" : "");
+  return '<div class="' + cls + '"><div class="drift-comp">' + esc(i.component) + '</div><div class="drift-issue">' + severityBadge(i.severity) + " " + esc(label) + "</div></div>";
+}
+function formatParityDesc(i) {
+  if (i.category === "figma-prop-not-in-code")
+    return "Figma " + i.figmaType + ' "' + esc(i.prop) + '" has no code counterpart';
+  if (i.category === "code-prop-not-in-figma")
+    return "Code " + i.codeKind + ' "' + esc(i.prop) + '" not in Figma';
+  if (i.category === "option-missing-in-code")
+    return '"' + esc(i.prop) + '": Figma option "' + esc(i.option) + '" not in code union';
+  if (i.category === "option-missing-in-figma")
+    return '"' + esc(i.prop) + '": code option "' + esc(i.option) + '" not in Figma variants';
+  return esc(i.category);
+}
+function renderParityGroup(parityIssues, isNoise) {
+  var html = "";
+  var byComp = {};
+  parityIssues.forEach(function(i) {
+    if (!byComp[i.component]) byComp[i.component] = [];
+    byComp[i.component].push(i);
+  });
+  var cls = "drift-row" + (isNoise ? " noise" : "");
+  Object.keys(byComp).sort().forEach(function(comp) {
+    html += '<div class="' + cls + '">';
+    html += '<div class="drift-comp">' + esc(comp) + "</div>";
+    byComp[comp].forEach(function(i) {
+      html += '<div class="drift-issue">' + severityBadge(i.severity) + " " + formatParityDesc(i) + "</div>";
+    });
+    html += "</div>";
+  });
+  return html;
+}
+function renderLintGroup(items, isNoise) {
+  var html = "";
+  var byComp = {};
+  items.forEach(function(f) {
+    var k = f.component || "(unknown)";
+    if (!byComp[k]) byComp[k] = [];
+    byComp[k].push(f);
+  });
+  var cls = "drift-row" + (isNoise ? " noise" : "");
+  Object.keys(byComp).sort().forEach(function(comp) {
+    html += '<div class="' + cls + '">';
+    html += '<div class="drift-comp">' + esc(comp) + "</div>";
+    byComp[comp].forEach(function(f) {
+      var isColor = /^#[0-9a-f]{6}/i.test(String(f.rawValue));
+      html += '<div class="drift-issue drift-lint-row">';
+      html += severityBadge("warning") + " ";
+      if (isColor) html += '<span class="swatch" style="background:' + esc(f.rawValue) + '"></span>';
+      html += "<code>" + esc(f.field) + "</code>";
+      html += ' = <span class="drift-lint-val">' + esc(String(f.rawValue)) + "</span>";
+      var lp = f.layerPath;
+      html += ' <span class="drift-lint-path" title="' + esc(lp) + '">' + esc(lp.length > 40 ? "\u2026" + lp.slice(-38) : lp) + "</span>";
+      html += "</div>";
+    });
+    html += "</div>";
+  });
+  return html;
 }
 function renderDriftReport(result, lintFindings) {
   if (result.error) return '<div class="panel-error">' + esc(result.error) + "</div>";
@@ -2235,92 +2377,85 @@ function renderDriftReport(result, lintFindings) {
   var summary = result.summary;
   var lint = lintFindings || [];
   var grandTotal = summary.total + lint.length;
+  var realLint = lint.filter(function(f) {
+    return !f.noise;
+  }).length;
+  var realCov = summary.realCoverage || 0;
+  var realPar = summary.realParity || 0;
   var html = '<div class="drift-summary-pills">';
   if (grandTotal === 0) {
     html += '<span class="pill ok">\u2713 No drift \u2014 Figma and code are in sync</span>';
     html += "</div>";
     return html;
   }
-  if (summary.coverage > 0) html += '<span class="pill changed">' + summary.coverage + " coverage</span>";
-  if (summary.parity > 0) html += '<span class="pill changed">' + summary.parity + " parity</span>";
-  if (lint.length > 0) html += '<span class="pill removed">' + lint.length + " hardcoded values</span>";
-  html += '<span class="pill muted-pill">' + grandTotal + " total</span>";
+  if (realCov === 0 && realPar === 0 && realLint === 0) {
+    html += '<span class="pill ok">\u2713 No actionable drift</span>';
+  } else {
+    if (realCov > 0) html += '<span class="pill changed">' + realCov + " coverage</span>";
+    if (realPar > 0) html += '<span class="pill changed">' + realPar + " parity</span>";
+    if (realLint > 0) html += '<span class="pill removed">' + realLint + " hardcoded</span>";
+  }
   html += "</div>";
   var covIssues = issues.filter(function(i) {
     return i.kind === "coverage";
   });
+  var realCovIssues = covIssues.filter(function(i) {
+    return !i.noise;
+  });
+  var noiseCovIssues = covIssues.filter(function(i) {
+    return i.noise;
+  });
   if (covIssues.length > 0) {
     html += '<div class="drift-section">';
-    html += '<div class="drift-section-title">Coverage (' + covIssues.length + ")</div>";
-    covIssues.forEach(function(i) {
-      var label = i.category === "figma-only" ? "In Figma, not in code library" : i.category === "code-only" ? "In code, no Figma component set" : i.category === "no-code-connect" ? "No Code Connect configured" : i.category;
-      html += '<div class="drift-row">';
-      html += '<div class="drift-comp">' + esc(i.component) + "</div>";
-      html += '<div class="drift-issue">' + severityBadge(i.severity) + " " + esc(label) + "</div>";
-      html += "</div>";
+    html += '<div class="drift-section-title">Coverage (' + realCovIssues.length + (noiseCovIssues.length > 0 ? " real" : "") + ")</div>";
+    realCovIssues.forEach(function(i) {
+      html += renderCoverageRow(i, false);
     });
+    if (noiseCovIssues.length > 0) {
+      html += '<details class="drift-minor"><summary>Show ' + noiseCovIssues.length + " minor</summary>";
+      noiseCovIssues.forEach(function(i) {
+        html += renderCoverageRow(i, true);
+      });
+      html += "</details>";
+    }
     html += "</div>";
   }
   var parIssues = issues.filter(function(i) {
     return i.kind === "parity";
   });
+  var realParIssues = parIssues.filter(function(i) {
+    return !i.noise;
+  });
+  var noiseParIssues = parIssues.filter(function(i) {
+    return i.noise;
+  });
   if (parIssues.length > 0) {
     html += '<div class="drift-section">';
-    html += '<div class="drift-section-title">Prop / variant parity (' + parIssues.length + ")</div>";
-    var byComp = {};
-    parIssues.forEach(function(i) {
-      if (!byComp[i.component]) byComp[i.component] = [];
-      byComp[i.component].push(i);
-    });
-    Object.keys(byComp).sort().forEach(function(comp) {
-      html += '<div class="drift-row">';
-      html += '<div class="drift-comp">' + esc(comp) + "</div>";
-      byComp[comp].forEach(function(i) {
-        var desc = "";
-        if (i.category === "figma-prop-not-in-code") {
-          desc = "Figma " + i.figmaType + ' "' + esc(i.prop) + '" has no code counterpart';
-        } else if (i.category === "code-prop-not-in-figma") {
-          desc = "Code " + i.codeKind + ' "' + esc(i.prop) + '" not in Figma';
-        } else if (i.category === "option-missing-in-code") {
-          desc = '"' + esc(i.prop) + '": Figma option "' + esc(i.option) + '" not in code union';
-        } else if (i.category === "option-missing-in-figma") {
-          desc = '"' + esc(i.prop) + '": code option "' + esc(i.option) + '" not in Figma variants';
-        } else {
-          desc = esc(i.category);
-        }
-        html += '<div class="drift-issue">' + severityBadge(i.severity) + " " + desc + "</div>";
-      });
-      html += "</div>";
-    });
+    html += '<div class="drift-section-title">Prop / variant parity (' + realParIssues.length + (noiseParIssues.length > 0 ? " real" : "") + ")</div>";
+    html += renderParityGroup(realParIssues, false);
+    if (noiseParIssues.length > 0) {
+      html += '<details class="drift-minor"><summary>Show ' + noiseParIssues.length + " minor</summary>";
+      html += renderParityGroup(noiseParIssues, true);
+      html += "</details>";
+    }
     html += "</div>";
   }
+  var realLintItems = lint.filter(function(f) {
+    return !f.noise;
+  });
+  var noiseLintItems = lint.filter(function(f) {
+    return f.noise;
+  });
   if (lint.length > 0) {
     html += '<div class="drift-section">';
-    html += '<div class="drift-section-title">Hardcoded values (' + lint.length + ")</div>";
+    html += '<div class="drift-section-title">Hardcoded values (' + realLintItems.length + (noiseLintItems.length > 0 ? " real" : "") + ")</div>";
     html += '<div class="drift-lint-note">Bindable fields with no variable binding on the default variant. Bind each to the matching design token.</div>';
-    var byLintComp = {};
-    lint.forEach(function(f) {
-      var k = f.component || "(unknown)";
-      if (!byLintComp[k]) byLintComp[k] = [];
-      byLintComp[k].push(f);
-    });
-    Object.keys(byLintComp).sort().forEach(function(comp) {
-      html += '<div class="drift-row">';
-      html += '<div class="drift-comp">' + esc(comp) + "</div>";
-      byLintComp[comp].forEach(function(f) {
-        var isColor = /^#[0-9a-f]{6}/i.test(String(f.rawValue));
-        html += '<div class="drift-issue drift-lint-row">';
-        html += severityBadge("warning") + " ";
-        if (isColor) {
-          html += '<span class="swatch" style="background:' + esc(f.rawValue) + '"></span>';
-        }
-        html += "<code>" + esc(f.field) + "</code>";
-        html += ' = <span class="drift-lint-val">' + esc(String(f.rawValue)) + "</span>";
-        html += ' <span class="drift-lint-path" title="' + esc(f.layerPath) + '">' + esc(f.layerPath.length > 40 ? "\u2026" + f.layerPath.slice(-38) : f.layerPath) + "</span>";
-        html += "</div>";
-      });
-      html += "</div>";
-    });
+    html += renderLintGroup(realLintItems, false);
+    if (noiseLintItems.length > 0) {
+      html += '<details class="drift-minor"><summary>Show ' + noiseLintItems.length + " minor</summary>";
+      html += renderLintGroup(noiseLintItems, true);
+      html += "</details>";
+    }
     html += "</div>";
   }
   return html;

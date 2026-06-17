@@ -180,19 +180,27 @@ On-demand, **read-only** report comparing the Figma component libraries against 
 2. **Prop/variant parity** — for each matched component, compare Figma variant options ↔ code prop union options (e.g. Figma `Variant=[primary…link]` vs the code `variant` union). Flag: option in code missing in Figma; option in Figma missing in code; a code variant-like prop with no Figma axis; a Figma axis with no code prop. Normalize names before compare and account for the **web vs mobile naming difference** (web variant props are code-aligned lowercase; mobile mixes — see `code-connect-property-map.md`).
 3. **Hardcoded-value lint** — traverse each set's layers; for bindable visual fields (fills, strokes, corner radii, stroke weights, itemSpacing, padding, tokenized width/height, text fontSize/fontFamily/lineHeight), flag any raw value with no `boundVariables` entry. Whitelist legit raws: opacity 1, fully-transparent fills, `0` spacing/radius, and an explicit structural-size allowlist. Report layer path + field + raw value. (Our components were built fully bound, so a clean run validates that; the value is catching future hand-edits.)
 
-### Output
+### Output (real-vs-noise model — shipped 2026-06-18)
 
-Read-only "Component Drift" report grouped by component, each issue tagged by category + severity (coverage = high, parity = medium, hardcoded = warning), with a counts summary. No fix actions (D5). Optional export-to-markdown.
+Read-only "Component Drift" report. Every finding (coverage, parity, hardcoded) carries a `noise: boolean` tag — **nothing is dropped**. The classifier demotes low-signal findings to noise rather than filtering them out, so the report is complete and trustworthy (see **L8** in `decisions.md`).
+
+**Classifier rules:**
+- Parity `noise=true` when: code prop kind is `node` or `other` (handlers/children/slots); prop name is in the convenience allowlist (`show label`, `show help`, `show description`, `show count`, `leading icon`, `trailing icon`); or prop encodes into a Figma variant axis rather than existing as a standalone prop (`loading`/`disabled`/`iconOnly`/`fullWidth`).
+- Coverage `noise=true` for internal helper component sets (`INTERNAL_HELPER_NAMES`: `icon placeholder`).
+- Hardcoded-value lint `noise=true` for COMPONENT_SET own gallery-layout fields (`itemSpacing`/`padding*`/`cornerRadius` on the COMPONENT_SET node itself, which hold variant-gallery arrangement values), and for INSTANCE-type nodes and icon/spinner placeholder nodes (noise propagates to all descendants).
+
+**Report UI:** Three headline pills show **real counts only** (e.g. "2 coverage · 4 parity · 6 hardcoded"). Inside each section, real findings are listed first; noise findings appear in a collapsed `<details class="drift-minor">Show N minor</details>` toggle, de-emphasised at 55% opacity. Genuine gaps → actionable; low-signal → visible but out of the way.
 
 ### Architecture / reuse
 
-A shared, pure `computeComponentDrift(figmaModel, codeManifest)` comparator (unit-testable), mirroring the token normalize-compare pattern, so a future CI gate can reuse it. New plugin action "Component Drift" beside Diff; network only from the UI thread, traversal/lint in the main thread, comparator pure.
+`computeComponentDrift(figmaModel, codeManifest)` is a pure, unit-tested comparator in `figma-plugin/src/drift.js` (ESM export) with an inline copy in `ui.js` (bundle:false cannot follow imports — keep the two in sync manually). 52 unit tests in `figma-plugin/test/check-drift.mjs`. New plugin action "Component Drift" beside Diff; network only from the UI thread, traversal/lint in the main thread, comparator pure.
 
 ### Phases
 
-- **A — repo:** `component-manifest.json` generator (TS-compiler parse of `*.types.ts` + Code Connect presence) + CI validate (idempotency guard like tokens).
-- **B — plugin:** read Figma component model + fetch manifest + coverage & parity comparator + report UI.
-- **C — plugin:** hardcoded-value lint traversal + whitelist, folded into the report.
+- **A — repo:** `component-manifest.json` generator (TS-compiler parse of `*.types.ts` + Code Connect presence) + CI validate (idempotency guard like tokens). ✅ shipped
+- **B — plugin:** read Figma component model + fetch manifest + coverage & parity comparator + report UI. ✅ shipped
+- **C — plugin:** hardcoded-value lint traversal + whitelist, folded into the report. ✅ shipped
+- **D — real-vs-noise classifier:** `noise: boolean` on every finding; real counts in headline; noise in `<details>` toggle. ✅ shipped 2026-06-18
 
 Deferred (fast-follows, not v1): CI gate via the Figma REST API; auto-filed GitHub issues. Rationale recorded as **D16** in `decisions.md`.
 

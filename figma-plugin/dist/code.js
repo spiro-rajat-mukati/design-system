@@ -2017,9 +2017,18 @@ function _layerPath(node, stopAt) {
   }
   return parts.join(" > ");
 }
-function _auditNode(node, stopAt, seen, findings) {
+function _isNoiseLintNode(node) {
+  if (node.type === "INSTANCE") return true;
+  var name = String(node.name || "").toLowerCase().trim();
+  return /^icon(?:\s+placeholder)?$/.test(name) || /^spinner$/.test(name);
+}
+function _auditNode(node, stopAt, findings, inheritedNoise) {
+  var nodeNoise = inheritedNoise || _isNoiseLintNode(node);
   var bv = node.boundVariables || {};
   var path = _layerPath(node, stopAt);
+  function push(field, rawValue) {
+    findings.push({ layerPath: path, field, rawValue, nodeType: node.type, noise: nodeNoise });
+  }
   if (Array.isArray(node.fills)) {
     var fb = bv.fills || [];
     for (var fi = 0; fi < node.fills.length; fi++) {
@@ -2029,13 +2038,7 @@ function _auditNode(node, stopAt, seen, findings) {
       if (fa === 0) continue;
       var fo = fill.opacity != null ? fill.opacity : 1;
       if (fo < 0.3) continue;
-      if (!fb[fi]) {
-        var fk = path + "|fill[" + fi + "]";
-        if (!seen[fk]) {
-          seen[fk] = true;
-          findings.push({ layerPath: path, field: "fill[" + fi + "]", rawValue: _toHex(fill.color), nodeType: node.type });
-        }
-      }
+      if (!fb[fi]) push("fill[" + fi + "]", _toHex(fill.color));
     }
   }
   if (Array.isArray(node.strokes) && node.strokes.length > 0) {
@@ -2045,56 +2048,26 @@ function _auditNode(node, stopAt, seen, findings) {
       if (!stroke || stroke.type !== "SOLID") continue;
       var sa = stroke.color && stroke.color.a != null ? stroke.color.a : 1;
       if (sa === 0) continue;
-      if (!sb[si]) {
-        var sk = path + "|stroke[" + si + "]";
-        if (!seen[sk]) {
-          seen[sk] = true;
-          findings.push({ layerPath: path, field: "stroke[" + si + "]", rawValue: _toHex(stroke.color), nodeType: node.type });
-        }
-      }
+      if (!sb[si]) push("stroke[" + si + "]", _toHex(stroke.color));
     }
     if ("strokeWeight" in node && !bv.strokeWeight) {
       var sw = node.strokeWeight;
-      if (typeof sw === "number" && sw !== 0 && STRUCTURAL_SIZE_ALLOWLIST.indexOf(sw) === -1) {
-        var swk = path + "|strokeWeight";
-        if (!seen[swk]) {
-          seen[swk] = true;
-          findings.push({ layerPath: path, field: "strokeWeight", rawValue: sw, nodeType: node.type });
-        }
-      }
+      if (typeof sw === "number" && sw !== 0 && STRUCTURAL_SIZE_ALLOWLIST.indexOf(sw) === -1) push("strokeWeight", sw);
     }
   }
   var radii = ["cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"];
   for (var ri = 0; ri < radii.length; ri++) {
     var rf = radii[ri];
     if (!(rf in node) || typeof node[rf] !== "number" || node[rf] === 0) continue;
-    if (STRUCTURAL_SIZE_ALLOWLIST.indexOf(node[rf]) === -1 && !bv[rf]) {
-      var rk = path + "|" + rf;
-      if (!seen[rk]) {
-        seen[rk] = true;
-        findings.push({ layerPath: path, field: rf, rawValue: node[rf], nodeType: node.type });
-      }
-    }
+    if (STRUCTURAL_SIZE_ALLOWLIST.indexOf(node[rf]) === -1 && !bv[rf]) push(rf, node[rf]);
   }
   if (node.layoutMode && node.layoutMode !== "NONE") {
-    if ("itemSpacing" in node && node.itemSpacing !== 0 && !bv.itemSpacing && STRUCTURAL_SIZE_ALLOWLIST.indexOf(node.itemSpacing) === -1) {
-      var isk = path + "|itemSpacing";
-      if (!seen[isk]) {
-        seen[isk] = true;
-        findings.push({ layerPath: path, field: "itemSpacing", rawValue: node.itemSpacing, nodeType: node.type });
-      }
-    }
+    if ("itemSpacing" in node && node.itemSpacing !== 0 && !bv.itemSpacing && STRUCTURAL_SIZE_ALLOWLIST.indexOf(node.itemSpacing) === -1) push("itemSpacing", node.itemSpacing);
     var pads = ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft"];
     for (var pi = 0; pi < pads.length; pi++) {
       var pf = pads[pi];
       if (!(pf in node) || node[pf] === 0) continue;
-      if (STRUCTURAL_SIZE_ALLOWLIST.indexOf(node[pf]) === -1 && !bv[pf]) {
-        var pk = path + "|" + pf;
-        if (!seen[pk]) {
-          seen[pk] = true;
-          findings.push({ layerPath: path, field: pf, rawValue: node[pf], nodeType: node.type });
-        }
-      }
+      if (STRUCTURAL_SIZE_ALLOWLIST.indexOf(node[pf]) === -1 && !bv[pf]) push(pf, node[pf]);
     }
   }
   if (node.type === "TEXT" && !node.textStyleId) {
@@ -2104,21 +2077,23 @@ function _auditNode(node, stopAt, seen, findings) {
       if (!bv[tf]) {
         var tv = node[tf];
         if (typeof tv === "object" && tv !== null) tv = JSON.stringify(tv);
-        var tk = path + "|" + tf;
-        if (!seen[tk]) {
-          seen[tk] = true;
-          findings.push({ layerPath: path, field: tf, rawValue: String(tv), nodeType: "TEXT" });
-        }
+        push(tf, String(tv));
       }
     }
   }
   if (node.children) {
-    for (var ci = 0; ci < node.children.length; ci++) _auditNode(node.children[ci], stopAt, seen, findings);
+    for (var ci = 0; ci < node.children.length; ci++) _auditNode(node.children[ci], stopAt, findings, nodeNoise);
   }
 }
 function auditHardcodedValues(componentSet) {
   var findings = [];
-  var seen = {};
+  var csGalleryFields = ["itemSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "cornerRadius"];
+  csGalleryFields.forEach(function(f) {
+    if (!(f in componentSet)) return;
+    var v = componentSet[f];
+    if (typeof v !== "number" || v === 0) return;
+    findings.push({ layerPath: "[variant gallery]", field: f, rawValue: v, nodeType: "COMPONENT_SET", noise: true });
+  });
   var primary = null;
   if (componentSet.children) {
     for (var i = 0; i < componentSet.children.length; i++) {
@@ -2130,7 +2105,7 @@ function auditHardcodedValues(componentSet) {
   }
   var root = primary || componentSet;
   if (root.children) {
-    for (var ci = 0; ci < root.children.length; ci++) _auditNode(root.children[ci], componentSet, seen, findings);
+    for (var ci = 0; ci < root.children.length; ci++) _auditNode(root.children[ci], componentSet, findings, false);
   }
   return findings;
 }
