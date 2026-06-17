@@ -73,6 +73,8 @@ function loadPrefs() {
   }
 }
 function showTab(id) {
+  var valid = ["tokens", "styles", "components", "assets"];
+  if (valid.indexOf(id) === -1) id = "tokens";
   document.querySelectorAll(".tab-btn").forEach(function(btn) {
     const active = btn.dataset.tab === id;
     btn.classList.toggle("active", active);
@@ -86,10 +88,10 @@ function showTab(id) {
   savePrefs(p);
 }
 var FILE_CTX = [
-  { re: /foundation/i, tab: "tokens", tabs: ["tokens", "styles", "build"], label: "Tokens, Styles, and Build actions apply here" },
-  { re: /assets/i, tab: "assets", tabs: ["assets"], label: "Asset export actions apply here" },
-  { re: /mobile/i, tab: "styles", tabs: ["styles", "build", "quality"], label: "Styles, Build, and Quality actions apply here" },
-  { re: /web/i, tab: "styles", tabs: ["styles", "build", "quality"], label: "Styles, Build, and Quality actions apply here" }
+  { re: /foundation/i, tab: "tokens", tabs: ["tokens", "styles", "components"], label: "tokens \xB7 styles \xB7 components" },
+  { re: /assets/i, tab: "assets", tabs: ["assets"], label: "asset export" },
+  { re: /mobile/i, tab: "styles", tabs: ["styles", "components"], label: "styles & components" },
+  { re: /web/i, tab: "styles", tabs: ["styles", "components"], label: "styles & components" }
 ];
 function updateContextBanner(fileName) {
   var banner = document.getElementById("ctx-banner");
@@ -110,7 +112,7 @@ function updateContextBanner(fileName) {
     banner.hidden = false;
     var prefs = loadPrefs();
     if (!prefs.lastTab) showTab(matched.tab);
-    var allTabs = ["tokens", "styles", "build", "assets", "quality"];
+    var allTabs = ["tokens", "styles", "components", "assets"];
     document.querySelectorAll(".tab-btn").forEach(function(btn) {
       btn.classList.toggle("dim", matched.tabs.indexOf(btn.dataset.tab) === -1);
     });
