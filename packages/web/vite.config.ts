@@ -42,6 +42,7 @@ export default defineConfig({
     },
     cssCodeSplit: false,
   },
+  publicDir: false,
   test: {
     environment: "jsdom",
     setupFiles: ["./src/setupTests.js"],
