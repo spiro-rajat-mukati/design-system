@@ -54,6 +54,8 @@ The durable, agent-facing record of **why** Kijani is built the way it is, and *
 
 PNG blobs are committed via the Git Data API as `{ content: base64, encoding: "base64" }` (never as UTF-8). SHA comparison for idempotency uses `SHA1("blob " + byteLength + "\0" + bytes)` — same formula as icons but operating on the raw `Uint8Array`. All three lanes land in a single atomic commit on one auto-merge PR. The plugin never touches generated files (`src/`, `raster/`, `manifest.ts`) — CI icons-build and illustrations-build regenerate those from the source files. The `raster-src/` drop-folder (manual file placement) remains a valid fallback if Figma is not the source.
 
+**D14 · Disabled state = colors only; `disabled-opacity` set to 1.0 (was 0.6).** _(locked 2026-06-17)_ Disabled is conveyed exclusively by `*-disabled` color tokens (surface, text, border), not by whole-element transparency. Setting `button.disabled-opacity` to `{opacity.100}` removes the 0.6 overlay that previously dimmed the entire button including its label — disabled colors now carry the full signal on their own. Opacity-based disabled is avoided because it makes text illegible for low-vision users and causes compositing artifacts over non-white backgrounds.
+
 ## Open / deferred
 
 - **Reset the Chromatic token.** The committed token was moved into the `CHROMATIC_TOKEN` secret but not yet rotated — the leaked value is still live and in git history. Reset it in Chromatic and update the secret.
