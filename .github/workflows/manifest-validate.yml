@@ -1,0 +1,27 @@
+name: Validate component manifests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - "packages/web/src/components/**"
+      - "packages/mobile/src/components/**"
+      - "scripts/build-manifest.mjs"
+
+jobs:
+  check:
+    name: manifest:check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Re-run manifest generator and verify committed files are up to date
+        run: node scripts/check-manifest.mjs

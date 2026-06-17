@@ -1,0 +1,754 @@
+{
+  "platform": "mobile",
+  "generatedAt": "2026-06-17T17:07:49.482Z",
+  "components": [
+    {
+      "name": "ActionSheet",
+      "source": "packages/mobile/src/components/ActionSheet/ActionSheet.types.ts",
+      "platform": "mobile",
+      "props": {
+        "visible": {
+          "kind": "boolean"
+        },
+        "onClose": {
+          "kind": "other"
+        },
+        "title": {
+          "kind": "other"
+        },
+        "message": {
+          "kind": "other"
+        },
+        "items": {
+          "kind": "other"
+        },
+        "cancelLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Badge",
+      "source": "packages/mobile/src/components/Badge/Badge.types.ts",
+      "platform": "mobile",
+      "props": {
+        "variant": {
+          "kind": "union",
+          "options": [
+            "soft",
+            "solid",
+            "outline",
+            "dot"
+          ]
+        },
+        "tone": {
+          "kind": "union",
+          "options": [
+            "neutral",
+            "brand",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "xs",
+            "sm",
+            "md"
+          ]
+        },
+        "leadingIcon": {
+          "kind": "node"
+        },
+        "count": {
+          "kind": "other"
+        },
+        "withDot": {
+          "kind": "boolean"
+        },
+        "children": {
+          "kind": "node"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "BottomSheet",
+      "source": "packages/mobile/src/components/BottomSheet/BottomSheet.types.ts",
+      "platform": "mobile",
+      "props": {
+        "visible": {
+          "kind": "boolean"
+        },
+        "onClose": {
+          "kind": "other"
+        },
+        "snapPoints": {
+          "kind": "other"
+        },
+        "initialSnapIndex": {
+          "kind": "other"
+        },
+        "title": {
+          "kind": "other"
+        },
+        "children": {
+          "kind": "node"
+        },
+        "showHandle": {
+          "kind": "boolean"
+        },
+        "closeOnBackdrop": {
+          "kind": "boolean"
+        },
+        "closeOnSwipeDown": {
+          "kind": "boolean"
+        },
+        "style": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Button",
+      "source": "packages/mobile/src/components/Button/Button.types.ts",
+      "platform": "mobile",
+      "props": {
+        "variant": {
+          "kind": "union",
+          "options": [
+            "primary",
+            "secondary",
+            "tertiary",
+            "destructive",
+            "destructive-secondary",
+            "link"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ]
+        },
+        "leadingIcon": {
+          "kind": "node"
+        },
+        "trailingIcon": {
+          "kind": "node"
+        },
+        "iconOnly": {
+          "kind": "boolean"
+        },
+        "fullWidth": {
+          "kind": "boolean"
+        },
+        "loading": {
+          "kind": "boolean"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "children": {
+          "kind": "node"
+        },
+        "onPress": {
+          "kind": "other"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Checkbox",
+      "source": "packages/mobile/src/components/Checkbox/Checkbox.types.ts",
+      "platform": "mobile",
+      "props": {
+        "label": {
+          "kind": "node"
+        },
+        "description": {
+          "kind": "node"
+        },
+        "checked": {
+          "kind": "boolean"
+        },
+        "defaultChecked": {
+          "kind": "boolean"
+        },
+        "indeterminate": {
+          "kind": "boolean"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Field",
+      "source": "packages/mobile/src/components/Field/Field.types.ts",
+      "platform": "mobile",
+      "props": {
+        "label": {
+          "kind": "node"
+        },
+        "description": {
+          "kind": "node"
+        },
+        "helperText": {
+          "kind": "node"
+        },
+        "errorText": {
+          "kind": "node"
+        },
+        "successText": {
+          "kind": "node"
+        },
+        "required": {
+          "kind": "boolean"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "children": {
+          "kind": "node"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "ListItem",
+      "source": "packages/mobile/src/components/ListItem/ListItem.types.ts",
+      "platform": "mobile",
+      "props": {
+        "title": {
+          "kind": "other"
+        },
+        "description": {
+          "kind": "other"
+        },
+        "leadingContent": {
+          "kind": "other"
+        },
+        "trailingContent": {
+          "kind": "other"
+        },
+        "showDivider": {
+          "kind": "boolean"
+        },
+        "variant": {
+          "kind": "union",
+          "options": [
+            "default",
+            "inset"
+          ]
+        },
+        "onPress": {
+          "kind": "other"
+        },
+        "onLongPress": {
+          "kind": "other"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "accessibilityHint": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        },
+        "style": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "MultiSelect",
+      "source": "packages/mobile/src/components/MultiSelect/MultiSelect.types.ts",
+      "platform": "mobile",
+      "props": {
+        "options": {
+          "kind": "other"
+        },
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "placeholder": {
+          "kind": "other"
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "maxSelections": {
+          "kind": "other"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "NumericInput",
+      "source": "packages/mobile/src/components/NumericInput/NumericInput.types.ts",
+      "platform": "mobile",
+      "props": {
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "min": {
+          "kind": "other"
+        },
+        "max": {
+          "kind": "other"
+        },
+        "step": {
+          "kind": "other"
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "placeholder": {
+          "kind": "other"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "ProgressBar",
+      "source": "packages/mobile/src/components/ProgressBar/ProgressBar.types.ts",
+      "platform": "mobile",
+      "props": {
+        "value": {
+          "kind": "other"
+        },
+        "max": {
+          "kind": "other"
+        },
+        "tone": {
+          "kind": "union",
+          "options": [
+            "brand",
+            "success",
+            "warning",
+            "danger"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "xs",
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "label": {
+          "kind": "other"
+        },
+        "showValue": {
+          "kind": "boolean"
+        },
+        "indeterminate": {
+          "kind": "boolean"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Radio",
+      "source": "packages/mobile/src/components/Radio/Radio.types.ts",
+      "platform": "mobile",
+      "props": {
+        "label": {
+          "kind": "node"
+        },
+        "description": {
+          "kind": "node"
+        },
+        "checked": {
+          "kind": "boolean"
+        },
+        "value": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "SafeAreaWrapper",
+      "source": "packages/mobile/src/components/SafeAreaWrapper/SafeAreaWrapper.types.ts",
+      "platform": "mobile",
+      "props": {
+        "children": {
+          "kind": "other"
+        },
+        "edges": {
+          "kind": "other"
+        },
+        "surface": {
+          "kind": "union",
+          "options": [
+            "default",
+            "raised",
+            "sunken",
+            "inverse",
+            "brand"
+          ]
+        },
+        "style": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "SegmentedControl",
+      "source": "packages/mobile/src/components/SegmentedControl/SegmentedControl.types.ts",
+      "platform": "mobile",
+      "props": {
+        "options": {
+          "kind": "other"
+        },
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "testID": {
+          "kind": "other"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Select",
+      "source": "packages/mobile/src/components/Select/Select.types.ts",
+      "platform": "mobile",
+      "props": {
+        "options": {
+          "kind": "other"
+        },
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "placeholder": {
+          "kind": "other"
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Tabs",
+      "source": "packages/mobile/src/components/Tabs/Tabs.types.ts",
+      "platform": "mobile",
+      "props": {
+        "items": {
+          "kind": "other"
+        },
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "variant": {
+          "kind": "union",
+          "options": [
+            "underline",
+            "pill"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "testID": {
+          "kind": "other"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Tag",
+      "source": "packages/mobile/src/components/Tag/Tag.types.ts",
+      "platform": "mobile",
+      "props": {
+        "label": {
+          "kind": "other"
+        },
+        "tone": {
+          "kind": "union",
+          "options": [
+            "neutral",
+            "brand",
+            "success",
+            "warning",
+            "danger",
+            "info"
+          ]
+        },
+        "variant": {
+          "kind": "union",
+          "options": [
+            "soft",
+            "outline",
+            "solid"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md"
+          ]
+        },
+        "removable": {
+          "kind": "boolean"
+        },
+        "onRemove": {
+          "kind": "other"
+        },
+        "onPress": {
+          "kind": "other"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "TextInput",
+      "source": "packages/mobile/src/components/TextInput/TextInput.types.ts",
+      "platform": "mobile",
+      "props": {
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "leadingIcon": {
+          "kind": "node"
+        },
+        "trailingIcon": {
+          "kind": "node"
+        },
+        "prefix": {
+          "kind": "other"
+        },
+        "suffix": {
+          "kind": "other"
+        },
+        "clearable": {
+          "kind": "boolean"
+        },
+        "onClear": {
+          "kind": "other"
+        },
+        "invalid": {
+          "kind": "boolean"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Textarea",
+      "source": "packages/mobile/src/components/Textarea/Textarea.types.ts",
+      "platform": "mobile",
+      "props": {
+        "rows": {
+          "kind": "union",
+          "options": [
+            "auto"
+          ]
+        },
+        "maxRows": {
+          "kind": "other"
+        },
+        "showCount": {
+          "kind": "boolean"
+        },
+        "invalid": {
+          "kind": "boolean"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "testID": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Toast",
+      "source": "packages/mobile/src/components/Toast/Toast.types.ts",
+      "platform": "mobile",
+      "props": {},
+      "codeConnect": true
+    }
+  ]
+}

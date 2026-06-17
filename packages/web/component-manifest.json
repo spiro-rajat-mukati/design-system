@@ -1,0 +1,547 @@
+{
+  "platform": "web",
+  "generatedAt": "2026-06-17T17:07:49.443Z",
+  "components": [
+    {
+      "name": "Badge",
+      "source": "packages/web/src/components/Badge/Badge.types.ts",
+      "platform": "web",
+      "props": {
+        "variant": {
+          "kind": "union",
+          "options": [
+            "solid",
+            "soft",
+            "outline",
+            "dot"
+          ]
+        },
+        "tone": {
+          "kind": "union",
+          "options": [
+            "neutral",
+            "brand",
+            "info",
+            "success",
+            "warning",
+            "danger"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "xs",
+            "sm",
+            "md"
+          ]
+        },
+        "leadingIcon": {
+          "kind": "node"
+        },
+        "count": {
+          "kind": "other"
+        },
+        "withDot": {
+          "kind": "boolean"
+        },
+        "children": {
+          "kind": "node"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Button",
+      "source": "packages/web/src/components/Button/Button.types.ts",
+      "platform": "web",
+      "props": {
+        "variant": {
+          "kind": "union",
+          "options": [
+            "primary",
+            "secondary",
+            "tertiary",
+            "destructive",
+            "destructive-secondary",
+            "link"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ]
+        },
+        "leadingIcon": {
+          "kind": "node"
+        },
+        "trailingIcon": {
+          "kind": "node"
+        },
+        "iconOnly": {
+          "kind": "boolean"
+        },
+        "fullWidth": {
+          "kind": "boolean"
+        },
+        "loading": {
+          "kind": "boolean"
+        },
+        "children": {
+          "kind": "node"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "ButtonGroup",
+      "source": "packages/web/src/components/ButtonGroup/ButtonGroup.types.ts",
+      "platform": "web",
+      "props": {
+        "variant": {
+          "kind": "other"
+        },
+        "size": {
+          "kind": "other"
+        },
+        "aria-label": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Checkbox",
+      "source": "packages/web/src/components/Checkbox/Checkbox.types.ts",
+      "platform": "web",
+      "props": {
+        "label": {
+          "kind": "node"
+        },
+        "description": {
+          "kind": "node"
+        },
+        "indeterminate": {
+          "kind": "boolean"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Field",
+      "source": "packages/web/src/components/Field/Field.types.ts",
+      "platform": "web",
+      "props": {
+        "label": {
+          "kind": "node"
+        },
+        "description": {
+          "kind": "node"
+        },
+        "helperText": {
+          "kind": "node"
+        },
+        "errorText": {
+          "kind": "node"
+        },
+        "successText": {
+          "kind": "node"
+        },
+        "required": {
+          "kind": "boolean"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "htmlFor": {
+          "kind": "other"
+        },
+        "children": {
+          "kind": "node"
+        }
+      },
+      "codeConnect": false
+    },
+    {
+      "name": "Menu",
+      "source": "packages/web/src/components/Menu/Menu.types.ts",
+      "platform": "web",
+      "props": {
+        "trigger": {
+          "kind": "other"
+        },
+        "items": {
+          "kind": "other"
+        },
+        "aria-label": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "MultiSelect",
+      "source": "packages/web/src/components/MultiSelect/MultiSelect.types.ts",
+      "platform": "web",
+      "props": {
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "selectAll": {
+          "kind": "boolean"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "NumericInput",
+      "source": "packages/web/src/components/NumericInput/NumericInput.types.ts",
+      "platform": "web",
+      "props": {
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "min": {
+          "kind": "other"
+        },
+        "max": {
+          "kind": "other"
+        },
+        "step": {
+          "kind": "other"
+        },
+        "unit": {
+          "kind": "other"
+        },
+        "format": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Popover",
+      "source": "packages/web/src/components/Popover/Popover.tsx",
+      "platform": "web",
+      "props": {
+        "trigger": {
+          "kind": "other"
+        },
+        "open": {
+          "kind": "boolean"
+        },
+        "defaultOpen": {
+          "kind": "boolean"
+        },
+        "onOpenChange": {
+          "kind": "other"
+        },
+        "children": {
+          "kind": "other"
+        },
+        "placement": {
+          "kind": "union",
+          "options": [
+            "bottom-start",
+            "bottom-end"
+          ]
+        },
+        "matchWidth": {
+          "kind": "boolean"
+        }
+      },
+      "codeConnect": false
+    },
+    {
+      "name": "ProgressBar",
+      "source": "packages/web/src/components/ProgressBar/ProgressBar.types.ts",
+      "platform": "web",
+      "props": {
+        "value": {
+          "kind": "other"
+        },
+        "max": {
+          "kind": "other"
+        },
+        "shape": {
+          "kind": "union",
+          "options": [
+            "linear",
+            "circular"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "xs",
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "tone": {
+          "kind": "union",
+          "options": [
+            "brand",
+            "success",
+            "warning",
+            "danger"
+          ]
+        },
+        "segments": {
+          "kind": "other"
+        },
+        "label": {
+          "kind": "node"
+        },
+        "showPercentage": {
+          "kind": "boolean"
+        },
+        "description": {
+          "kind": "node"
+        },
+        "aria-label": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Radio",
+      "source": "packages/web/src/components/Radio/Radio.types.ts",
+      "platform": "web",
+      "props": {
+        "label": {
+          "kind": "node"
+        },
+        "description": {
+          "kind": "node"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Select",
+      "source": "packages/web/src/components/Select/Select.types.ts",
+      "platform": "web",
+      "props": {
+        "options": {
+          "kind": "other"
+        },
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "placeholder": {
+          "kind": "other"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "invalid": {
+          "kind": "boolean"
+        },
+        "searchable": {
+          "kind": "boolean"
+        },
+        "matchWidth": {
+          "kind": "boolean"
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "id": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Tabs",
+      "source": "packages/web/src/components/Tabs/Tabs.types.ts",
+      "platform": "web",
+      "props": {
+        "items": {
+          "kind": "other"
+        },
+        "value": {
+          "kind": "other"
+        },
+        "defaultValue": {
+          "kind": "other"
+        },
+        "onChange": {
+          "kind": "other"
+        },
+        "variant": {
+          "kind": "union",
+          "options": [
+            "underline",
+            "pill",
+            "segmented",
+            "enclosed"
+          ]
+        },
+        "orientation": {
+          "kind": "union",
+          "options": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "fullWidth": {
+          "kind": "boolean"
+        },
+        "aria-label": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Tag",
+      "source": "packages/web/src/components/Tag/Tag.types.ts",
+      "platform": "web",
+      "props": {
+        "variant": {
+          "kind": "other"
+        },
+        "tone": {
+          "kind": "other"
+        },
+        "size": {
+          "kind": "other"
+        },
+        "leadingIcon": {
+          "kind": "node"
+        },
+        "removable": {
+          "kind": "boolean"
+        },
+        "onRemove": {
+          "kind": "other"
+        },
+        "href": {
+          "kind": "other"
+        },
+        "selected": {
+          "kind": "boolean"
+        },
+        "onSelect": {
+          "kind": "other"
+        },
+        "children": {
+          "kind": "node"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "TextInput",
+      "source": "packages/web/src/components/TextInput/TextInput.types.ts",
+      "platform": "web",
+      "props": {
+        "size": {
+          "kind": "union",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "leadingIcon": {
+          "kind": "node"
+        },
+        "trailingIcon": {
+          "kind": "node"
+        },
+        "prefix": {
+          "kind": "node"
+        },
+        "suffix": {
+          "kind": "node"
+        },
+        "clearable": {
+          "kind": "boolean"
+        },
+        "invalid": {
+          "kind": "boolean"
+        },
+        "onClear": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Textarea",
+      "source": "packages/web/src/components/Textarea/Textarea.types.ts",
+      "platform": "web",
+      "props": {
+        "rows": {
+          "kind": "union",
+          "options": [
+            "auto"
+          ]
+        },
+        "showCount": {
+          "kind": "boolean"
+        },
+        "resize": {
+          "kind": "union",
+          "options": [
+            "vertical",
+            "horizontal",
+            "both",
+            "none"
+          ]
+        },
+        "invalid": {
+          "kind": "boolean"
+        }
+      },
+      "codeConnect": true
+    },
+    {
+      "name": "Toast",
+      "source": "packages/web/src/components/Toast/Toast.types.ts",
+      "platform": "web",
+      "props": {},
+      "codeConnect": true
+    }
+  ]
+}
