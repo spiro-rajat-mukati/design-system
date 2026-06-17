@@ -164,6 +164,38 @@ All raw bytes sent to UI as `Array.from(uint8Array)`.
 
 **Drop-folder fallback:** `packages/illustrations/raster-src/` can still receive PNG files by manual placement (CI `illustrations-build.yml` is path-filtered to that directory and runs on push). The plugin route is the primary path; drop-folder is the fallback.
 
+## P2 — ③ Component drift detection (planned 2026-06-17)
+
+On-demand, **read-only** report comparing the Figma component libraries against the code component libraries. **Detect, never codegen** (D5). Scope: coverage + prop/variant parity + hardcoded-value lint. Surfacing: plugin report on demand (a CI gate / auto-issues are deferred fast-follows).
+
+### Data sources
+
+- **Code contract = generated manifest.** New build script per component package emits `packages/<lib>/component-manifest.json` (generated + committed + CI-validated, same discipline as tokens). Parse each `src/components/**/<Name>.types.ts` via the TypeScript compiler API to extract: component name, source path, the exported Props interface → each prop's name + kind (string-literal union → its option list; boolean; node/other), and whether a sibling `<Name>.figma.tsx` Code Connect file exists. Tag platform (`web` | `mobile`).
+- **Figma side = live component sets.** The plugin reads, per `COMPONENT_SET` in the open component file: name, variant properties + options, component properties (TEXT/BOOLEAN/INSTANCE_SWAP), and the node tree (for the lint).
+- The component-drift action runs **in a component file** (Web or Mobile) — once per file (tokens Diff runs from Foundations; component Diff runs from the component file). It fetches the matching `component-manifest.json` via the plugin's existing authenticated GitHub API.
+
+### Checks
+
+1. **Coverage** — name set-difference: code-only (e.g. web `Field`/`Input`/`Popover` have code, no Figma set), Figma-only (no code component), and matched-but-no-Code-Connect (`.figma.tsx` missing).
+2. **Prop/variant parity** — for each matched component, compare Figma variant options ↔ code prop union options (e.g. Figma `Variant=[primary…link]` vs the code `variant` union). Flag: option in code missing in Figma; option in Figma missing in code; a code variant-like prop with no Figma axis; a Figma axis with no code prop. Normalize names before compare and account for the **web vs mobile naming difference** (web variant props are code-aligned lowercase; mobile mixes — see `code-connect-property-map.md`).
+3. **Hardcoded-value lint** — traverse each set's layers; for bindable visual fields (fills, strokes, corner radii, stroke weights, itemSpacing, padding, tokenized width/height, text fontSize/fontFamily/lineHeight), flag any raw value with no `boundVariables` entry. Whitelist legit raws: opacity 1, fully-transparent fills, `0` spacing/radius, and an explicit structural-size allowlist. Report layer path + field + raw value. (Our components were built fully bound, so a clean run validates that; the value is catching future hand-edits.)
+
+### Output
+
+Read-only "Component Drift" report grouped by component, each issue tagged by category + severity (coverage = high, parity = medium, hardcoded = warning), with a counts summary. No fix actions (D5). Optional export-to-markdown.
+
+### Architecture / reuse
+
+A shared, pure `computeComponentDrift(figmaModel, codeManifest)` comparator (unit-testable), mirroring the token normalize-compare pattern, so a future CI gate can reuse it. New plugin action "Component Drift" beside Diff; network only from the UI thread, traversal/lint in the main thread, comparator pure.
+
+### Phases
+
+- **A — repo:** `component-manifest.json` generator (TS-compiler parse of `*.types.ts` + Code Connect presence) + CI validate (idempotency guard like tokens).
+- **B — plugin:** read Figma component model + fetch manifest + coverage & parity comparator + report UI.
+- **C — plugin:** hardcoded-value lint traversal + whitelist, folded into the report.
+
+Deferred (fast-follows, not v1): CI gate via the Figma REST API; auto-filed GitHub issues. Rationale recorded as **D16** in `decisions.md`.
+
 ## Guardrails
 
 - Write `packages/tokens/source/` only; let `build.mjs` + the `tokens-validate` CI build. Never hand-edit generated files.
