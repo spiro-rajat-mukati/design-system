@@ -111,7 +111,7 @@ body {
 }
 .ctx-banner[hidden] { display: none; }
 .ctx-pill {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 5px;
   padding: 3px 8px 3px 6px;
@@ -120,7 +120,6 @@ body {
   color: var(--figma-color-text-brand, #3C61DD);
   font-size: 11px;
   font-weight: 500;
-  max-width: 100%;
   overflow: hidden;
 }
 .ctx-pill svg { flex-shrink: 0; }
@@ -163,7 +162,7 @@ body {
   border-bottom-color: var(--figma-color-bg-brand, #3C61DD);
   border-radius: 0;
 }
-.tab-btn.dim { opacity: 0.35; pointer-events: none; }
+.tab-btn.dim { opacity: 0.4; cursor: not-allowed; }
 
 /* ══ Tab panels ════════════════════════════════════════════════════════ */
 .tab-panels {
@@ -196,7 +195,6 @@ body {
 }
 .action-card:hover:not(:disabled) { background: var(--figma-color-bg-secondary); }
 .action-card:disabled { opacity: 0.4; cursor: not-allowed; }
-.action-card.primary { border-color: var(--figma-color-bg-brand, #3C61DD); }
 .action-card.caution { border-color: var(--figma-color-text-danger, #B91C1C); }
 .card-icon {
   width: 22px;
@@ -207,7 +205,6 @@ body {
   justify-content: center;
   color: var(--figma-color-text-secondary);
 }
-.action-card.primary .card-icon { color: var(--figma-color-bg-brand, #3C61DD); }
 .action-card.caution .card-icon { color: var(--figma-color-text-danger, #B91C1C); }
 .card-content { flex: 1; min-width: 0; }
 .card-title {
@@ -230,7 +227,6 @@ body {
   font-style: normal;
   line-height: 1;
 }
-.action-card.primary .card-glyph { color: var(--figma-color-bg-brand, #3C61DD); }
 
 /* ══ Advanced disclosure ═══════════════════════════════════════════════ */
 .adv-section {
@@ -542,7 +538,7 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
   <!-- ── Tokens ─────────────────────────────────────────────────────── -->
   <div class="tab-panel active" id="panel-tokens" role="tabpanel" aria-labelledby="tab-tokens">
 
-    <button class="action-card primary" id="btn-push">
+    <button class="action-card" id="btn-push">
       <span class="card-icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 1.5L12.5 6H9.5v6H6.5V6H3.5L8 1.5Z"/>
@@ -553,7 +549,6 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
         <div class="card-title">Push to GitHub</div>
         <div class="card-subtitle">Open a PR from your Figma edits</div>
       </div>
-      <span class="card-glyph" aria-hidden="true">↑</span>
     </button>
 
     <button class="action-card" id="btn-pull">
@@ -567,7 +562,6 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
         <div class="card-title">Pull from GitHub</div>
         <div class="card-subtitle">Overwrite Figma with repo values</div>
       </div>
-      <span class="card-glyph" aria-hidden="true">↓</span>
     </button>
 
     <button class="action-card" id="btn-diff">
@@ -580,7 +574,6 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
         <div class="card-title">Diff vs GitHub</div>
         <div class="card-subtitle">Preview changes — no writes</div>
       </div>
-      <span class="card-glyph" aria-hidden="true">⇄</span>
     </button>
 
     <details class="adv-section">
@@ -933,6 +926,12 @@ var FILE_CTX = [
   { re: /mobile/i, tab: "styles", tabs: ["styles", "components"], label: "styles & components" },
   { re: /web/i, tab: "styles", tabs: ["styles", "components"], label: "styles & components" }
 ];
+var TAB_TOOLTIPS = {
+  tokens: "Tokens actions run from the Foundations file \u2014 open it to use this tab.",
+  styles: "Styles actions run from Foundations, Web, or Mobile files \u2014 open one to use this tab.",
+  components: "Components actions run from a Web or Mobile file \u2014 open one to use this tab.",
+  assets: "Assets actions run from the Kijani \u2014 Assets file \u2014 open it to use this tab."
+};
 function updateContextBanner(fileName) {
   var banner = document.getElementById("ctx-banner");
   var text = document.getElementById("ctx-text");
@@ -952,14 +951,16 @@ function updateContextBanner(fileName) {
     banner.hidden = false;
     var prefs = loadPrefs();
     if (!prefs.lastTab) showTab(matched.tab);
-    var allTabs = ["tokens", "styles", "components", "assets"];
     document.querySelectorAll(".tab-btn").forEach(function(btn) {
-      btn.classList.toggle("dim", matched.tabs.indexOf(btn.dataset.tab) === -1);
+      var isDim = matched.tabs.indexOf(btn.dataset.tab) === -1;
+      btn.classList.toggle("dim", isDim);
+      btn.title = isDim ? TAB_TOOLTIPS[btn.dataset.tab] || "" : "";
     });
   } else {
     banner.hidden = true;
     document.querySelectorAll(".tab-btn").forEach(function(btn) {
       btn.classList.remove("dim");
+      btn.title = "";
     });
   }
 }
