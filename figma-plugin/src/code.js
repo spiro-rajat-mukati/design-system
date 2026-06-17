@@ -2366,12 +2366,22 @@ function _layerPath(node, stopAt) {
 /**
  * Returns true when this node's findings should be classified as noise.
  * INSTANCE nodes have their master component managing bindings; icon/spinner
- * nodes are placeholder slots.  All findings in a noise subtree inherit noise=true.
+ * nodes are placeholder slots; single-glyph symbol text nodes are decorative.
+ * All findings in a noise subtree inherit noise=true.
  */
 function _isNoiseLintNode(node) {
   if (node.type === "INSTANCE") return true;
   var name = String(node.name || "").toLowerCase().trim();
-  return /^icon(?:\s+placeholder)?$/.test(name) || /^spinner$/.test(name);
+  if (/^icon(?:\s+placeholder)?$/.test(name) || /^spinner$/.test(name)) return true;
+  // Single-glyph icon/symbol text node (✓ × › ▾ − + etc.) — decorative, not tokenizable
+  if (node.type === "TEXT") {
+    var chars = String(node.characters || "");
+    if (chars.length === 1) {
+      var cp = chars.charCodeAt(0);
+      if (cp > 127 || '+-×›‹▾▴−✓✗•·'.indexOf(chars) !== -1) return true;
+    }
+  }
+  return false;
 }
 
 /** Recursively audit one node; findings inherit nodeNoise from ancestors. */
@@ -2436,14 +2446,19 @@ function _auditNode(node, stopAt, findings, inheritedNoise) {
 
   // Text typography (skip if a Text Style is applied — that manages typography)
   if (node.type === "TEXT" && !node.textStyleId) {
-    var tfs = ["fontSize", "lineHeight"];
-    for (var ti = 0; ti < tfs.length; ti++) {
-      var tf = tfs[ti];
-      if (!bv[tf]) {
-        var tv = node[tf];
-        if (typeof tv === "object" && tv !== null) tv = JSON.stringify(tv);
-        push(tf, String(tv));
+    // fontSize — apply structural allowlist (common token-aligned sizes are whitelisted)
+    if (!bv.fontSize) {
+      var fsz = node.fontSize;
+      if (typeof fsz === "number" && STRUCTURAL_SIZE_ALLOWLIST.indexOf(fsz) === -1) push("fontSize", String(fsz));
+    }
+    // lineHeight — skip AUTO (computed); flag only explicit PIXELS/PERCENT values
+    if (!bv.lineHeight) {
+      var lh = node.lineHeight;
+      if (lh && typeof lh === "object" && lh.unit !== "AUTO") {
+        push("lineHeight", lh.unit + ":" + lh.value);
       }
+      // Numeric lineHeight (not standard Figma API) — flag if non-zero
+      if (typeof lh === "number" && lh !== 0) push("lineHeight", String(lh));
     }
   }
 
