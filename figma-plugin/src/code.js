@@ -2593,6 +2593,8 @@ figma.ui.onmessage = async (msg) => {
       await exportAssetsScan();
     } else if (msg.type === "scan-component-drift") {
       scanComponentDrift();
+    } else if (msg.type === "resize") {
+      figma.ui.resize(Math.round(msg.w) || 360, Math.round(msg.h) || 520);
     } else {
       uiLog("Unknown message: " + msg.type, "warn");
     }

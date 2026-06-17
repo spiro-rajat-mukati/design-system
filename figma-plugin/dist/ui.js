@@ -59,10 +59,78 @@ function log(msg, kind) {
   logEl.appendChild(line);
   logEl.scrollTop = logEl.scrollHeight;
 }
+function savePrefs(p) {
+  try {
+    localStorage.setItem("ds-ui-prefs", JSON.stringify(p));
+  } catch (_) {
+  }
+}
+function loadPrefs() {
+  try {
+    return JSON.parse(localStorage.getItem("ds-ui-prefs") || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+function showTab(id) {
+  document.querySelectorAll(".tab-btn").forEach(function(btn) {
+    const active = btn.dataset.tab === id;
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-selected", String(active));
+  });
+  document.querySelectorAll(".tab-panel").forEach(function(panel) {
+    panel.classList.toggle("active", panel.id === "panel-" + id);
+  });
+  const p = loadPrefs();
+  p.lastTab = id;
+  savePrefs(p);
+}
+var FILE_CTX = [
+  { re: /foundation/i, tab: "tokens", tabs: ["tokens", "styles", "build"], label: "Tokens, Styles, and Build actions apply here" },
+  { re: /assets/i, tab: "assets", tabs: ["assets"], label: "Asset export actions apply here" },
+  { re: /mobile/i, tab: "styles", tabs: ["styles", "build", "quality"], label: "Styles, Build, and Quality actions apply here" },
+  { re: /web/i, tab: "styles", tabs: ["styles", "build", "quality"], label: "Styles, Build, and Quality actions apply here" }
+];
+function updateContextBanner(fileName) {
+  var banner = document.getElementById("ctx-banner");
+  var text = document.getElementById("ctx-text");
+  if (!banner || !fileName) {
+    if (banner) banner.hidden = true;
+    return;
+  }
+  var matched = null;
+  for (var i = 0; i < FILE_CTX.length; i++) {
+    if (FILE_CTX[i].re.test(fileName)) {
+      matched = FILE_CTX[i];
+      break;
+    }
+  }
+  if (matched) {
+    text.textContent = "In " + fileName + " \u2014 " + matched.label;
+    banner.hidden = false;
+    var prefs = loadPrefs();
+    if (!prefs.lastTab) showTab(matched.tab);
+    var allTabs = ["tokens", "styles", "build", "assets", "quality"];
+    document.querySelectorAll(".tab-btn").forEach(function(btn) {
+      btn.classList.toggle("dim", matched.tabs.indexOf(btn.dataset.tab) === -1);
+    });
+  } else {
+    banner.hidden = true;
+    document.querySelectorAll(".tab-btn").forEach(function(btn) {
+      btn.classList.remove("dim");
+    });
+  }
+}
 function updatePatStatus(hasPat) {
   const el = document.getElementById("pat-status");
-  el.innerHTML = hasPat ? '<strong>PAT:</strong> <span class="pat-ok">\u2713 stored</span>' : '<strong>PAT:</strong> <span class="pat-err">not set \u2014 open PAT Settings below</span>';
-  if (!hasPat) document.getElementById("pat-settings").open = true;
+  if (el) {
+    el.className = hasPat ? "pat-ok" : "pat-err";
+    el.textContent = hasPat ? "\u2713" : "\u2717 PAT";
+  }
+  if (!hasPat) {
+    const ps = document.getElementById("pat-settings");
+    if (ps) ps.open = true;
+  }
 }
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -1461,6 +1529,48 @@ document.getElementById("export-assets-confirm").addEventListener("click", async
   }
   setBusy(false);
 });
+document.querySelectorAll(".tab-btn").forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    if (!btn.classList.contains("dim")) showTab(btn.dataset.tab);
+  });
+});
+(function() {
+  var gear = document.getElementById("gear-btn");
+  if (gear) gear.addEventListener("click", function() {
+    var ps = document.getElementById("pat-settings");
+    if (ps) ps.open = !ps.open;
+  });
+})();
+(function() {
+  var handle = document.getElementById("drag-handle");
+  if (!handle) return;
+  var startY, startH;
+  handle.addEventListener("mousedown", function(e) {
+    startY = e.clientY;
+    startH = document.documentElement.clientHeight || 520;
+    e.preventDefault();
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  });
+  function onMove(e) {
+    var h = Math.max(300, Math.min(800, startH + (e.clientY - startY)));
+    parent.postMessage({ pluginMessage: { type: "resize", w: 360, h: Math.round(h) } }, "*");
+  }
+  function onUp() {
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+    var p = loadPrefs();
+    p.panelH = document.documentElement.clientHeight || 520;
+    savePrefs(p);
+  }
+})();
+(function() {
+  var prefs = loadPrefs();
+  if (prefs.lastTab) showTab(prefs.lastTab);
+  if (prefs.panelH) {
+    parent.postMessage({ pluginMessage: { type: "resize", w: 360, h: Math.round(prefs.panelH) } }, "*");
+  }
+})();
 window.onmessage = (event) => {
   const msg = event.data.pluginMessage;
   if (!msg) return;
@@ -1545,6 +1655,7 @@ window.onmessage = (event) => {
     case "file-info": {
       const isMobile = /mobile/i.test(msg.fileName || "");
       document.getElementById(isMobile ? "ets-mobile" : "ets-web").checked = true;
+      updateContextBanner(msg.fileName || "");
       setBusy(false);
       break;
     }
@@ -2139,3 +2250,4 @@ document.getElementById("btn-component-drift").addEventListener("click", functio
   parent.postMessage({ pluginMessage: { type: "scan-component-drift" } }, "*");
 });
 parent.postMessage({ pluginMessage: { type: "get-pat" } }, "*");
+parent.postMessage({ pluginMessage: { type: "get-file-info" } }, "*");
