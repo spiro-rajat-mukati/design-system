@@ -2201,11 +2201,22 @@ window.onmessage = (event) => {
           setBusy(false);
           return;
         }
+        // Aggregate Phase C lint findings (each component now carries .lint[])
+        var lintFindings = [];
+        (msg.components || []).forEach(function(c) {
+          if (Array.isArray(c.lint) && c.lint.length > 0) {
+            c.lint.forEach(function(f) {
+              lintFindings.push(Object.assign({}, f, { component: c.name }));
+            });
+          }
+        });
         const result = computeComponentDrift(msg.components || [], codeManifest);
-        driftBody.innerHTML = renderDriftReport(result);
+        driftBody.innerHTML = renderDriftReport(result, lintFindings);
         const s = result.summary;
+        const lintNote = lintFindings.length > 0 ? ', ' + lintFindings.length + ' hardcoded-value' : '';
         log('Component Drift (' + esc(platform) + ' — ' + esc(msg.fileName || '') + '): ' +
-          s.coverage + ' coverage, ' + s.parity + ' parity, ' + s.total + ' total', s.total > 0 ? 'warn' : 'ok');
+          s.coverage + ' coverage, ' + s.parity + ' parity, ' + s.total + ' total' + lintNote,
+          (s.total + lintFindings.length) > 0 ? 'warn' : 'ok');
         setBusy(false);
       })().catch(function(e) {
         document.getElementById('drift-body').innerHTML = '<div class="panel-error">Unexpected error: ' + esc(e.message) + '</div>';
@@ -2308,20 +2319,23 @@ function severityBadge(severity) {
   return '<span class="drift-badge ' + severity + '">' + severity + '</span>';
 }
 
-function renderDriftReport(result) {
+function renderDriftReport(result, lintFindings) {
   if (result.error) return '<div class="panel-error">' + esc(result.error) + '</div>';
   var issues = result.issues;
   var summary = result.summary;
+  var lint = lintFindings || [];
+  var grandTotal = summary.total + lint.length;
 
   var html = '<div class="drift-summary-pills">';
-  if (summary.total === 0) {
+  if (grandTotal === 0) {
     html += '<span class="pill ok">✓ No drift — Figma and code are in sync</span>';
     html += '</div>';
     return html;
   }
   if (summary.coverage > 0) html += '<span class="pill changed">' + summary.coverage + ' coverage</span>';
-  if (summary.parity > 0)   html += '<span class="pill warning changed">' + summary.parity + ' parity</span>';
-  html += '<span class="pill muted-pill">' + summary.total + ' total</span>';
+  if (summary.parity > 0)   html += '<span class="pill changed">' + summary.parity + ' parity</span>';
+  if (lint.length > 0)      html += '<span class="pill removed">' + lint.length + ' hardcoded values</span>';
+  html += '<span class="pill muted-pill">' + grandTotal + ' total</span>';
   html += '</div>';
 
   // Coverage section
@@ -2369,6 +2383,37 @@ function renderDriftReport(result) {
           desc = esc(i.category);
         }
         html += '<div class="drift-issue">' + severityBadge(i.severity) + ' ' + desc + '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Phase C — Hardcoded values lint section (grouped by component)
+  if (lint.length > 0) {
+    html += '<div class="drift-section">';
+    html += '<div class="drift-section-title">Hardcoded values (' + lint.length + ')</div>';
+    html += '<div class="drift-lint-note">Bindable fields with no variable binding on the default variant. Bind each to the matching design token.</div>';
+    var byLintComp = {};
+    lint.forEach(function(f) {
+      var k = f.component || '(unknown)';
+      if (!byLintComp[k]) byLintComp[k] = [];
+      byLintComp[k].push(f);
+    });
+    Object.keys(byLintComp).sort().forEach(function(comp) {
+      html += '<div class="drift-row">';
+      html += '<div class="drift-comp">' + esc(comp) + '</div>';
+      byLintComp[comp].forEach(function(f) {
+        var isColor = /^#[0-9a-f]{6}/i.test(String(f.rawValue));
+        html += '<div class="drift-issue drift-lint-row">';
+        html += severityBadge('warning') + ' ';
+        if (isColor) {
+          html += '<span class="swatch" style="background:' + esc(f.rawValue) + '"></span>';
+        }
+        html += '<code>' + esc(f.field) + '</code>';
+        html += ' = <span class="drift-lint-val">' + esc(String(f.rawValue)) + '</span>';
+        html += ' <span class="drift-lint-path" title="' + esc(f.layerPath) + '">' + esc(f.layerPath.length > 40 ? '…' + f.layerPath.slice(-38) : f.layerPath) + '</span>';
+        html += '</div>';
       });
       html += '</div>';
     });
