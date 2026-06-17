@@ -161,6 +161,12 @@
   .drift-lint-row { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
   .drift-lint-val { font-family:ui-monospace,monospace; font-size:10px; color:var(--fg); }
   .drift-lint-path { font-size:10px; color:var(--fg-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
+  .drift-row.noise { opacity:0.55; }
+  .drift-minor { margin-top:4px; }
+  .drift-minor > summary { font-size:10px; color:var(--fg-muted); cursor:pointer; padding:3px 0; list-style:none; }
+  .drift-minor > summary::before { content:'▸ '; }
+  .drift-minor[open] > summary::before { content:'▾ '; }
+  .drift-minor > summary:hover { color:var(--fg); }
 
   /* Export Assets overlay */
   .ei-lane { margin-bottom:16px; border-top:1px solid var(--border); padding-top:10px; }

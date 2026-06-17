@@ -202,7 +202,7 @@ console.log("\n── Prop parity ───────────────�
 }
 
 {
-  console.log("\n  code 'node' props not flagged as code-prop-not-in-figma:");
+  console.log("\n  code 'node' props emitted with noise=true (not dropped):");
   const result = computeComponentDrift(
     [figmaComp("Button", {})],
     makeManifest([codeComp("Button", {
@@ -211,7 +211,8 @@ console.log("\n── Prop parity ───────────────�
     }, true)])
   );
   const parityIssues = result.issues.filter(function(i) { return i.kind === "parity"; });
-  assert("node props not flagged", parityIssues.length === 0);
+  assert("node props emitted (not dropped)", parityIssues.length === 2);
+  assert("node props have noise=true", parityIssues.every(function(i) { return i.noise === true; }));
 }
 
 {
@@ -222,6 +223,152 @@ console.log("\n── Prop parity ───────────────�
   );
   assert("coverage count correct", result.summary.coverage >= 2); // Ghost→figma-only, Field→code-only
   assert("total >= coverage + parity", result.summary.total === result.summary.coverage + result.summary.parity);
+}
+
+/* ══════════════════════════════════════════════════════════ */
+
+console.log("\n── Noise classification ─────────────────────────────────");
+
+{
+  console.log("\n  convenience prop (Show label) → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Input", { "Show label": boolProp() })],
+    makeManifest([codeComp("Input", {}, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "figma-prop-not-in-code"; });
+  assert("issue exists", !!issue);
+  assert("noise=true for Show label", issue && issue.noise === true);
+}
+
+{
+  console.log("\n  convenience prop (Leading icon) → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Input", { "Leading icon": boolProp() })],
+    makeManifest([codeComp("Input", {}, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "figma-prop-not-in-code"; });
+  assert("noise=true for Leading icon", issue && issue.noise === true);
+}
+
+{
+  console.log("\n  regular Figma prop not in code → noise=false:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { variant: variantProp(["primary"]) })],
+    makeManifest([codeComp("Button", {}, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "figma-prop-not-in-code"; });
+  assert("noise=false for real Figma prop gap", issue && issue.noise === false);
+}
+
+{
+  console.log("\n  encoded code prop (loading) → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {})],
+    makeManifest([codeComp("Button", {
+      loading: { kind: "boolean" }
+    }, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "code-prop-not-in-figma" && i.prop === "loading"; });
+  assert("issue exists for loading", !!issue);
+  assert("noise=true for loading", issue && issue.noise === true);
+}
+
+{
+  console.log("\n  encoded code prop (disabled) → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {})],
+    makeManifest([codeComp("Button", {
+      disabled: { kind: "boolean" }
+    }, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.prop === "disabled"; });
+  assert("noise=true for disabled", issue && issue.noise === true);
+}
+
+{
+  console.log("\n  node kind → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {})],
+    makeManifest([codeComp("Button", {
+      icon: { kind: "node" }
+    }, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.prop === "icon"; });
+  assert("node kind emitted", !!issue);
+  assert("node kind noise=true", issue && issue.noise === true);
+}
+
+{
+  console.log("\n  other kind → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", {})],
+    makeManifest([codeComp("Button", {
+      onClick: { kind: "other" }
+    }, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.prop === "onClick"; });
+  assert("other kind emitted", !!issue);
+  assert("other kind noise=true", issue && issue.noise === true);
+}
+
+{
+  console.log("\n  internal helper (Icon Placeholder) coverage → noise=true:");
+  const result = computeComponentDrift(
+    [figmaComp("Icon Placeholder")],
+    makeManifest([])
+  );
+  const issue = result.issues.find(function(i) { return i.component === "Icon Placeholder"; });
+  assert("issue exists for Icon Placeholder", !!issue);
+  assert("noise=true for Icon Placeholder", issue && issue.noise === true);
+}
+
+{
+  console.log("\n  regular coverage → noise=false:");
+  const result = computeComponentDrift(
+    [figmaComp("Badge")],
+    makeManifest([])
+  );
+  const issue = result.issues.find(function(i) { return i.component === "Badge"; });
+  assert("noise=false for real figma-only component", issue && issue.noise === false);
+}
+
+{
+  console.log("\n  no-code-connect → noise=false:");
+  const result = computeComponentDrift(
+    [figmaComp("Card")],
+    makeManifest([codeComp("Card", {}, false)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "no-code-connect"; });
+  assert("no-code-connect noise=false", issue && issue.noise === false);
+}
+
+{
+  console.log("\n  summary includes realCoverage and realParity:");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { "Show label": boolProp(), variant: variantProp(["primary"]) }),
+     figmaComp("Icon Placeholder")],
+    makeManifest([codeComp("Button", {
+      disabled: { kind: "boolean" }
+    }, true)])
+  );
+  assert("summary has realCoverage", "realCoverage" in result.summary);
+  assert("summary has realParity", "realParity" in result.summary);
+  // Icon Placeholder figma-only → noise (1 noise coverage)
+  assert("realCoverage < total coverage", result.summary.realCoverage < result.summary.coverage);
+  // Show label → noise, variant → real, disabled → noise; so realParity = 1
+  assert("realParity counts only real parity", result.summary.realParity === 1);
+}
+
+{
+  console.log("\n  option-level issues are noise=false (real mismatches):");
+  const result = computeComponentDrift(
+    [figmaComp("Button", { variant: variantProp(["primary", "ghost"]) })],
+    makeManifest([codeComp("Button", {
+      variant: { kind: "union", options: ["primary"] }
+    }, true)])
+  );
+  const issue = result.issues.find(function(i) { return i.category === "option-missing-in-code"; });
+  assert("option mismatch noise=false", issue && issue.noise === false);
 }
 
 /* ══════════════════════════════════════════════════════════ */
