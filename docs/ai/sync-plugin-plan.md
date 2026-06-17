@@ -223,9 +223,10 @@ Deferred (fast-follows, not v1): CI gate via the Figma REST API; auto-filed GitH
 **UI-layer refactor only — do NOT change any action logic** (the main-thread handlers in `code.js` and the network calls in `ui.js` stay as-is). This restyles/reorganizes the iframe (`ui.html`/UI markup) and re-labels actions. Replaces the long linear button list with a tabbed, context-aware, themed panel. Chosen over a command-palette alternative.
 
 ### Layout
-- **Header:** "DesignSync" + a compact connection chip (`repo · branch · PAT ✓`); a gear opens PAT settings.
-- **Context banner:** detect the open file via `figma.root.name` (match "Kijani — Foundations/Web/Mobile/Assets"); show "In <file> — <relevant> actions" as a full-width pill and **default to the relevant tab**; dim tabs that don't apply to the current file with a hover `title` tooltip explaining which file to open.
-- **Tabs (segmented):** `Tokens · Styles · Components · Assets`. Only the active tab's actions render. Dimmed tabs have `cursor: not-allowed` + a tooltip (e.g. "Assets actions run from the Kijani — Assets file — open it to use this tab.").
+- **Header row:** "DesignSync" (logo, flex:1) + ⓘ info button (opens info panel) + ⚙ gear button (opens PAT settings). No inline chip.
+- **Status bar:** Full-width grey monospace chip below the header — `repo · branch · PAT ✓` — spans the panel width regardless of text length.
+- **Context banner:** detect the open file via `figma.root.name` (match "Kijani — Foundations/Web/Mobile/Assets"); show "In <file> — <relevant> actions" as a full-width pill and **default to the relevant tab**; dim tabs that don't apply to the current file.
+- **Tabs (segmented):** `Tokens · Styles · Components · Assets`. Only the active tab's actions render. Dimmed tabs have `cursor: not-allowed` + a **custom popover tooltip** (absolute-positioned, dark bg, file-specific text) on hover.
 - **Action cards:** each = icon + title + one-line subtitle (≤ ~6 words). No direction glyphs anywhere — the left icon already conveys direction. Destructive actions live under an **"Advanced"** disclosure with a caution accent. All cards render identically (no contextual accent border).
 - **Result console:** monospace, status-colored (success/error), with a spinner + progress while a long action runs (progress posted from the main thread).
 - **PAT settings:** collapsible footer (repo, branch, token entry) — unchanged behavior.
@@ -245,12 +246,14 @@ Deferred (fast-follows, not v1): CI gate via the Figma REST API; auto-filed GitH
 | Assets | Export assets → GitHub PR | Push icon/illustration/image sources | |
 
 ### Disabled-tab tooltip copy
-| Tab | Tooltip |
+Template: `"<Tab> actions aren't available in <current file>. Open <home file> to use them."`
+Text is computed dynamically from `currentFileName` + `TAB_HOME_FILES` map in `ui.js`; tooltip is a custom absolute-positioned popover (not `title=`), dark bg, shown on `mouseenter` of a dim tab.
+| Tab | Home file |
 |---|---|
-| Tokens | Tokens actions run from the Foundations file — open it to use this tab. |
-| Styles | Styles actions run from Foundations, Web, or Mobile files — open one to use this tab. |
-| Components | Components actions run from a Web or Mobile file — open one to use this tab. |
-| Assets | Assets actions run from the Kijani — Assets file — open it to use this tab. |
+| Tokens | Foundations |
+| Styles | Foundations, Web, or Mobile |
+| Components | Web or Mobile |
+| Assets | Kijani — Assets |
 
 (Resolves the old "Sync vs Pull" ambiguity → three clear directional actions: Push / Pull / Diff. Disambiguates the two text-style actions via subtitles + run-context. Build + Quality tabs merged into Components.)
 
@@ -259,6 +262,7 @@ Deferred (fast-follows, not v1): CI gate via the Figma REST API; auto-filed GitH
 - Icons: **bundle inline SVGs** (no CDN — network is allowlisted to GitHub only).
 - Resizable: `figma.ui.resize()` + a drag handle; persist window size + last-active tab in `clientStorage`.
 - Destructive actions require an inline confirm. Long actions show spinner + console progress.
+- **Info panel:** ⓘ button in header opens a full overlay with plugin purpose, author ("Rajat Mukati"), version (`PLUGIN_VERSION` constant in `ui.js`), repo link, file-context hint, and issues link.
 
 ### Figma plugin-UI constraints (design space)
 Single resizable rectangular window; can't restyle Figma's outer chrome (title bar/close); UI ↔ main thread via `postMessage`; network only from the UI thread within the manifest allowlist; persist prefs via `clientStorage`. Within that, the iframe is full HTML/CSS/JS — near-unlimited visual freedom.
