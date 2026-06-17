@@ -492,12 +492,24 @@ function emitFigmaVariablesJSON() {
     // text.NS.ROLE.line → emit computed px (round(size × ratio)) rather than
     // an alias to the ratio primitive. Figma requires FLOAT px for lineHeight.
     const isTextLine = /^text\.[^.]+\.[^.]+\.line$/.test(path);
+    // Opacity variables: Figma uses 0–100 scale, repo source uses 0–1 (L7).
+    // Literal values are multiplied by 100 and rounded; aliases pass through
+    // unchanged (they resolve to the already-scaled primitive in Figma).
+    const isOpacity = firstNode.$type === "opacity";
 
     const valuesByMode = {};
     for (const m of modes) {
       const n = m.lookup.get(path);
       if (!n) continue;
-      if (isTextLine) {
+      if (isOpacity) {
+        const raw = figmaValueFor(n, type);
+        if (!raw) continue;
+        if ("alias" in raw) {
+          valuesByMode[m.id] = raw;
+        } else {
+          valuesByMode[m.id] = { value: Math.round(raw.value * 100) };
+        }
+      } else if (isTextLine) {
         const px = computeLineHeightPx(path, m.lookup);
         if (px != null) valuesByMode[m.id] = { value: px };
       } else {

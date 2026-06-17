@@ -440,6 +440,11 @@ function figmaValToSrcEntry(figmaVal, existingEntry) {
     updated[key] = String(n) + dim.unit;
     return updated;
   }
+  if (typeof figmaVal.value === "number" && existingEntry["$type"] === "opacity") {
+    const dp = decimalPlaces(srcStr);
+    updated[key] = (figmaVal.value / 100).toFixed(dp);
+    return updated;
+  }
   if (typeof figmaVal.value === "number") {
     const dp = decimalPlaces(srcStr);
     updated[key] = figmaVal.value.toFixed(dp);
@@ -468,6 +473,10 @@ function figmaValMatchesSrc(figmaVal, existingEntry) {
   if (dim && dim.unit) {
     const n = typeof figmaVal.value === "number" ? figmaVal.value : parseFloat(String(figmaVal.value));
     return Math.abs(dim.num - n) < 1e-4;
+  }
+  if (typeof figmaVal.value === "number" && existingEntry["$type"] === "opacity") {
+    const dp = decimalPlaces(srcStr);
+    return parseFloat((figmaVal.value / 100).toFixed(dp)) === parseFloat(srcStr);
   }
   if (typeof figmaVal.value === "number") {
     const dp = decimalPlaces(srcStr);

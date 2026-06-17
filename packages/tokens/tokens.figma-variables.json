@@ -7449,22 +7449,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 0.1
+          "value": 10
         },
         "dark-web": {
-          "value": 0.1
+          "value": 10
         },
         "light-ios": {
-          "value": 0.1
+          "value": 10
         },
         "dark-ios": {
-          "value": 0.1
+          "value": 10
         },
         "light-android": {
-          "value": 0.1
+          "value": 10
         },
         "dark-android": {
-          "value": 0.1
+          "value": 10
         }
       }
     },
@@ -7473,22 +7473,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 1
+          "value": 100
         },
         "dark-web": {
-          "value": 1
+          "value": 100
         },
         "light-ios": {
-          "value": 1
+          "value": 100
         },
         "dark-ios": {
-          "value": 1
+          "value": 100
         },
         "light-android": {
-          "value": 1
+          "value": 100
         },
         "dark-android": {
-          "value": 1
+          "value": 100
         }
       }
     },
@@ -7497,22 +7497,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 0.2
+          "value": 20
         },
         "dark-web": {
-          "value": 0.2
+          "value": 20
         },
         "light-ios": {
-          "value": 0.2
+          "value": 20
         },
         "dark-ios": {
-          "value": 0.2
+          "value": 20
         },
         "light-android": {
-          "value": 0.2
+          "value": 20
         },
         "dark-android": {
-          "value": 0.2
+          "value": 20
         }
       }
     },
@@ -7521,22 +7521,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 0.4
+          "value": 40
         },
         "dark-web": {
-          "value": 0.4
+          "value": 40
         },
         "light-ios": {
-          "value": 0.4
+          "value": 40
         },
         "dark-ios": {
-          "value": 0.4
+          "value": 40
         },
         "light-android": {
-          "value": 0.4
+          "value": 40
         },
         "dark-android": {
-          "value": 0.4
+          "value": 40
         }
       }
     },
@@ -7545,22 +7545,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 0.05
+          "value": 5
         },
         "dark-web": {
-          "value": 0.05
+          "value": 5
         },
         "light-ios": {
-          "value": 0.05
+          "value": 5
         },
         "dark-ios": {
-          "value": 0.05
+          "value": 5
         },
         "light-android": {
-          "value": 0.05
+          "value": 5
         },
         "dark-android": {
-          "value": 0.05
+          "value": 5
         }
       }
     },
@@ -7569,22 +7569,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 0.6
+          "value": 60
         },
         "dark-web": {
-          "value": 0.6
+          "value": 60
         },
         "light-ios": {
-          "value": 0.6
+          "value": 60
         },
         "dark-ios": {
-          "value": 0.6
+          "value": 60
         },
         "light-android": {
-          "value": 0.6
+          "value": 60
         },
         "dark-android": {
-          "value": 0.6
+          "value": 60
         }
       }
     },
@@ -7593,22 +7593,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 0.8
+          "value": 80
         },
         "dark-web": {
-          "value": 0.8
+          "value": 80
         },
         "light-ios": {
-          "value": 0.8
+          "value": 80
         },
         "dark-ios": {
-          "value": 0.8
+          "value": 80
         },
         "light-android": {
-          "value": 0.8
+          "value": 80
         },
         "dark-android": {
-          "value": 0.8
+          "value": 80
         }
       }
     },

@@ -56,6 +56,26 @@ PNG blobs are committed via the Git Data API as `{ content: base64, encoding: "b
 
 **D14 · Disabled state = colors only; `disabled-opacity` set to 1.0 (was 0.6).** _(locked 2026-06-17)_ Disabled is conveyed exclusively by `*-disabled` color tokens (surface, text, border), not by whole-element transparency. Setting `button.disabled-opacity` to `{opacity.100}` removes the 0.6 overlay that previously dimmed the entire button including its label — disabled colors now carry the full signal on their own. Opacity-based disabled is avoided because it makes text illegible for low-vision users and causes compositing artifacts over non-white backgrounds.
 
+## Figma variable representation — conversion rules (MUST FOLLOW)
+
+Figma stores/binds certain variable `$type`s on a **different scale or unit** than the repo source. `build.mjs` MUST apply these conversions when emitting `tokens.figma-variables.json`, and the DesignSync plugin MUST apply the inverse in its shared normalize-compare so Push / Pull / Diff round-trip byte-clean. The repo source, CSS variables, `tokens.ts`, and `tokens.native.ts` always stay in the **code-native** representation (left column). Never "fix" a scale mismatch by hand-editing Figma variables — fix it in `build.mjs` + the plugin so it stays consistent.
+
+| `$type` | Repo / code value | Figma variable value | Conversion in `build.mjs` (→ figma-variables.json) |
+|---|---|---|---|
+| `opacity` | 0–1 (`0.6`, `1`) | **0–100** (`60`, `100`) | **× 100** (round). [L7] |
+| `lineHeight` | unitless ratio (`1.25`) | **px** FLOAT (e.g. `20`) | emit computed `round(fontSizePx × ratio)` per role; do NOT emit the ratio primitives as Figma vars. [L5] |
+| `sizing` / `spacing` / `borderRadius` / `borderWidth` / `fontSizes` / `letterSpacing` | `"16px"` strings | unitless FLOAT `16` | strip `px`. [L4] |
+| `color` | hex / `rgba()` / `transparent` | `{r,g,b,a}` floats | parse to RGBA floats; compare normalized. [L4] |
+
+**Binding-side rule (Figma build agents):** a variable's value must already be in Figma's scale before you bind it. For `opacity`, a node bound to an opacity variable renders `value / 100` — so `100` ⇒ 100%, `60` ⇒ 60%; never bind a 0–1 value to a node's `opacity`. For "disabled = colors only" (D14), do NOT bind node-opacity at all — convey disabled via the `*-disabled` color tokens.
+
+**MANDATORY checklist before emitting ANY new token `$type` as a Figma variable:**
+1. Create a throwaway node, bind the property to a test variable, and **read back the effective value** to learn Figma's scale/unit for that property.
+2. If it differs from the code-native value, add a row to the table above, implement the conversion in `build.mjs` (figma-variables output only), and add the inverse to the plugin's normalize-compare.
+3. Verify a Pull→Push round-trip is a no-op (Diff clean).
+
+**L7 · Figma opacity variables are 0–100, not 0–1.** _(discovered 2026-06-17)_ Binding `opacity/100` (value `1`) to a node yields effective opacity `0.01` (1%); `opacity/60` (`0.6`) → 0.6%. This silently made opacity-bound disabled states nearly invisible. Fix per the table: `build.mjs` emits `opacity` tokens ×100 into `tokens.figma-variables.json` (kept 0–1 in CSS/RN); the plugin normalizes opacity Figma(0–100)↔repo(0–1) on Push/Pull/Diff. See D14 for the related "disabled = colors only" decision (component variants no longer bind node-opacity at all).
+
 ## Open / deferred
 
 - **Reset the Chromatic token.** The committed token was moved into the `CHROMATIC_TOKEN` secret but not yet rotated — the leaked value is still live and in git history. Reset it in Chromatic and update the secret.

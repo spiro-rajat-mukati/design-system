@@ -580,7 +580,14 @@ function figmaValToSrcEntry(figmaVal, existingEntry) {
     return updated;
   }
 
-  // Pure number (opacity, etc.): round to source string's decimal precision.
+  // Opacity tokens: Figma uses 0–100 scale, repo uses 0–1 (L7).
+  if (typeof figmaVal.value === 'number' && existingEntry['$type'] === 'opacity') {
+    const dp = decimalPlaces(srcStr);
+    updated[key] = (figmaVal.value / 100).toFixed(dp);
+    return updated;
+  }
+
+  // Pure number (non-opacity): round to source string's decimal precision.
   if (typeof figmaVal.value === 'number') {
     const dp = decimalPlaces(srcStr);
     updated[key] = figmaVal.value.toFixed(dp);
@@ -631,7 +638,13 @@ function figmaValMatchesSrc(figmaVal, existingEntry) {
     return Math.abs(dim.num - n) < 0.0001;
   }
 
-  // Pure number (opacity/number type): round Figma float32 to source precision.
+  // Opacity tokens: Figma uses 0–100 scale, repo uses 0–1 (L7).
+  if (typeof figmaVal.value === 'number' && existingEntry['$type'] === 'opacity') {
+    const dp = decimalPlaces(srcStr);
+    return parseFloat((figmaVal.value / 100).toFixed(dp)) === parseFloat(srcStr);
+  }
+
+  // Pure number (non-opacity): round Figma float32 to source precision.
   if (typeof figmaVal.value === 'number') {
     const dp = decimalPlaces(srcStr);
     return parseFloat(figmaVal.value.toFixed(dp)) === parseFloat(srcStr);
