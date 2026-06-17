@@ -3,223 +3,715 @@
 <head>
 <meta charset="utf-8" />
 <style>
+/* ══ Reset ══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ══ Base (Figma native theme vars; auto light/dark via themeColors:true) ══ */
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--figma-color-text);
+  background: var(--figma-color-bg);
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Semantic diff / status palette (not in --figma-color-* — dark via @media) */
+:root {
+  --changed-bg: #FEF3C7; --changed-fg: #92400E;
+  --added-bg:   #D1FAE5; --added-fg:   #065F46;
+  --removed-bg: #FEE2E2; --removed-fg: #991B1B;
+  --conflict-bg:#FFF7ED; --conflict-fg:#9A3412;
+  /* legacy alias vars (used by overlay CSS classes referencing these) */
+  --bg:         var(--figma-color-bg);
+  --fg:         var(--figma-color-text);
+  --fg-muted:   var(--figma-color-text-secondary);
+  --border:     var(--figma-color-border);
+  --action-bg:  var(--figma-color-bg-brand, #3C61DD);
+  --action-fg:  var(--figma-color-text-onbrand, #FFFFFF);
+  --bg-sunken:  var(--figma-color-bg-secondary);
+  --success:    var(--figma-color-text-success, #15803D);
+  --error:      var(--figma-color-text-danger, #B91C1C);
+  --warning:    #B45309;
+}
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: #FFFFFF;
-    --fg: #11181C;
-    --fg-muted: #697177;
-    --border: #E6E8EB;
-    --action-bg: #3C61DD;
-    --action-bg-hover: #385BCC;
-    --action-fg: #FFFFFF;
-    --bg-sunken: #F8F9FA;
-    --success: #15803D;
-    --error: #B91C1C;
-    --warning: #B45309;
-    --changed-bg: #FEF3C7; --changed-fg: #92400E;
-    --added-bg: #D1FAE5;   --added-fg: #065F46;
-    --removed-bg: #FEE2E2; --removed-fg: #991B1B;
-    --conflict-bg: #FFF7ED; --conflict-fg: #9A3412;
+    --warning:    #FBD38D;
+    --changed-bg: #451A03; --changed-fg: #FDE68A;
+    --added-bg:   #052E16; --added-fg:   #6EE7B7;
+    --removed-bg: #450A0A; --removed-fg: #FCA5A5;
+    --conflict-bg:#431407; --conflict-fg:#FDBA74;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1A1F23; --fg: #F0F2F4; --fg-muted: #889096;
-      --border: #2C3338; --bg-sunken: #11181C;
-      --changed-bg: #451A03; --changed-fg: #FDE68A;
-      --added-bg: #052E16;   --added-fg: #6EE7B7;
-      --removed-bg: #450A0A; --removed-fg: #FCA5A5;
-      --conflict-bg: #431407; --conflict-fg: #FDBA74;
-    }
-  }
-  * { box-sizing: border-box; }
-  body { margin:0; padding:16px; font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif; font-size:12px; line-height:1.4; color:var(--fg); background:var(--bg); }
-  h1 { font-size:13px; font-weight:600; margin:0 0 4px; }
-  .subtitle { color:var(--fg-muted); margin:0 0 16px; }
-  .config { background:var(--bg-sunken); border:1px solid var(--border); border-radius:6px; padding:10px 12px; margin-bottom:16px; font-family:ui-monospace,monospace; font-size:11px; color:var(--fg-muted); }
-  .config strong { color:var(--fg); font-weight:500; }
-  .config .pat-ok  { color:var(--success); }
-  .config .pat-err { color:var(--error); }
-  .group-label { font-size:10px; font-weight:600; color:var(--fg-muted); text-transform:uppercase; letter-spacing:.05em; margin:12px 0 5px; }
-  .group-label:first-child { margin-top:0; }
-  .actions { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
-  button { appearance:none; border:0; border-radius:6px; padding:8px 14px; font-family:inherit; font-size:12px; font-weight:500; cursor:pointer; background:var(--action-bg); color:var(--action-fg); transition:background-color .15s ease; }
-  button:hover:not(:disabled) { background:var(--action-bg-hover); }
-  button:disabled { opacity:.5; cursor:not-allowed; }
-  button.secondary { background:transparent; color:var(--fg); border:1px solid var(--border); }
-  button.secondary:hover:not(:disabled) { background:var(--bg-sunken); }
-  button.small { padding:6px 10px; font-size:11px; }
-  .log { background:var(--bg-sunken); border:1px solid var(--border); border-radius:6px; padding:8px 10px; height:130px; overflow-y:auto; font-family:ui-monospace,monospace; font-size:11px; line-height:1.5; margin-bottom:12px; }
-  .log .line { white-space:pre-wrap; }
-  .log .muted { color:var(--fg-muted); } .log .ok { color:var(--success); } .log .err { color:var(--error); } .log .warn { color:var(--warning); } .log .empty { color:var(--fg-muted); font-style:italic; }
-  details { border:1px solid var(--border); border-radius:6px; overflow:hidden; }
-  summary { padding:8px 12px; cursor:pointer; font-size:11px; font-weight:500; color:var(--fg-muted); background:var(--bg-sunken); list-style:none; user-select:none; }
-  summary::-webkit-details-marker { display:none; }
-  summary::before { content:"▶  "; font-size:9px; }
-  details[open] summary::before { content:"▼  "; }
-  .settings-body { padding:12px; display:flex; flex-direction:column; gap:8px; }
-  .settings-body p { margin:0; color:var(--fg-muted); font-size:11px; line-height:1.5; }
-  .pat-row { display:flex; gap:6px; }
-  .pat-row input { flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--fg); font-family:ui-monospace,monospace; font-size:11px; outline:none; }
-  .pat-row input:focus { border-color:var(--action-bg); }
+}
 
-  /* ── Overlay panels ─────────────────────── */
-  .overlay { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; z-index:20; }
-  .overlay[hidden] { display:none; }
-  .ov-header { display:flex; align-items:center; gap:8px; padding:11px 12px 9px; border-bottom:1px solid var(--border); flex-shrink:0; }
-  .ov-title  { flex:1; font-size:12px; font-weight:600; }
-  .ov-close  { background:none; border:none; padding:2px 6px; cursor:pointer; color:var(--fg-muted); font-size:15px; line-height:1; }
-  .ov-close:hover { color:var(--fg); background:none; }
-  .ov-body   { flex:1; overflow-y:auto; padding:12px; }
-  .ov-footer { display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--border); flex-shrink:0; }
-  .ov-footer button { flex:1; }
+/* ══ Header ════════════════════════════════════════════════════════════ */
+.ds-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 12px;
+  height: 40px;
+  border-bottom: 1px solid var(--figma-color-border);
+  flex-shrink: 0;
+}
+.ds-logo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--figma-color-text);
+  flex-shrink: 0;
+  letter-spacing: -0.01em;
+}
+.ds-chip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font-size: 10px;
+  color: var(--figma-color-text-secondary);
+  min-width: 0;
+}
+.chip-repo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, monospace;
+}
+.chip-sep { color: var(--figma-color-text-secondary); margin: 0 3px; flex-shrink: 0; }
+#pat-status { flex-shrink: 0; }
+.pat-ok  { color: var(--figma-color-text-success,  #15803D); font-weight: 600; }
+.pat-err { color: var(--figma-color-text-danger,   #B91C1C); font-weight: 600; }
+.ds-gear {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--figma-color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: inherit;
+  transition: background 0.1s;
+  opacity: 1;
+}
+.ds-gear:hover { background: var(--figma-color-bg-secondary); color: var(--figma-color-text); opacity: 1; }
 
-  /* Diff / shared content */
-  .diff-summary { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
-  .pill { padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:600; }
-  .pill.changed { background:var(--changed-bg); color:var(--changed-fg); }
-  .pill.added   { background:var(--added-bg);   color:var(--added-fg);   }
-  .pill.removed { background:var(--removed-bg); color:var(--removed-fg); }
-  .pill.ok      { background:var(--added-bg);   color:var(--added-fg);   }
-  .diff-modes { font-size:11px; color:var(--fg-muted); margin-bottom:10px; line-height:1.6; }
-  .diff-modes em { font-style:normal; background:var(--bg-sunken); padding:0 3px; border-radius:3px; }
-  .diff-stitle { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin:12px 0 4px; }
-  .diff-row { padding:6px 0; border-bottom:1px solid var(--border); }
-  .diff-row:last-child { border-bottom:none; }
-  .var-name { font-family:ui-monospace,monospace; font-size:10px; color:var(--fg); word-break:break-all; margin-bottom:2px; }
-  .var-name.changed::before { content:"~  "; color:var(--warning); }
-  .var-name.added::before   { content:"+  "; color:var(--success); }
-  .var-name.removed::before { content:"−  "; color:var(--error);   }
-  .mode-change { font-size:11px; color:var(--fg-muted); padding:1px 0 1px 12px; }
-  .mode-lbl { font-size:9px; font-weight:600; color:var(--fg-muted); display:inline-block; min-width:70px; }
-  .swatch { display:inline-block; width:11px; height:11px; border-radius:2px; border:1px solid rgba(128,128,128,.3); vertical-align:middle; margin-right:2px; flex-shrink:0; }
-  .val-old { opacity:.65; }
-  .val-arr  { margin:0 4px; color:var(--fg-muted); }
-  code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-sunken); padding:1px 4px; border-radius:3px; }
-  .diff-more { font-size:11px; color:var(--fg-muted); padding:4px 0; font-style:italic; }
-  .diff-collapse { border:none; margin-top:6px; }
-  .diff-collapse > summary { background:none; padding:4px 0; border-radius:0; }
-  .panel-error { color:var(--error); font-size:12px; padding:16px 0; }
+/* ══ Context banner ════════════════════════════════════════════════════ */
+.ctx-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--figma-color-bg-secondary);
+  border-bottom: 1px solid var(--figma-color-border);
+  font-size: 11px;
+  color: var(--figma-color-text-secondary);
+  flex-shrink: 0;
+}
+.ctx-banner[hidden] { display: none; }
+.ctx-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--figma-color-bg-brand, #3C61DD);
+  flex-shrink: 0;
+}
+#ctx-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  /* Pull overlay extras */
-  .pull-section { margin-bottom:14px; }
-  .pull-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:6px; }
-  .mode-recon-item { font-size:11px; padding:3px 0; border-bottom:1px solid var(--border); display:flex; align-items:baseline; gap:5px; }
-  .mode-recon-item:last-child { border-bottom:none; }
-  .mode-badge { padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
-  .mode-badge.rename { background:var(--changed-bg); color:var(--changed-fg); }
-  .mode-badge.add    { background:var(--added-bg);   color:var(--added-fg);   }
-  .mode-badge.remove { background:var(--removed-bg); color:var(--removed-fg); }
-  .mode-badge.ok     { background:var(--added-bg);   color:var(--added-fg);   }
-  .conflict-card { border:1px solid var(--conflict-bg); border-radius:6px; padding:8px 10px; margin-bottom:8px; background:var(--conflict-bg); color:var(--conflict-fg); }
-  .conflict-name { font-family:ui-monospace,monospace; font-size:10px; margin-bottom:4px; word-break:break-all; }
-  .conflict-mode { font-size:10px; color:var(--fg-muted); margin-bottom:4px; }
-  .conflict-radios { display:flex; flex-direction:column; gap:4px; }
-  .conflict-radio { display:flex; align-items:flex-start; gap:6px; cursor:pointer; font-size:11px; line-height:1.4; }
-  .conflict-radio input { margin:2px 0 0; cursor:pointer; flex-shrink:0; }
-  .pull-summary-pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
-  .pill.conflict { background:var(--conflict-bg); color:var(--conflict-fg); }
-  .pill.muted-pill { background:var(--bg-sunken); color:var(--fg-muted); }
+/* ══ Tab bar ═══════════════════════════════════════════════════════════ */
+.ds-tabbar {
+  display: flex;
+  border-bottom: 1px solid var(--figma-color-border);
+  flex-shrink: 0;
+  padding: 0 4px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 8px 2px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--figma-color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.1s;
+  position: relative;
+  top: 1px;
+  opacity: 1;
+}
+.tab-btn:hover:not(.dim) { color: var(--figma-color-text); }
+.tab-btn.active {
+  color: var(--figma-color-bg-brand, #3C61DD);
+  border-bottom-color: var(--figma-color-bg-brand, #3C61DD);
+}
+.tab-btn.dim { opacity: 0.35; pointer-events: none; }
 
-  /* Push overlay extras */
-  .push-file-section { margin-bottom:16px; }
-  .push-file-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:5px; display:flex; align-items:center; gap:6px; }
-  .push-file-badge { background:var(--changed-bg); color:var(--changed-fg); padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
-  .push-scope-note { font-size:11px; color:var(--fg-muted); margin-bottom:10px; line-height:1.5; }
-  .push-scope-note strong { color:var(--fg); }
-  .pr-link { display:inline-block; margin-top:8px; font-size:11px; color:var(--action-bg); text-decoration:underline; word-break:break-all; }
-  .push-ok { color:var(--success); font-size:12px; padding:16px 0; }
+/* ══ Tab panels ════════════════════════════════════════════════════════ */
+.tab-panels {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+.tab-panel { display: none; flex-direction: column; gap: 6px; }
+.tab-panel.active { display: flex; }
 
-  /* Ensure Text Styles overlay */
-  .ets-platform { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
-  .ets-plabel { font-size:10px; font-weight:600; color:var(--fg-muted); text-transform:uppercase; letter-spacing:.05em; }
-  .ets-radio { display:flex; align-items:center; gap:4px; cursor:pointer; font-size:12px; }
-  .ets-summary { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
-  .ets-table { width:100%; border-collapse:collapse; font-size:11px; }
-  .ets-table th { text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); padding:4px 6px 6px; border-bottom:2px solid var(--border); }
-  .ets-table td { padding:5px 6px; border-bottom:1px solid var(--border); vertical-align:top; }
-  .ets-table tr:last-child td { border-bottom:none; }
-  .ets-badge { display:inline-block; padding:1px 7px; border-radius:9999px; font-size:10px; font-weight:600; white-space:nowrap; }
-  .ets-badge.create  { background:var(--added-bg);   color:var(--added-fg); }
-  .ets-badge.update  { background:var(--changed-bg); color:var(--changed-fg); }
-  .ets-badge.correct { background:var(--bg-sunken);  color:var(--fg-muted); }
-  .ets-style { font-family:ui-monospace,monospace; font-size:10px; word-break:break-word; }
-  .ets-var   { font-family:ui-monospace,monospace; font-size:9px; color:var(--fg-muted); line-height:1.6; }
-  .ets-missing { border-radius:6px; padding:8px 10px; margin-top:8px; color:var(--removed-fg); font-size:11px; background:var(--removed-bg); }
+/* ══ Action cards ══════════════════════════════════════════════════════ */
+.action-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--figma-color-border);
+  border-radius: 8px;
+  background: var(--figma-color-bg);
+  color: var(--figma-color-text);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  transition: background 0.1s;
+  appearance: none;
+  opacity: 1;
+}
+.action-card:hover:not(:disabled) { background: var(--figma-color-bg-secondary); }
+.action-card:disabled { opacity: 0.4; cursor: not-allowed; }
+.action-card.primary { border-color: var(--figma-color-bg-brand, #3C61DD); }
+.action-card.caution { border-color: var(--figma-color-text-danger, #B91C1C); }
+.card-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--figma-color-text-secondary);
+}
+.action-card.primary .card-icon { color: var(--figma-color-bg-brand, #3C61DD); }
+.action-card.caution .card-icon { color: var(--figma-color-text-danger, #B91C1C); }
+.card-content { flex: 1; min-width: 0; }
+.card-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--figma-color-text);
+}
+.card-subtitle {
+  font-size: 11px;
+  color: var(--figma-color-text-secondary);
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-glyph {
+  font-size: 13px;
+  color: var(--figma-color-text-secondary);
+  flex-shrink: 0;
+  font-style: normal;
+  line-height: 1;
+}
+.action-card.primary .card-glyph { color: var(--figma-color-bg-brand, #3C61DD); }
 
-  /* Component Drift overlay */
-  .drift-summary-pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
-  .pill.info  { background:var(--bg-sunken); color:var(--fg-muted); }
-  .drift-section { margin-bottom:14px; }
-  .drift-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:6px; }
-  .drift-row { padding:5px 0; border-bottom:1px solid var(--border); font-size:11px; }
-  .drift-row:last-child { border-bottom:none; }
-  .drift-comp { font-family:ui-monospace,monospace; font-size:10px; font-weight:600; color:var(--fg); margin-bottom:3px; }
-  .drift-issue { padding:2px 0 2px 10px; color:var(--fg-muted); line-height:1.5; }
-  .drift-badge { display:inline-block; padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
-  .drift-badge.warning { background:var(--changed-bg); color:var(--changed-fg); }
-  .drift-badge.info    { background:var(--bg-sunken);  color:var(--fg-muted); }
-  .drift-lint-note { font-size:10px; color:var(--fg-muted); margin-bottom:6px; font-style:italic; }
-  .drift-lint-row { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
-  .drift-lint-val { font-family:ui-monospace,monospace; font-size:10px; color:var(--fg); }
-  .drift-lint-path { font-size:10px; color:var(--fg-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
-  .drift-row.noise { opacity:0.55; }
-  .drift-minor { margin-top:4px; }
-  .drift-minor > summary { font-size:10px; color:var(--fg-muted); cursor:pointer; padding:3px 0; list-style:none; }
-  .drift-minor > summary::before { content:'▸ '; }
-  .drift-minor[open] > summary::before { content:'▾ '; }
-  .drift-minor > summary:hover { color:var(--fg); }
+/* ══ Advanced disclosure ═══════════════════════════════════════════════ */
+.adv-section {
+  border: 1px solid var(--figma-color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.adv-section > summary {
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--figma-color-text-secondary);
+  background: var(--figma-color-bg-secondary);
+  list-style: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.adv-section > summary::-webkit-details-marker { display: none; }
+.adv-section > summary::before { content: "▶"; font-size: 8px; }
+.adv-section[open] > summary::before { content: "▼"; }
+.adv-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.adv-warn {
+  font-size: 10px;
+  color: var(--figma-color-text-danger, #B91C1C);
+  padding: 2px 4px 4px;
+  margin: 0;
+}
 
-  /* Export Assets overlay */
-  .ei-lane { margin-bottom:16px; border-top:1px solid var(--border); padding-top:10px; }
-  .ei-lane:first-child { border-top:none; padding-top:0; }
-  .ei-lane-title { font-size:10px; font-weight:600; color:var(--fg-muted); font-family:ui-monospace,monospace; margin-bottom:6px; }
-  .ei-section { margin-bottom:8px; }
-  .ei-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:4px; }
-  .ei-row { display:flex; align-items:baseline; gap:6px; padding:3px 0; border-bottom:1px solid var(--border); font-size:11px; }
-  .ei-row:last-child { border-bottom:none; }
-  .ei-name { font-family:ui-monospace,monospace; font-size:10px; flex:1; word-break:break-all; }
-  .ei-warn { color:var(--warning); font-size:10px; white-space:nowrap; }
-  .ei-mc-banner { border:1px solid; border-color:var(--warning); border-radius:4px; padding:6px 10px; font-size:11px; color:var(--warning); margin-bottom:8px; line-height:1.5; }
+/* ══ Log console ═══════════════════════════════════════════════════════ */
+.ds-console {
+  border-top: 1px solid var(--figma-color-border);
+  background: var(--figma-color-bg-secondary);
+  height: 90px;
+  min-height: 60px;
+  overflow-y: auto;
+  padding: 6px 10px;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+.ds-console .line { white-space: pre-wrap; color: var(--figma-color-text-secondary); }
+.ds-console .line.ok    { color: var(--success); }
+.ds-console .line.err   { color: var(--error); }
+.ds-console .line.warn  { color: var(--warning); }
+.ds-console .line.empty { color: var(--figma-color-text-secondary); font-style: italic; }
+.ds-console .line.info  { color: var(--figma-color-text-secondary); }
+.ds-console .line.muted { color: var(--fg-muted); }
+
+/* ══ PAT settings ══════════════════════════════════════════════════════ */
+#pat-settings {
+  border-top: 1px solid var(--figma-color-border);
+  flex-shrink: 0;
+}
+#pat-settings > summary {
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--figma-color-text-secondary);
+  list-style: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+#pat-settings > summary::-webkit-details-marker { display: none; }
+#pat-settings > summary::before { content: "▶"; font-size: 8px; }
+#pat-settings[open] > summary::before { content: "▼"; }
+.settings-body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--figma-color-border);
+}
+.settings-body p { font-size: 11px; color: var(--fg-muted); line-height: 1.5; margin: 0; }
+.settings-body p strong { color: var(--figma-color-text); font-weight: 500; }
+.pat-row { display: flex; gap: 6px; }
+.pat-row input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--figma-color-border);
+  border-radius: 6px;
+  background: var(--figma-color-bg);
+  color: var(--figma-color-text);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  outline: none;
+}
+.pat-row input:focus { border-color: var(--figma-color-bg-brand, #3C61DD); }
+
+/* ══ Generic buttons (overlay footers + save-pat) ══════════════════════ */
+button {
+  appearance: none;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--action-bg);
+  color: var(--action-fg);
+  transition: opacity 0.1s;
+}
+button:hover:not(:disabled) { opacity: 0.85; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.secondary {
+  background: transparent;
+  color: var(--figma-color-text);
+  border: 1px solid var(--figma-color-border);
+}
+button.secondary:hover:not(:disabled) { background: var(--figma-color-bg-secondary); opacity: 1; }
+button.small { padding: 6px 10px; font-size: 11px; }
+
+/* ══ Drag handle ═══════════════════════════════════════════════════════ */
+.drag-handle {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  cursor: se-resize;
+  z-index: 200;
+  opacity: 0.45;
+  transition: opacity 0.1s;
+}
+.drag-handle:hover { opacity: 0.9; }
+.drag-handle::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--figma-color-border);
+  border-bottom: 2px solid var(--figma-color-border);
+  border-radius: 0 0 2px 0;
+}
+
+/* ══ Inline code ═══════════════════════════════════════════════════════ */
+code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-sunken); padding:1px 4px; border-radius:3px; }
+
+/* ══ Overlays ══════════════════════════════════════════════════════════ */
+.overlay { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; z-index:20; }
+.overlay[hidden] { display:none; }
+.ov-header { display:flex; align-items:center; gap:8px; padding:11px 12px 9px; border-bottom:1px solid var(--border); flex-shrink:0; }
+.ov-title  { flex:1; font-size:12px; font-weight:600; }
+.ov-close  { background:none !important; border:none; padding:2px 6px; cursor:pointer; color:var(--fg-muted); font-size:15px; line-height:1; opacity:1 !important; }
+.ov-close:hover:not(:disabled) { color:var(--fg); background:none !important; opacity:1 !important; }
+.ov-body   { flex:1; overflow-y:auto; padding:12px; }
+.ov-footer { display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--border); flex-shrink:0; }
+.ov-footer button { flex:1; }
+
+/* Diff / shared content */
+.diff-summary { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+.pill { padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:600; }
+.pill.changed { background:var(--changed-bg); color:var(--changed-fg); }
+.pill.added   { background:var(--added-bg);   color:var(--added-fg);   }
+.pill.removed { background:var(--removed-bg); color:var(--removed-fg); }
+.pill.ok      { background:var(--added-bg);   color:var(--added-fg);   }
+.pill.info    { background:var(--bg-sunken);  color:var(--fg-muted);   }
+.pill.muted-pill { background:var(--bg-sunken); color:var(--fg-muted); }
+.pill.conflict { background:var(--conflict-bg); color:var(--conflict-fg); }
+.diff-modes { font-size:11px; color:var(--fg-muted); margin-bottom:10px; line-height:1.6; }
+.diff-modes em { font-style:normal; background:var(--bg-sunken); padding:0 3px; border-radius:3px; }
+.diff-stitle { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin:12px 0 4px; }
+.diff-row { padding:6px 0; border-bottom:1px solid var(--border); }
+.diff-row:last-child { border-bottom:none; }
+.var-name { font-family:ui-monospace,monospace; font-size:10px; color:var(--fg); word-break:break-all; margin-bottom:2px; }
+.var-name.changed::before { content:"~  "; color:var(--warning); }
+.var-name.added::before   { content:"+  "; color:var(--success); }
+.var-name.removed::before { content:"−  "; color:var(--error);   }
+.mode-change { font-size:11px; color:var(--fg-muted); padding:1px 0 1px 12px; }
+.mode-lbl { font-size:9px; font-weight:600; color:var(--fg-muted); display:inline-block; min-width:70px; }
+.swatch { display:inline-block; width:11px; height:11px; border-radius:2px; border:1px solid rgba(128,128,128,.3); vertical-align:middle; margin-right:2px; flex-shrink:0; }
+.val-old { opacity:.65; }
+.val-arr  { margin:0 4px; color:var(--fg-muted); }
+.diff-more { font-size:11px; color:var(--fg-muted); padding:4px 0; font-style:italic; }
+.diff-collapse { border:none; margin-top:6px; }
+.diff-collapse > summary { background:none; padding:4px 0; border-radius:0; list-style:none; font-size:11px; color:var(--fg-muted); cursor:pointer; }
+.diff-collapse > summary::-webkit-details-marker { display:none; }
+.panel-error { color:var(--error); font-size:12px; padding:16px 0; }
+
+/* Pull overlay extras */
+.pull-section { margin-bottom:14px; }
+.pull-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:6px; }
+.mode-recon-item { font-size:11px; padding:3px 0; border-bottom:1px solid var(--border); display:flex; align-items:baseline; gap:5px; }
+.mode-recon-item:last-child { border-bottom:none; }
+.mode-badge { padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
+.mode-badge.rename { background:var(--changed-bg); color:var(--changed-fg); }
+.mode-badge.add    { background:var(--added-bg);   color:var(--added-fg);   }
+.mode-badge.remove { background:var(--removed-bg); color:var(--removed-fg); }
+.mode-badge.ok     { background:var(--added-bg);   color:var(--added-fg);   }
+.conflict-card { border:1px solid var(--conflict-fg); border-radius:6px; padding:8px 10px; margin-bottom:8px; background:var(--conflict-bg); color:var(--conflict-fg); }
+.conflict-name { font-family:ui-monospace,monospace; font-size:10px; margin-bottom:4px; word-break:break-all; }
+.conflict-mode { font-size:10px; color:var(--fg-muted); margin-bottom:4px; }
+.conflict-radios { display:flex; flex-direction:column; gap:4px; }
+.conflict-radio { display:flex; align-items:flex-start; gap:6px; cursor:pointer; font-size:11px; line-height:1.4; }
+.conflict-radio input { margin:2px 0 0; cursor:pointer; flex-shrink:0; }
+.pull-summary-pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+
+/* Push overlay extras */
+.push-file-section { margin-bottom:16px; }
+.push-file-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+.push-file-badge { background:var(--changed-bg); color:var(--changed-fg); padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
+.push-scope-note { font-size:11px; color:var(--fg-muted); margin-bottom:10px; line-height:1.5; }
+.push-scope-note strong { color:var(--fg); }
+.pr-link { display:inline-block; margin-top:8px; font-size:11px; color:var(--action-bg); text-decoration:underline; word-break:break-all; }
+.push-ok { color:var(--success); font-size:12px; padding:16px 0; }
+
+/* Ensure Text Styles overlay */
+.ets-platform { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+.ets-plabel { font-size:10px; font-weight:600; color:var(--fg-muted); text-transform:uppercase; letter-spacing:.05em; }
+.ets-radio { display:flex; align-items:center; gap:4px; cursor:pointer; font-size:12px; }
+.ets-summary { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+.ets-table { width:100%; border-collapse:collapse; font-size:11px; }
+.ets-table th { text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); padding:4px 6px 6px; border-bottom:2px solid var(--border); }
+.ets-table td { padding:5px 6px; border-bottom:1px solid var(--border); vertical-align:top; }
+.ets-table tr:last-child td { border-bottom:none; }
+.ets-badge { display:inline-block; padding:1px 7px; border-radius:9999px; font-size:10px; font-weight:600; white-space:nowrap; }
+.ets-badge.create  { background:var(--added-bg);   color:var(--added-fg); }
+.ets-badge.update  { background:var(--changed-bg); color:var(--changed-fg); }
+.ets-badge.correct { background:var(--bg-sunken);  color:var(--fg-muted); }
+.ets-style { font-family:ui-monospace,monospace; font-size:10px; word-break:break-word; }
+.ets-var   { font-family:ui-monospace,monospace; font-size:9px; color:var(--fg-muted); line-height:1.6; }
+.ets-missing { border-radius:6px; padding:8px 10px; margin-top:8px; color:var(--removed-fg); font-size:11px; background:var(--removed-bg); }
+
+/* Component Drift overlay */
+.drift-summary-pills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+.drift-section { margin-bottom:14px; }
+.drift-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:6px; }
+.drift-row { padding:5px 0; border-bottom:1px solid var(--border); font-size:11px; }
+.drift-row:last-child { border-bottom:none; }
+.drift-comp { font-family:ui-monospace,monospace; font-size:10px; font-weight:600; color:var(--fg); margin-bottom:3px; }
+.drift-issue { padding:2px 0 2px 10px; color:var(--fg-muted); line-height:1.5; }
+.drift-badge { display:inline-block; padding:1px 6px; border-radius:9999px; font-size:10px; font-weight:600; }
+.drift-badge.warning { background:var(--changed-bg); color:var(--changed-fg); }
+.drift-badge.info    { background:var(--bg-sunken);  color:var(--fg-muted); }
+.drift-lint-note { font-size:10px; color:var(--fg-muted); margin-bottom:6px; font-style:italic; }
+.drift-lint-row { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+.drift-lint-val { font-family:ui-monospace,monospace; font-size:10px; color:var(--fg); }
+.drift-lint-path { font-size:10px; color:var(--fg-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
+.drift-row.noise { opacity:0.55; }
+.drift-minor { margin-top:4px; }
+.drift-minor > summary { font-size:10px; color:var(--fg-muted); cursor:pointer; padding:3px 0; list-style:none; }
+.drift-minor > summary::before { content:'▸ '; }
+.drift-minor[open] > summary::before { content:'▾ '; }
+.drift-minor > summary::-webkit-details-marker { display:none; }
+.drift-minor > summary:hover { color:var(--fg); }
+
+/* Export Assets overlay */
+.ei-lane { margin-bottom:16px; border-top:1px solid var(--border); padding-top:10px; }
+.ei-lane:first-child { border-top:none; padding-top:0; }
+.ei-lane-title { font-size:10px; font-weight:600; color:var(--fg-muted); font-family:ui-monospace,monospace; margin-bottom:6px; }
+.ei-section { margin-bottom:8px; }
+.ei-section-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--fg-muted); margin-bottom:4px; }
+.ei-row { display:flex; align-items:baseline; gap:6px; padding:3px 0; border-bottom:1px solid var(--border); font-size:11px; }
+.ei-row:last-child { border-bottom:none; }
+.ei-name { font-family:ui-monospace,monospace; font-size:10px; flex:1; word-break:break-all; }
+.ei-warn { color:var(--warning); font-size:10px; white-space:nowrap; }
+.ei-mc-banner { border:1px solid var(--warning); border-radius:4px; padding:6px 10px; font-size:11px; color:var(--warning); margin-bottom:8px; line-height:1.5; }
 </style>
 </head>
 <body>
 
-<!-- ═══════════ MAIN PANEL ═══════════ -->
-<h1>Design System Sync</h1>
-<p class="subtitle">Syncs tokens and components from your GitHub repo into this Figma file.</p>
+<!-- ═══════════ HEADER ═══════════════════════════════════════════════════ -->
+<header class="ds-header">
+  <span class="ds-logo">DesignSync</span>
+  <div class="ds-chip">
+    <span class="chip-repo">spiro-rajat-mukati/design-system · main</span>
+    <span class="chip-sep">·</span>
+    <span id="pat-status">…</span>
+  </div>
+  <button class="ds-gear" id="gear-btn" title="PAT settings" aria-label="PAT settings">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M6.3 1.5a2 2 0 0 1 3.4 0l.18.33c.26.46.8.7 1.31.58l.37-.08a2 2 0 0 1 2.3 1.54l.14.62a2 2 0 0 1-1.05 2.2l-.33.17a1.77 1.77 0 0 0 0 3.28l.33.17a2 2 0 0 1 1.05 2.2l-.14.62a2 2 0 0 1-2.3 1.54l-.37-.08a1.77 1.77 0 0 0-1.31.58l-.18.33a2 2 0 0 1-3.4 0l-.18-.33a1.77 1.77 0 0 0-1.31-.58l-.37.08A2 2 0 0 1 2.14 13l-.14-.62a2 2 0 0 1 1.05-2.2l.33-.17a1.77 1.77 0 0 0 0-3.28l-.33-.17A2 2 0 0 1 2 4.37l.14-.62A2 2 0 0 1 4.44 2.2l.37.08c.51.12 1.05-.12 1.31-.58L6.3 1.5ZM8 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+    </svg>
+  </button>
+</header>
 
-<div class="config">
-  <div><strong>Repo:</strong> spiro-rajat-mukati/design-system</div>
-  <div><strong>Branch:</strong> main</div>
-  <div id="pat-status"><strong>PAT:</strong> <span class="muted">loading…</span></div>
+<!-- ═══════════ CONTEXT BANNER ═══════════════════════════════════════════ -->
+<div class="ctx-banner" id="ctx-banner" hidden>
+  <span class="ctx-dot"></span>
+  <span id="ctx-text"></span>
 </div>
 
-<div class="actions">
-  <div class="group-label">Tokens</div>
-  <button id="sync-tokens">Sync tokens from GitHub</button>
-  <button id="btn-diff" class="secondary">Diff tokens vs GitHub</button>
-  <button id="btn-pull" class="secondary">Pull tokens from GitHub → Figma</button>
-  <button id="btn-push" class="secondary">Push Figma → GitHub (create PR)</button>
-  <button id="btn-prune" class="secondary">Prune Figma-only variables</button>
+<!-- ═══════════ TAB BAR ══════════════════════════════════════════════════ -->
+<nav class="ds-tabbar" role="tablist" aria-label="Plugin sections">
+  <button class="tab-btn active" data-tab="tokens"  role="tab" aria-selected="true"  aria-controls="panel-tokens">Tokens</button>
+  <button class="tab-btn"        data-tab="styles"  role="tab" aria-selected="false" aria-controls="panel-styles">Styles</button>
+  <button class="tab-btn"        data-tab="build"   role="tab" aria-selected="false" aria-controls="panel-build">Build</button>
+  <button class="tab-btn"        data-tab="assets"  role="tab" aria-selected="false" aria-controls="panel-assets">Assets</button>
+  <button class="tab-btn"        data-tab="quality" role="tab" aria-selected="false" aria-controls="panel-quality">Quality</button>
+</nav>
 
-  <div class="group-label">Styles &amp; components</div>
-  <button id="sync-text-styles" class="secondary">Sync Text Styles (Foundations)</button>
-  <button id="ensure-text-styles" class="secondary">Ensure Text Styles (Web / Mobile)</button>
-  <button id="generate-foundations" class="secondary">Generate Foundations pages</button>
-  <button id="generate-components" class="secondary">Generate components</button>
+<!-- ═══════════ TAB PANELS ═══════════════════════════════════════════════ -->
+<div class="tab-panels">
 
-  <div class="group-label">Quality</div>
-  <button id="btn-component-drift" class="secondary">Component Drift Report</button>
+  <!-- ── Tokens ─────────────────────────────────────────────────────── -->
+  <div class="tab-panel active" id="panel-tokens" role="tabpanel" aria-labelledby="tab-tokens">
 
-  <div class="group-label">Assets</div>
-  <button id="btn-export-assets" class="secondary">Export Assets → GitHub PR</button>
-</div>
+    <button class="action-card primary" id="btn-push">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1.5L12.5 6H9.5v6H6.5V6H3.5L8 1.5Z"/>
+          <rect x="2" y="13.5" width="12" height="1.5" rx=".75"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Push to GitHub</div>
+        <div class="card-subtitle">Open a PR from your Figma edits</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">↑</span>
+    </button>
 
-<div class="log" id="log">
+    <button class="action-card" id="btn-pull">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 14.5L3.5 10H6.5V4h3v6h3L8 14.5Z"/>
+          <rect x="2" y="1" width="12" height="1.5" rx=".75"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Pull from GitHub</div>
+        <div class="card-subtitle">Overwrite Figma with repo values</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">↓</span>
+    </button>
+
+    <button class="action-card" id="btn-diff">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 5.5L5.5 2.5V4.5H13v2H5.5V8.5L2 5.5ZM14 10.5L10.5 13.5V11.5H3v-2h7.5V7.5L14 10.5Z"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Diff vs GitHub</div>
+        <div class="card-subtitle">Preview changes — no writes</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">⇄</span>
+    </button>
+
+    <details class="adv-section">
+      <summary>Advanced</summary>
+      <div class="adv-body">
+        <p class="adv-warn">Destructive — review the preview before applying.</p>
+        <button class="action-card caution" id="btn-prune">
+          <span class="card-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6.5 1h3v1.5H13V4H3V2.5h3.5V1ZM5 5.5h6l-.65 9H5.65L5 5.5ZM7 7v5.5h.5V7H7Zm1.5 0v5.5h.5V7H8.5Z"/>
+            </svg>
+          </span>
+          <div class="card-content">
+            <div class="card-title">Prune Figma-only variables</div>
+            <div class="card-subtitle">Delete vars not in the repo</div>
+          </div>
+          <span class="card-glyph" aria-hidden="true">🗑</span>
+        </button>
+      </div>
+    </details>
+
+    <!-- sync-tokens: legacy push variant preserved in ALL_BTNS; hidden in new UI -->
+    <button id="sync-tokens" style="display:none" aria-hidden="true"></button>
+
+  </div><!-- #panel-tokens -->
+
+  <!-- ── Styles ──────────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="panel-styles" role="tabpanel" aria-labelledby="tab-styles">
+
+    <button class="action-card" id="ensure-text-styles">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.5 2.5h11v2.5H9.5v9h-3v-9H2.5V2.5Z"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Ensure text styles</div>
+        <div class="card-subtitle">Bind text styles in this file · Web / Mobile</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">—</span>
+    </button>
+
+    <button class="action-card" id="sync-text-styles">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.5 4L14 6.5H9.5V5H6V4H11.5ZM4.5 12L2 9.5H6.5V11H10v1H4.5Z"/>
+          <rect x="6.5" y="7" width="3" height="1.5" rx=".5"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Sync text-style variables</div>
+        <div class="card-subtitle">Update the semantic type vars · Foundations</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">—</span>
+    </button>
+
+  </div><!-- #panel-styles -->
+
+  <!-- ── Build ───────────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="panel-build" role="tabpanel" aria-labelledby="tab-build">
+
+    <button class="action-card" id="generate-components">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M8 1.5L14.5 8L8 14.5L1.5 8L8 1.5ZM8 4L4 8L8 12L12 8L8 4Z"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Generate components</div>
+        <div class="card-subtitle">Build / refresh component sets</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">—</span>
+    </button>
+
+    <button class="action-card" id="generate-foundations">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M4 1.5h6.5L13 4v10.5H4V1.5ZM5.5 3v10h6V5H9.5V3H5.5ZM9.5 3v1.5H11L9.5 3Z"/>
+          <rect x="6.5" y="7" width="3" height="1" rx=".5"/>
+          <rect x="6.5" y="9" width="4" height="1" rx=".5"/>
+          <rect x="6.5" y="11" width="2.5" height="1" rx=".5"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Generate Foundations pages</div>
+        <div class="card-subtitle">Build the foundation docs pages</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">—</span>
+    </button>
+
+  </div><!-- #panel-build -->
+
+  <!-- ── Assets ──────────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="panel-assets" role="tabpanel" aria-labelledby="tab-assets">
+
+    <button class="action-card" id="btn-export-assets">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1.5L12.5 6H9.5v4.5H6.5V6H3.5L8 1.5Z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M2 11.5h12V13H2v-1.5Z"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Export assets → GitHub PR</div>
+        <div class="card-subtitle">Push icon / illustration / image sources</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">↑</span>
+    </button>
+
+  </div><!-- #panel-assets -->
+
+  <!-- ── Quality ─────────────────────────────────────────────────────── -->
+  <div class="tab-panel" id="panel-quality" role="tabpanel" aria-labelledby="tab-quality">
+
+    <button class="action-card" id="btn-component-drift">
+      <span class="card-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M7 2a5 5 0 1 0 3.1 8.93l2.98 2.98 1.06-1.06-2.98-2.98A5 5 0 0 0 7 2Zm-3.5 5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0Z"/>
+        </svg>
+      </span>
+      <div class="card-content">
+        <div class="card-title">Component drift report</div>
+        <div class="card-subtitle">Coverage · parity · hardcoded</div>
+      </div>
+      <span class="card-glyph" aria-hidden="true">—</span>
+    </button>
+
+  </div><!-- #panel-quality -->
+
+</div><!-- .tab-panels -->
+
+<!-- ═══════════ LOG CONSOLE ══════════════════════════════════════════════ -->
+<div class="ds-console" id="log" aria-live="polite" aria-label="Activity log">
   <div class="line empty">Logs appear here.</div>
 </div>
 
+<!-- ═══════════ PAT SETTINGS ═════════════════════════════════════════════ -->
 <details id="pat-settings">
-  <summary>PAT Settings</summary>
+  <summary>PAT settings</summary>
   <div class="settings-body">
     <p>
       <strong>Pull / Diff / Sync:</strong> fine-grained PAT with <strong>Contents: Read</strong>.<br>
@@ -233,7 +725,10 @@
   </div>
 </details>
 
-<!-- ═══════════ PUSH OVERLAY ═══════════ -->
+<!-- ═══════════ DRAG HANDLE ═══════════════════════════════════════════════ -->
+<div class="drag-handle" id="drag-handle" title="Drag to resize"></div>
+
+<!-- ═══════════ PUSH OVERLAY ═════════════════════════════════════════════ -->
 <div id="push-panel" class="overlay" hidden>
   <div class="ov-header">
     <span class="ov-title">Push — Figma → GitHub</span>
@@ -246,7 +741,7 @@
   </div>
 </div>
 
-<!-- ═══════════ PULL OVERLAY ═══════════ -->
+<!-- ═══════════ PULL OVERLAY ═════════════════════════════════════════════ -->
 <div id="pull-panel" class="overlay" hidden>
   <div class="ov-header">
     <span class="ov-title">Pull — GitHub → Figma</span>
@@ -255,11 +750,11 @@
   <div class="ov-body" id="pull-body"><!-- populated by renderPullPreview() --></div>
   <div class="ov-footer" id="pull-footer">
     <button class="secondary" id="pull-cancel">Cancel</button>
-    <button id="pull-apply">Apply Pull</button>
+    <button id="pull-apply">Apply pull</button>
   </div>
 </div>
 
-<!-- ═══════════ DIFF OVERLAY ═══════════ -->
+<!-- ═══════════ DIFF OVERLAY ═════════════════════════════════════════════ -->
 <div id="diff-panel" class="overlay" hidden>
   <div class="ov-header">
     <span class="ov-title">Diff — Figma vs repo</span>
@@ -268,8 +763,7 @@
   <div class="ov-body" id="diff-body"><!-- populated by renderDiff() --></div>
 </div>
 
-
-<!-- ═══════════ ENSURE TEXT STYLES OVERLAY ═══════════ -->
+<!-- ═══════════ ENSURE TEXT STYLES OVERLAY ═══════════════════════════════ -->
 <div id="ensure-ts-panel" class="overlay" hidden>
   <div class="ov-header">
     <span class="ov-title">Ensure Text Styles</span>
@@ -292,7 +786,7 @@
   </div>
 </div>
 
-<!-- ═══════════ PRUNE OVERLAY ═══════════ -->
+<!-- ═══════════ PRUNE OVERLAY ════════════════════════════════════════════ -->
 <div id="prune-panel" class="overlay" hidden>
   <div class="ov-header">
     <span class="ov-title">Prune Figma-only variables</span>
@@ -311,7 +805,7 @@
   </div>
 </div>
 
-<!-- ═══════════ EXPORT ASSETS OVERLAY ═══════════ -->
+<!-- ═══════════ EXPORT ASSETS OVERLAY ════════════════════════════════════ -->
 <div id="export-assets-panel" class="overlay" hidden>
   <div class="ov-header">
     <span class="ov-title">Export Assets — Figma → GitHub</span>
@@ -337,7 +831,7 @@
   </div>
 </div>
 
-<!-- ═══════════ COMPONENT DRIFT OVERLAY ═══════════ -->
+<!-- ═══════════ COMPONENT DRIFT OVERLAY ══════════════════════════════════ -->
 <div id="drift-panel" class="overlay" hidden>
   <div class="ov-header">
     <span class="ov-title">Component Drift Report</span>
