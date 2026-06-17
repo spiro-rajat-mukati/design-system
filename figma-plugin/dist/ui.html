@@ -85,7 +85,6 @@ body {
 .ds-status {
   padding: 0 12px 7px;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--figma-color-border);
 }
 .status-chip {
   display: flex;
@@ -105,9 +104,8 @@ body {
   white-space: nowrap;
   flex: 1;
 }
-.chip-sep { flex-shrink: 0; }
-#pat-status { flex-shrink: 0; }
-.pat-ok  { color: var(--figma-color-text-success,  #15803D); font-weight: 600; }
+#pat-status { flex-shrink: 0; display: flex; align-items: center; }
+.pat-ok  { color: var(--figma-color-text-success,  #15803D); }
 .pat-err { color: var(--figma-color-text-danger,   #B91C1C); font-weight: 600; }
 
 /* ══ Context banner ════════════════════════════════════════════════════ */
@@ -427,6 +425,68 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
   color: var(--figma-color-text-secondary);
   margin-top: 3px;
 }
+/* creator block */
+.creator-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.creator-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--figma-color-bg-secondary);
+}
+.creator-text { flex: 1; min-width: 0; }
+.creator-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--figma-color-text);
+  line-height: 1.3;
+}
+.creator-role {
+  font-size: 11px;
+  color: var(--figma-color-text-secondary);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+/* email copy row */
+.info-feedback-row { margin-top: 6px; }
+.info-email-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+.info-email-addr {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  background: var(--figma-color-bg-secondary);
+  padding: 3px 6px;
+  border-radius: 3px;
+  color: var(--figma-color-text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: all;
+  -webkit-user-select: all;
+}
+.info-copy-btn {
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 3px 8px;
+  border: 1px solid var(--figma-color-border);
+  border-radius: 3px;
+  background: var(--figma-color-bg);
+  color: var(--figma-color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+.info-copy-btn:hover { background: var(--figma-color-bg-secondary); }
 
 /* ══ Overlays ══════════════════════════════════════════════════════════ */
 .overlay { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; z-index:20; }
@@ -572,7 +632,6 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
 <div class="ds-status">
   <div class="status-chip">
     <span class="chip-repo">spiro-rajat-mukati/design-system · main</span>
-    <span class="chip-sep">·</span>
     <span id="pat-status">…</span>
   </div>
 </div>
@@ -901,27 +960,45 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
     <button class="ov-close" id="close-info" title="Close">✕</button>
   </div>
   <div class="ov-body">
+
+    <!-- Purpose -->
     <div class="info-section">
       <div class="info-tagline">Keeps the Kijani Figma libraries and the GitHub repo in sync — tokens, text styles, components, assets, and drift checks.</div>
       <div class="info-hint">
-        Run <strong>Tokens</strong> actions from <strong>Foundations</strong> ·
+        Run <strong>Tokens</strong> from <strong>Foundations</strong> ·
         <strong>Styles</strong> &amp; <strong>Components</strong> from <strong>Web</strong> or <strong>Mobile</strong> ·
         <strong>Assets</strong> from <strong>Kijani — Assets</strong>
       </div>
     </div>
+
+    <!-- Creator -->
     <div class="info-section">
-      <div class="info-label">Created by <strong>Rajat Mukati</strong> for the Kijani Design System.</div>
-      <div class="info-version" id="plugin-version-line">v0.1.0</div>
+      <div class="creator-block">
+        <img class="creator-avatar" id="creator-avatar" src="data:image/jpeg;base64,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" alt="Rajat Mukati" />
+        <div class="creator-text">
+          <div class="creator-name">Rajat Mukati</div>
+          <div class="creator-role">Creator of the Kijani Design System</div>
+          <div class="info-version" id="plugin-version-line">v0.1.0</div>
+        </div>
+      </div>
     </div>
+
+    <!-- Repo + Issues & feedback -->
     <div class="info-section">
       <div class="info-label">
-        <a href="https://github.com/spiro-rajat-mukati/design-system" class="info-link" target="_blank" rel="noopener noreferrer">spiro-rajat-mukati/design-system</a>
+        <a href="https://github.com/spiro-rajat-mukati/design-system" class="info-link" target="_blank" rel="noopener noreferrer">spiro-rajat-mukati/design-system ↗</a>
       </div>
-      <div class="info-label" style="margin-top:5px">
-        Issues &amp; feedback:
-        <a href="https://github.com/spiro-rajat-mukati/design-system/issues" class="info-link" target="_blank" rel="noopener noreferrer">open an issue ↗</a>
+      <div class="info-label" style="margin-top:10px"><strong>Issues &amp; feedback</strong></div>
+      <div class="info-feedback-row">
+        <a href="https://github.com/spiro-rajat-mukati/design-system/issues" class="info-link" target="_blank" rel="noopener noreferrer">Open a GitHub issue ↗</a>
+      </div>
+      <div class="info-email-row">
+        <span class="info-email-addr" id="info-email-addr">rajat.mukati@spironet.com</span>
+        <button class="info-copy-btn" id="copy-email-btn">Copy</button>
+        <a href="mailto:rajat.mukati@spironet.com" class="info-link">mailto ↗</a>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -1063,14 +1140,20 @@ function updateContextBanner(fileName) {
     });
   }
 }
+var PAT_OK_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2,6.5 4.5,9 10,3"/></svg>';
 function updatePatStatus(hasPat) {
-  const el = document.getElementById("pat-status");
+  var el = document.getElementById("pat-status");
   if (el) {
     el.className = hasPat ? "pat-ok" : "pat-err";
-    el.textContent = hasPat ? "\u2713" : "\u2717 PAT";
+    el.title = hasPat ? "PAT connected" : "";
+    if (hasPat) {
+      el.innerHTML = PAT_OK_SVG;
+    } else {
+      el.textContent = "\u2717 PAT";
+    }
   }
   if (!hasPat) {
-    const ps = document.getElementById("pat-settings");
+    var ps = document.getElementById("pat-settings");
     if (ps) ps.open = true;
   }
 }
@@ -2509,6 +2592,22 @@ document.getElementById("export-assets-confirm").addEventListener("click", async
   if (closeInfo && infoPanel) {
     closeInfo.addEventListener("click", function() {
       infoPanel.hidden = true;
+    });
+  }
+  var copyBtn = document.getElementById("copy-email-btn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function() {
+      var addr = "rajat.mukati@spironet.com";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(addr).then(function() {
+          var orig = copyBtn.textContent;
+          copyBtn.textContent = "Copied!";
+          setTimeout(function() {
+            copyBtn.textContent = orig;
+          }, 1800);
+        }).catch(function() {
+        });
+      }
     });
   }
 })();

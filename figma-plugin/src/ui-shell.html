@@ -85,7 +85,6 @@ body {
 .ds-status {
   padding: 0 12px 7px;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--figma-color-border);
 }
 .status-chip {
   display: flex;
@@ -105,9 +104,8 @@ body {
   white-space: nowrap;
   flex: 1;
 }
-.chip-sep { flex-shrink: 0; }
-#pat-status { flex-shrink: 0; }
-.pat-ok  { color: var(--figma-color-text-success,  #15803D); font-weight: 600; }
+#pat-status { flex-shrink: 0; display: flex; align-items: center; }
+.pat-ok  { color: var(--figma-color-text-success,  #15803D); }
 .pat-err { color: var(--figma-color-text-danger,   #B91C1C); font-weight: 600; }
 
 /* ══ Context banner ════════════════════════════════════════════════════ */
@@ -427,6 +425,68 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
   color: var(--figma-color-text-secondary);
   margin-top: 3px;
 }
+/* creator block */
+.creator-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.creator-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--figma-color-bg-secondary);
+}
+.creator-text { flex: 1; min-width: 0; }
+.creator-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--figma-color-text);
+  line-height: 1.3;
+}
+.creator-role {
+  font-size: 11px;
+  color: var(--figma-color-text-secondary);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+/* email copy row */
+.info-feedback-row { margin-top: 6px; }
+.info-email-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+.info-email-addr {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  background: var(--figma-color-bg-secondary);
+  padding: 3px 6px;
+  border-radius: 3px;
+  color: var(--figma-color-text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: all;
+  -webkit-user-select: all;
+}
+.info-copy-btn {
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 3px 8px;
+  border: 1px solid var(--figma-color-border);
+  border-radius: 3px;
+  background: var(--figma-color-bg);
+  color: var(--figma-color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+.info-copy-btn:hover { background: var(--figma-color-bg-secondary); }
 
 /* ══ Overlays ══════════════════════════════════════════════════════════ */
 .overlay { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; z-index:20; }
@@ -572,7 +632,6 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
 <div class="ds-status">
   <div class="status-chip">
     <span class="chip-repo">spiro-rajat-mukati/design-system · main</span>
-    <span class="chip-sep">·</span>
     <span id="pat-status">…</span>
   </div>
 </div>
@@ -901,27 +960,45 @@ code { font-size:10px; font-family:ui-monospace,monospace; background:var(--bg-s
     <button class="ov-close" id="close-info" title="Close">✕</button>
   </div>
   <div class="ov-body">
+
+    <!-- Purpose -->
     <div class="info-section">
       <div class="info-tagline">Keeps the Kijani Figma libraries and the GitHub repo in sync — tokens, text styles, components, assets, and drift checks.</div>
       <div class="info-hint">
-        Run <strong>Tokens</strong> actions from <strong>Foundations</strong> ·
+        Run <strong>Tokens</strong> from <strong>Foundations</strong> ·
         <strong>Styles</strong> &amp; <strong>Components</strong> from <strong>Web</strong> or <strong>Mobile</strong> ·
         <strong>Assets</strong> from <strong>Kijani — Assets</strong>
       </div>
     </div>
+
+    <!-- Creator -->
     <div class="info-section">
-      <div class="info-label">Created by <strong>Rajat Mukati</strong> for the Kijani Design System.</div>
-      <div class="info-version" id="plugin-version-line">v0.1.0</div>
+      <div class="creator-block">
+        <img class="creator-avatar" id="creator-avatar" src="__CREATOR_IMG__" alt="Rajat Mukati" />
+        <div class="creator-text">
+          <div class="creator-name">Rajat Mukati</div>
+          <div class="creator-role">Creator of the Kijani Design System</div>
+          <div class="info-version" id="plugin-version-line">v0.1.0</div>
+        </div>
+      </div>
     </div>
+
+    <!-- Repo + Issues & feedback -->
     <div class="info-section">
       <div class="info-label">
-        <a href="https://github.com/spiro-rajat-mukati/design-system" class="info-link" target="_blank" rel="noopener noreferrer">spiro-rajat-mukati/design-system</a>
+        <a href="https://github.com/spiro-rajat-mukati/design-system" class="info-link" target="_blank" rel="noopener noreferrer">spiro-rajat-mukati/design-system ↗</a>
       </div>
-      <div class="info-label" style="margin-top:5px">
-        Issues &amp; feedback:
-        <a href="https://github.com/spiro-rajat-mukati/design-system/issues" class="info-link" target="_blank" rel="noopener noreferrer">open an issue ↗</a>
+      <div class="info-label" style="margin-top:10px"><strong>Issues &amp; feedback</strong></div>
+      <div class="info-feedback-row">
+        <a href="https://github.com/spiro-rajat-mukati/design-system/issues" class="info-link" target="_blank" rel="noopener noreferrer">Open a GitHub issue ↗</a>
+      </div>
+      <div class="info-email-row">
+        <span class="info-email-addr" id="info-email-addr">rajat.mukati@spironet.com</span>
+        <button class="info-copy-btn" id="copy-email-btn">Copy</button>
+        <a href="mailto:rajat.mukati@spironet.com" class="info-link">mailto ↗</a>
       </div>
     </div>
+
   </div>
 </div>
 

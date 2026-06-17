@@ -135,14 +135,20 @@ function updateContextBanner(fileName) {
     });
   }
 }
+var PAT_OK_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2,6.5 4.5,9 10,3"/></svg>';
 function updatePatStatus(hasPat) {
-  const el = document.getElementById("pat-status");
+  var el = document.getElementById("pat-status");
   if (el) {
     el.className = hasPat ? "pat-ok" : "pat-err";
-    el.textContent = hasPat ? "\u2713" : "\u2717 PAT";
+    el.title = hasPat ? "PAT connected" : "";
+    if (hasPat) {
+      el.innerHTML = PAT_OK_SVG;
+    } else {
+      el.textContent = "\u2717 PAT";
+    }
   }
   if (!hasPat) {
-    const ps = document.getElementById("pat-settings");
+    var ps = document.getElementById("pat-settings");
     if (ps) ps.open = true;
   }
 }
@@ -1581,6 +1587,22 @@ document.getElementById("export-assets-confirm").addEventListener("click", async
   if (closeInfo && infoPanel) {
     closeInfo.addEventListener("click", function() {
       infoPanel.hidden = true;
+    });
+  }
+  var copyBtn = document.getElementById("copy-email-btn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function() {
+      var addr = "rajat.mukati@spironet.com";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(addr).then(function() {
+          var orig = copyBtn.textContent;
+          copyBtn.textContent = "Copied!";
+          setTimeout(function() {
+            copyBtn.textContent = orig;
+          }, 1800);
+        }).catch(function() {
+        });
+      }
     });
   }
 })();
