@@ -63,11 +63,13 @@
   border-radius: var(--radius-full);
 }
 .ds-tabs--underline .ds-tabs__trigger--active::after { background: var(--tabs-underline-color); }
+.ds-tabs--underline .ds-tabs__trigger--active { color: var(--tabs-underline-color); }
 
 .ds-tabs--vertical.ds-tabs--underline .ds-tabs__list { border-block-end: 0; border-inline-end: var(--border-width-1) solid var(--color-border-subtle); }
 .ds-tabs--vertical.ds-tabs--underline .ds-tabs__trigger::after { inset-block: 0; inset-block-end: 0; inset-inline-end: -1px; inset-inline-start: auto; inline-size: 2px; block-size: auto; }
 
 /* ---------- Variant: pill ---------- */
+.ds-tabs--pill .ds-tabs__trigger { border-radius: var(--tabs-pill-radius); }
 .ds-tabs--pill .ds-tabs__trigger--active {
   background: var(--tabs-pill-bg-active);
   color: var(--tabs-pill-fg-active);

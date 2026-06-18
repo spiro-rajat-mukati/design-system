@@ -1497,22 +1497,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/950"
         },
         "dark-web": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/50"
         },
         "light-ios": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/950"
         },
         "dark-ios": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/50"
         },
         "light-android": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/950"
         },
         "dark-android": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/50"
         }
       }
     },
@@ -1521,22 +1521,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/primary/bg-active"
+          "alias": "color/neutral/700"
         },
         "dark-web": {
-          "alias": "color/action/primary/bg-active"
+          "alias": "color/neutral/300"
         },
         "light-ios": {
-          "alias": "color/action/primary/bg-active"
+          "alias": "color/neutral/700"
         },
         "dark-ios": {
-          "alias": "color/action/primary/bg-active"
+          "alias": "color/neutral/300"
         },
         "light-android": {
-          "alias": "color/action/primary/bg-active"
+          "alias": "color/neutral/700"
         },
         "dark-android": {
-          "alias": "color/action/primary/bg-active"
+          "alias": "color/neutral/300"
         }
       }
     },
@@ -1545,22 +1545,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/primary/bg-disabled"
+          "alias": "color/neutral/400"
         },
         "dark-web": {
-          "alias": "color/action/primary/bg-disabled"
+          "alias": "color/neutral/800"
         },
         "light-ios": {
-          "alias": "color/action/primary/bg-disabled"
+          "alias": "color/neutral/400"
         },
         "dark-ios": {
-          "alias": "color/action/primary/bg-disabled"
+          "alias": "color/neutral/800"
         },
         "light-android": {
-          "alias": "color/action/primary/bg-disabled"
+          "alias": "color/neutral/400"
         },
         "dark-android": {
-          "alias": "color/action/primary/bg-disabled"
+          "alias": "color/neutral/800"
         }
       }
     },
@@ -1569,22 +1569,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/primary/bg-hover"
+          "alias": "color/neutral/800"
         },
         "dark-web": {
-          "alias": "color/action/primary/bg-hover"
+          "alias": "color/neutral/200"
         },
         "light-ios": {
-          "alias": "color/action/primary/bg-hover"
+          "alias": "color/neutral/800"
         },
         "dark-ios": {
-          "alias": "color/action/primary/bg-hover"
+          "alias": "color/neutral/200"
         },
         "light-android": {
-          "alias": "color/action/primary/bg-hover"
+          "alias": "color/neutral/800"
         },
         "dark-android": {
-          "alias": "color/action/primary/bg-hover"
+          "alias": "color/neutral/200"
         }
       }
     },
@@ -1593,22 +1593,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/950"
         },
         "dark-web": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/50"
         },
         "light-ios": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/950"
         },
         "dark-ios": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/50"
         },
         "light-android": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/950"
         },
         "dark-android": {
-          "alias": "color/action/primary/bg"
+          "alias": "color/neutral/50"
         }
       }
     },
@@ -1617,22 +1617,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/primary/fg"
+          "alias": "color/white"
         },
         "dark-web": {
-          "alias": "color/action/primary/fg"
+          "alias": "color/neutral/950"
         },
         "light-ios": {
-          "alias": "color/action/primary/fg"
+          "alias": "color/white"
         },
         "dark-ios": {
-          "alias": "color/action/primary/fg"
+          "alias": "color/neutral/950"
         },
         "light-android": {
-          "alias": "color/action/primary/fg"
+          "alias": "color/white"
         },
         "dark-android": {
-          "alias": "color/action/primary/fg"
+          "alias": "color/neutral/950"
         }
       }
     },
@@ -1641,22 +1641,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "dark-web": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "light-ios": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "dark-ios": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "light-android": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "dark-android": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         }
       }
     },
@@ -1665,22 +1665,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/secondary/bg"
+          "alias": "color/surface/default"
         },
         "dark-web": {
-          "alias": "color/action/secondary/bg"
+          "alias": "color/surface/default"
         },
         "light-ios": {
-          "alias": "color/action/secondary/bg"
+          "alias": "color/surface/default"
         },
         "dark-ios": {
-          "alias": "color/action/secondary/bg"
+          "alias": "color/surface/default"
         },
         "light-android": {
-          "alias": "color/action/secondary/bg"
+          "alias": "color/surface/default"
         },
         "dark-android": {
-          "alias": "color/action/secondary/bg"
+          "alias": "color/surface/default"
         }
       }
     },
@@ -1689,22 +1689,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/secondary/bg-active"
+          "alias": "color/neutral/200"
         },
         "dark-web": {
-          "alias": "color/action/secondary/bg-active"
+          "alias": "color/neutral/200"
         },
         "light-ios": {
-          "alias": "color/action/secondary/bg-active"
+          "alias": "color/neutral/200"
         },
         "dark-ios": {
-          "alias": "color/action/secondary/bg-active"
+          "alias": "color/neutral/200"
         },
         "light-android": {
-          "alias": "color/action/secondary/bg-active"
+          "alias": "color/neutral/200"
         },
         "dark-android": {
-          "alias": "color/action/secondary/bg-active"
+          "alias": "color/neutral/200"
         }
       }
     },
@@ -1713,22 +1713,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/secondary/bg-disabled"
+          "alias": "color/surface/default"
         },
         "dark-web": {
-          "alias": "color/action/secondary/bg-disabled"
+          "alias": "color/surface/default"
         },
         "light-ios": {
-          "alias": "color/action/secondary/bg-disabled"
+          "alias": "color/surface/default"
         },
         "dark-ios": {
-          "alias": "color/action/secondary/bg-disabled"
+          "alias": "color/surface/default"
         },
         "light-android": {
-          "alias": "color/action/secondary/bg-disabled"
+          "alias": "color/surface/default"
         },
         "dark-android": {
-          "alias": "color/action/secondary/bg-disabled"
+          "alias": "color/surface/default"
         }
       }
     },
@@ -1737,22 +1737,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/secondary/bg-hover"
+          "alias": "color/neutral/100"
         },
         "dark-web": {
-          "alias": "color/action/secondary/bg-hover"
+          "alias": "color/neutral/100"
         },
         "light-ios": {
-          "alias": "color/action/secondary/bg-hover"
+          "alias": "color/neutral/100"
         },
         "dark-ios": {
-          "alias": "color/action/secondary/bg-hover"
+          "alias": "color/neutral/100"
         },
         "light-android": {
-          "alias": "color/action/secondary/bg-hover"
+          "alias": "color/neutral/100"
         },
         "dark-android": {
-          "alias": "color/action/secondary/bg-hover"
+          "alias": "color/neutral/100"
         }
       }
     },
@@ -1761,22 +1761,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/border/default"
+          "alias": "color/neutral/800"
         },
         "dark-web": {
-          "alias": "color/border/default"
+          "alias": "color/neutral/600"
         },
         "light-ios": {
-          "alias": "color/border/default"
+          "alias": "color/neutral/800"
         },
         "dark-ios": {
-          "alias": "color/border/default"
+          "alias": "color/neutral/600"
         },
         "light-android": {
-          "alias": "color/border/default"
+          "alias": "color/neutral/800"
         },
         "dark-android": {
-          "alias": "color/border/default"
+          "alias": "color/neutral/600"
         }
       }
     },
@@ -1785,22 +1785,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "alias": "color/action/secondary/fg"
+          "alias": "color/text/primary"
         },
         "dark-web": {
-          "alias": "color/action/secondary/fg"
+          "alias": "color/text/primary"
         },
         "light-ios": {
-          "alias": "color/action/secondary/fg"
+          "alias": "color/text/primary"
         },
         "dark-ios": {
-          "alias": "color/action/secondary/fg"
+          "alias": "color/text/primary"
         },
         "light-android": {
-          "alias": "color/action/secondary/fg"
+          "alias": "color/text/primary"
         },
         "dark-android": {
-          "alias": "color/action/secondary/fg"
+          "alias": "color/text/primary"
         }
       }
     },
@@ -2961,22 +2961,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#DDE6FE"
+          "value": "#E0E1FF"
         },
         "dark-web": {
-          "value": "#DDE6FE"
+          "value": "#E0E1FF"
         },
         "light-ios": {
-          "value": "#DDE6FE"
+          "value": "#E0E1FF"
         },
         "dark-ios": {
-          "value": "#DDE6FE"
+          "value": "#E0E1FF"
         },
         "light-android": {
-          "value": "#DDE6FE"
+          "value": "#E0E1FF"
         },
         "dark-android": {
-          "value": "#DDE6FE"
+          "value": "#E0E1FF"
         }
       }
     },
@@ -2985,22 +2985,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#ADBFF5"
+          "value": "#C7C8FE"
         },
         "dark-web": {
-          "value": "#ADBFF5"
+          "value": "#C7C8FE"
         },
         "light-ios": {
-          "value": "#ADBFF5"
+          "value": "#C7C8FE"
         },
         "dark-ios": {
-          "value": "#ADBFF5"
+          "value": "#C7C8FE"
         },
         "light-android": {
-          "value": "#ADBFF5"
+          "value": "#C7C8FE"
         },
         "dark-android": {
-          "value": "#ADBFF5"
+          "value": "#C7C8FE"
         }
       }
     },
@@ -3009,22 +3009,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#8FA6F0"
+          "value": "#A6A9FE"
         },
         "dark-web": {
-          "value": "#8FA6F0"
+          "value": "#A6A9FE"
         },
         "light-ios": {
-          "value": "#8FA6F0"
+          "value": "#A6A9FE"
         },
         "dark-ios": {
-          "value": "#8FA6F0"
+          "value": "#A6A9FE"
         },
         "light-android": {
-          "value": "#8FA6F0"
+          "value": "#A6A9FE"
         },
         "dark-android": {
-          "value": "#8FA6F0"
+          "value": "#A6A9FE"
         }
       }
     },
@@ -3033,22 +3033,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#6F8AE8"
+          "value": "#8E90FE"
         },
         "dark-web": {
-          "value": "#6F8AE8"
+          "value": "#8E90FE"
         },
         "light-ios": {
-          "value": "#6F8AE8"
+          "value": "#8E90FE"
         },
         "dark-ios": {
-          "value": "#6F8AE8"
+          "value": "#8E90FE"
         },
         "light-android": {
-          "value": "#6F8AE8"
+          "value": "#8E90FE"
         },
         "dark-android": {
-          "value": "#6F8AE8"
+          "value": "#8E90FE"
         }
       }
     },
@@ -3057,22 +3057,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#EEF2FE"
+          "value": "#EEEFFF"
         },
         "dark-web": {
-          "value": "#EEF2FE"
+          "value": "#EEEFFF"
         },
         "light-ios": {
-          "value": "#EEF2FE"
+          "value": "#EEEFFF"
         },
         "dark-ios": {
-          "value": "#EEF2FE"
+          "value": "#EEEFFF"
         },
         "light-android": {
-          "value": "#EEF2FE"
+          "value": "#EEEFFF"
         },
         "dark-android": {
-          "value": "#EEF2FE"
+          "value": "#EEEFFF"
         }
       }
     },
@@ -3081,22 +3081,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#5277e2"
+          "value": "#6164FD"
         },
         "dark-web": {
-          "value": "#5277e2"
+          "value": "#6164FD"
         },
         "light-ios": {
-          "value": "#5277e2"
+          "value": "#6164FD"
         },
         "dark-ios": {
-          "value": "#5277e2"
+          "value": "#6164FD"
         },
         "light-android": {
-          "value": "#5277e2"
+          "value": "#6164FD"
         },
         "dark-android": {
-          "value": "#5277e2"
+          "value": "#6164FD"
         }
       }
     },
@@ -3105,22 +3105,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#4567DD"
+          "value": "#4346FD"
         },
         "dark-web": {
-          "value": "#4567DD"
+          "value": "#4346FD"
         },
         "light-ios": {
-          "value": "#4567DD"
+          "value": "#4346FD"
         },
         "dark-ios": {
-          "value": "#4567DD"
+          "value": "#4346FD"
         },
         "light-android": {
-          "value": "#4567DD"
+          "value": "#4346FD"
         },
         "dark-android": {
-          "value": "#4567DD"
+          "value": "#4346FD"
         }
       }
     },
@@ -3129,22 +3129,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#3C61DD"
+          "value": "#3137FD"
         },
         "dark-web": {
-          "value": "#3C61DD"
+          "value": "#3137FD"
         },
         "light-ios": {
-          "value": "#3C61DD"
+          "value": "#3137FD"
         },
         "dark-ios": {
-          "value": "#3C61DD"
+          "value": "#3137FD"
         },
         "light-android": {
-          "value": "#3C61DD"
+          "value": "#3137FD"
         },
         "dark-android": {
-          "value": "#3C61DD"
+          "value": "#3137FD"
         }
       }
     },
@@ -3153,22 +3153,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#385BCC"
+          "value": "#2226D8"
         },
         "dark-web": {
-          "value": "#385BCC"
+          "value": "#2226D8"
         },
         "light-ios": {
-          "value": "#385BCC"
+          "value": "#2226D8"
         },
         "dark-ios": {
-          "value": "#385BCC"
+          "value": "#2226D8"
         },
         "light-android": {
-          "value": "#385BCC"
+          "value": "#2226D8"
         },
         "dark-android": {
-          "value": "#385BCC"
+          "value": "#2226D8"
         }
       }
     },
@@ -3177,22 +3177,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#3451B2"
+          "value": "#1B1FA6"
         },
         "dark-web": {
-          "value": "#3451B2"
+          "value": "#1B1FA6"
         },
         "light-ios": {
-          "value": "#3451B2"
+          "value": "#1B1FA6"
         },
         "dark-ios": {
-          "value": "#3451B2"
+          "value": "#1B1FA6"
         },
         "light-android": {
-          "value": "#3451B2"
+          "value": "#1B1FA6"
         },
         "dark-android": {
-          "value": "#3451B2"
+          "value": "#1B1FA6"
         }
       }
     },
@@ -3201,22 +3201,22 @@
       "type": "COLOR",
       "values": {
         "light-web": {
-          "value": "#243B8A"
+          "value": "#141663"
         },
         "dark-web": {
-          "value": "#243B8A"
+          "value": "#141663"
         },
         "light-ios": {
-          "value": "#243B8A"
+          "value": "#141663"
         },
         "dark-ios": {
-          "value": "#243B8A"
+          "value": "#141663"
         },
         "light-android": {
-          "value": "#243B8A"
+          "value": "#141663"
         },
         "dark-android": {
-          "value": "#243B8A"
+          "value": "#141663"
         }
       }
     },
@@ -6225,22 +6225,22 @@
       "type": "STRING",
       "values": {
         "light-web": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "dark-web": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "light-ios": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "dark-ios": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "light-android": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "dark-android": {
-          "value": "Menlo"
+          "value": "DM Mono"
         }
       }
     },
@@ -6249,10 +6249,10 @@
       "type": "STRING",
       "values": {
         "light-web": {
-          "value": "Inter"
+          "value": "TT Hoves"
         },
         "dark-web": {
-          "value": "Inter"
+          "value": "TT Hoves"
         },
         "light-ios": {
           "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", sans-serif"
@@ -6481,6 +6481,30 @@
         },
         "dark-android": {
           "value": 24
+        }
+      }
+    },
+    {
+      "name": "font-size/650",
+      "type": "FLOAT",
+      "values": {
+        "light-web": {
+          "value": 28
+        },
+        "dark-web": {
+          "value": 28
+        },
+        "light-ios": {
+          "value": 28
+        },
+        "dark-ios": {
+          "value": 28
+        },
+        "light-android": {
+          "value": 28
+        },
+        "dark-android": {
+          "value": 28
         }
       }
     },
@@ -7209,22 +7233,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "dark-web": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "light-ios": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "dark-ios": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "light-android": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "dark-android": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         }
       }
     },
@@ -9341,6 +9365,30 @@
       }
     },
     {
+      "name": "tabs/pill-radius",
+      "type": "FLOAT",
+      "values": {
+        "light-web": {
+          "alias": "radius/full"
+        },
+        "dark-web": {
+          "alias": "radius/full"
+        },
+        "light-ios": {
+          "alias": "radius/full"
+        },
+        "dark-ios": {
+          "alias": "radius/full"
+        },
+        "light-android": {
+          "alias": "radius/full"
+        },
+        "dark-android": {
+          "alias": "radius/full"
+        }
+      }
+    },
+    {
       "name": "tabs/segmented-bg-active",
       "type": "COLOR",
       "values": {
@@ -10521,22 +10569,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 38
+          "value": 35
         },
         "dark-web": {
-          "value": 38
+          "value": 35
         },
         "light-ios": {
-          "value": 38
+          "value": 35
         },
         "dark-ios": {
-          "value": 38
+          "value": 35
         },
         "light-android": {
-          "value": 38
+          "value": 35
         },
         "dark-android": {
-          "value": 38
+          "value": 35
         }
       }
     },
@@ -10545,22 +10593,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-web": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "light-ios": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-ios": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "light-android": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-android": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         }
       }
     },
@@ -11409,22 +11457,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 38
+          "value": 35
         },
         "dark-web": {
-          "value": 38
+          "value": 35
         },
         "light-ios": {
-          "value": 38
+          "value": 35
         },
         "dark-ios": {
-          "value": 38
+          "value": 35
         },
         "light-android": {
-          "value": 38
+          "value": 35
         },
         "dark-android": {
-          "value": 38
+          "value": 35
         }
       }
     },
@@ -11433,22 +11481,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-web": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "light-ios": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-ios": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "light-android": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-android": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         }
       }
     },

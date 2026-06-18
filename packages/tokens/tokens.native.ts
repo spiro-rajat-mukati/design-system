@@ -22,17 +22,17 @@ export const themes = {
       "950": "#11181C"
     },
     "brand": {
-      "50": "#EEF2FE",
-      "100": "#DDE6FE",
-      "200": "#ADBFF5",
-      "300": "#8FA6F0",
-      "400": "#6F8AE8",
-      "500": "#5277e2",
-      "600": "#4567DD",
-      "700": "#3C61DD",
-      "800": "#385BCC",
-      "900": "#3451B2",
-      "950": "#243B8A"
+      "50": "#EEEFFF",
+      "100": "#E0E1FF",
+      "200": "#C7C8FE",
+      "300": "#A6A9FE",
+      "400": "#8E90FE",
+      "500": "#6164FD",
+      "600": "#4346FD",
+      "700": "#3137FD",
+      "800": "#2226D8",
+      "900": "#1B1FA6",
+      "950": "#141663"
     },
     "info": {
       "50": "#ECFEFF",
@@ -95,7 +95,7 @@ export const themes = {
       "sunken": "#F8F9FA",
       "overlay": "rgba(17, 24, 28, 0.40)",
       "inverse": "#11181C",
-      "brand": "#3C61DD",
+      "brand": "#3137FD",
       "info-subtle": "#ECFEFF",
       "success-subtle": "#F0FDF4",
       "warning-subtle": "#FFFBEB",
@@ -109,8 +109,8 @@ export const themes = {
       "disabled": "#C1C8CD",
       "inverse": "#FFFFFF",
       "on-brand": "#FFFFFF",
-      "link": "#3C61DD",
-      "link-hover": "#385BCC",
+      "link": "#3137FD",
+      "link-hover": "#2226D8",
       "success": "#15803D",
       "warning": "#92400E",
       "danger": "#B91C1C",
@@ -120,7 +120,7 @@ export const themes = {
       "default": "#D7DBDF",
       "subtle": "#E6E8EB",
       "strong": "#C1C8CD",
-      "focus": "#3C61DD",
+      "focus": "#3137FD",
       "disabled": "#E6E8EB",
       "error": "#DC2626",
       "success": "#16A34A",
@@ -129,10 +129,10 @@ export const themes = {
     },
     "action": {
       "primary": {
-        "bg": "#3C61DD",
-        "bg-hover": "#385BCC",
-        "bg-active": "#3451B2",
-        "bg-disabled": "#ADBFF5",
+        "bg": "#3137FD",
+        "bg-hover": "#2226D8",
+        "bg-active": "#1B1FA6",
+        "bg-disabled": "#C7C8FE",
         "fg": "#FFFFFF"
       },
       "secondary": {
@@ -201,9 +201,9 @@ export const themes = {
     "32": "128px"
   },
   "font-family": {
-    "sans": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "sans": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "serif": "ui-serif, Georgia, \"Times New Roman\", serif",
-    "mono": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+    "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
   },
   "font-size": {
     "25": "10px",
@@ -214,6 +214,7 @@ export const themes = {
     "400": "18px",
     "500": "20px",
     "600": "24px",
+    "650": "28px",
     "700": "30px",
     "800": "36px",
     "900": "48px"
@@ -345,8 +346,8 @@ export const themes = {
         "weight": "600"
       },
       "heading-1": {
-        "size": "30px",
-        "line": "38",
+        "size": "28px",
+        "line": "35",
         "weight": "600"
       },
       "heading-2": {
@@ -413,7 +414,7 @@ export const themes = {
         "size": "14px",
         "line": "21",
         "weight": "400",
-        "family": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+        "family": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
       },
       "overline": {
         "size": "11px",
@@ -429,8 +430,8 @@ export const themes = {
         "weight": "600"
       },
       "title-lg": {
-        "size": "30px",
-        "line": "38",
+        "size": "28px",
+        "line": "35",
         "weight": "600"
       },
       "title-md": {
@@ -506,15 +507,15 @@ export const themes = {
     }
   },
   "button": {
-    "radius": "6px",
+    "radius": "9999px",
     "border-width": "1px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-weight": "500",
     "letter-spacing": "0",
     "icon-gap": "8px",
     "transition": "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 100ms cubic-bezier(0, 0, 0.2, 1)",
     "disabled-opacity": "1",
-    "focus-ring": "0 0 0 2px #FFFFFF, 0 0 0 4px #3C61DD",
+    "focus-ring": "0 0 0 2px #FFFFFF, 0 0 0 4px #3137FD",
     "height": {
       "xs": "24px",
       "sm": "32px",
@@ -537,20 +538,20 @@ export const themes = {
       "xl": "18px"
     },
     "primary": {
-      "bg": "#3C61DD",
-      "bg-hover": "#385BCC",
-      "bg-active": "#3451B2",
-      "bg-disabled": "#ADBFF5",
+      "bg": "#11181C",
+      "bg-hover": "#2C3338",
+      "bg-active": "#4D5358",
+      "bg-disabled": "#C1C8CD",
       "fg": "#FFFFFF",
-      "border": "#3C61DD"
+      "border": "#11181C"
     },
     "secondary": {
-      "bg": "#E6E8EB",
-      "bg-hover": "#D7DBDF",
-      "bg-active": "#C1C8CD",
-      "bg-disabled": "#F0F2F4",
+      "bg": "#FFFFFF",
+      "bg-hover": "#F0F2F4",
+      "bg-active": "#E6E8EB",
+      "bg-disabled": "#FFFFFF",
       "fg": "#11181C",
-      "border": "#D7DBDF"
+      "border": "#2C3338"
     },
     "tertiary": {
       "bg": "transparent",
@@ -581,8 +582,8 @@ export const themes = {
       "bg-hover": "transparent",
       "bg-active": "transparent",
       "bg-disabled": "transparent",
-      "fg": "#3C61DD",
-      "fg-hover": "#385BCC",
+      "fg": "#3137FD",
+      "fg-hover": "#2226D8",
       "border": "transparent"
     }
   },
@@ -618,13 +619,13 @@ export const themes = {
     "fg-disabled": "#C1C8CD",
     "border": "#D7DBDF",
     "border-hover": "#C1C8CD",
-    "border-focus": "#3C61DD",
+    "border-focus": "#3137FD",
     "border-error": "#DC2626",
     "border-success": "#16A34A",
     "border-disabled": "#E6E8EB",
-    "radius": "6px",
+    "radius": "8px",
     "border-width": "1px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-size": "14px",
     "line-height": "1.5",
     "transition": "border-color 100ms cubic-bezier(0, 0, 0.2, 1), box-shadow 100ms cubic-bezier(0, 0, 0.2, 1)",
@@ -656,9 +657,9 @@ export const themes = {
   "radio": {
     "size": "16px",
     "border": "#C1C8CD",
-    "border-checked": "#3C61DD",
+    "border-checked": "#3137FD",
     "bg": "#FFFFFF",
-    "bg-checked": "#3C61DD",
+    "bg-checked": "#3137FD",
     "dot": "#FFFFFF",
     "bg-disabled": "#F8F9FA",
     "border-disabled": "#E6E8EB",
@@ -671,9 +672,9 @@ export const themes = {
     "size": "16px",
     "radius": "2px",
     "border": "#C1C8CD",
-    "border-checked": "#3C61DD",
+    "border-checked": "#3137FD",
     "bg": "#FFFFFF",
-    "bg-checked": "#3C61DD",
+    "bg-checked": "#3137FD",
     "mark": "#FFFFFF",
     "bg-disabled": "#F8F9FA",
     "border-disabled": "#E6E8EB",
@@ -707,7 +708,7 @@ export const themes = {
   },
   "badge": {
     "radius": "9999px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-weight": "500",
     "icon-gap": "4px",
     "padding-inline": {
@@ -739,8 +740,8 @@ export const themes = {
     "trigger-fg-active": "#11181C",
     "trigger-fg-hover": "#11181C",
     "trigger-fg-disabled": "#C1C8CD",
-    "underline-color": "#3C61DD",
-    "pill-bg-active": "#3C61DD",
+    "underline-color": "#3137FD",
+    "pill-bg-active": "#3137FD",
     "pill-fg-active": "#FFFFFF",
     "segmented-bg-active": "#FFFFFF",
     "trigger-padding": {
@@ -754,6 +755,7 @@ export const themes = {
       "lg": "16px"
     },
     "trigger-radius": "6px",
+    "pill-radius": "9999px",
     "list-radius": "6px",
     "trigger-transition": "color 100ms cubic-bezier(0, 0, 0.2, 1), background-color 100ms cubic-bezier(0, 0, 0.2, 1)"
   },
@@ -769,7 +771,7 @@ export const themes = {
     "item-fg": "#11181C",
     "item-fg-active": "#11181C",
     "item-bg-hover": "#F8F9FA",
-    "item-bg-active": "#EEF2FE",
+    "item-bg-active": "#EEEFFF",
     "item-fg-disabled": "#C1C8CD",
     "item-fg-destructive": "#B91C1C",
     "item-bg-destructive-hover": "#FEF2F2",
@@ -783,7 +785,7 @@ export const themes = {
     "trigger-bg": "#FFFFFF",
     "trigger-fg": "#11181C",
     "trigger-border": "#D7DBDF",
-    "trigger-radius": "6px",
+    "trigger-radius": "8px",
     "trigger-padding": "8px 12px",
     "chip-bg": "#F0F2F4",
     "chip-fg": "#11181C",
@@ -799,7 +801,7 @@ export const themes = {
       "md": "8px",
       "lg": "12px"
     },
-    "fill-brand": "#3C61DD",
+    "fill-brand": "#3137FD",
     "fill-success": "#16A34A",
     "fill-warning": "#D97706",
     "fill-danger": "#DC2626",
@@ -826,17 +828,17 @@ export const themes = {
       "950": "#11181C"
     },
     "brand": {
-      "50": "#EEF2FE",
-      "100": "#DDE6FE",
-      "200": "#ADBFF5",
-      "300": "#8FA6F0",
-      "400": "#6F8AE8",
-      "500": "#5277e2",
-      "600": "#4567DD",
-      "700": "#3C61DD",
-      "800": "#385BCC",
-      "900": "#3451B2",
-      "950": "#243B8A"
+      "50": "#EEEFFF",
+      "100": "#E0E1FF",
+      "200": "#C7C8FE",
+      "300": "#A6A9FE",
+      "400": "#8E90FE",
+      "500": "#6164FD",
+      "600": "#4346FD",
+      "700": "#3137FD",
+      "800": "#2226D8",
+      "900": "#1B1FA6",
+      "950": "#141663"
     },
     "info": {
       "50": "#ECFEFF",
@@ -899,7 +901,7 @@ export const themes = {
       "sunken": "#11181C",
       "overlay": "rgba(0, 0, 0, 0.60)",
       "inverse": "#FFFFFF",
-      "brand": "#4567DD",
+      "brand": "#4346FD",
       "info-subtle": "#083344",
       "success-subtle": "#052E16",
       "warning-subtle": "#451A03",
@@ -913,8 +915,8 @@ export const themes = {
       "disabled": "#697177",
       "inverse": "#11181C",
       "on-brand": "#FFFFFF",
-      "link": "#8FA6F0",
-      "link-hover": "#ADBFF5",
+      "link": "#A6A9FE",
+      "link-hover": "#C7C8FE",
       "success": "#86EFAC",
       "warning": "#FCD34D",
       "danger": "#FCA5A5",
@@ -924,7 +926,7 @@ export const themes = {
       "default": "#4D5358",
       "subtle": "#2C3338",
       "strong": "#697177",
-      "focus": "#6F8AE8",
+      "focus": "#8E90FE",
       "disabled": "#2C3338",
       "error": "#F87171",
       "success": "#4ADE80",
@@ -933,10 +935,10 @@ export const themes = {
     },
     "action": {
       "primary": {
-        "bg": "#4567DD",
-        "bg-hover": "#5277e2",
-        "bg-active": "#6F8AE8",
-        "bg-disabled": "#3451B2",
+        "bg": "#4346FD",
+        "bg-hover": "#6164FD",
+        "bg-active": "#8E90FE",
+        "bg-disabled": "#1B1FA6",
         "fg": "#FFFFFF"
       },
       "secondary": {
@@ -1005,9 +1007,9 @@ export const themes = {
     "32": "128px"
   },
   "font-family": {
-    "sans": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "sans": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "serif": "ui-serif, Georgia, \"Times New Roman\", serif",
-    "mono": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+    "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
   },
   "font-size": {
     "25": "10px",
@@ -1018,6 +1020,7 @@ export const themes = {
     "400": "18px",
     "500": "20px",
     "600": "24px",
+    "650": "28px",
     "700": "30px",
     "800": "36px",
     "900": "48px"
@@ -1149,8 +1152,8 @@ export const themes = {
         "weight": "600"
       },
       "heading-1": {
-        "size": "30px",
-        "line": "38",
+        "size": "28px",
+        "line": "35",
         "weight": "600"
       },
       "heading-2": {
@@ -1217,7 +1220,7 @@ export const themes = {
         "size": "14px",
         "line": "21",
         "weight": "400",
-        "family": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+        "family": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
       },
       "overline": {
         "size": "11px",
@@ -1233,8 +1236,8 @@ export const themes = {
         "weight": "600"
       },
       "title-lg": {
-        "size": "30px",
-        "line": "38",
+        "size": "28px",
+        "line": "35",
         "weight": "600"
       },
       "title-md": {
@@ -1310,15 +1313,15 @@ export const themes = {
     }
   },
   "button": {
-    "radius": "6px",
+    "radius": "9999px",
     "border-width": "1px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-weight": "500",
     "letter-spacing": "0",
     "icon-gap": "8px",
     "transition": "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 100ms cubic-bezier(0, 0, 0.2, 1)",
     "disabled-opacity": "1",
-    "focus-ring": "0 0 0 2px #1A1F23, 0 0 0 4px #6F8AE8",
+    "focus-ring": "0 0 0 2px #1A1F23, 0 0 0 4px #8E90FE",
     "height": {
       "xs": "24px",
       "sm": "32px",
@@ -1341,20 +1344,20 @@ export const themes = {
       "xl": "18px"
     },
     "primary": {
-      "bg": "#4567DD",
-      "bg-hover": "#5277e2",
-      "bg-active": "#6F8AE8",
-      "bg-disabled": "#3451B2",
-      "fg": "#FFFFFF",
-      "border": "#4567DD"
+      "bg": "#F8F9FA",
+      "bg-hover": "#E6E8EB",
+      "bg-active": "#D7DBDF",
+      "bg-disabled": "#2C3338",
+      "fg": "#11181C",
+      "border": "#F8F9FA"
     },
     "secondary": {
-      "bg": "#2C3338",
-      "bg-hover": "#4D5358",
-      "bg-active": "#697177",
+      "bg": "#1A1F23",
+      "bg-hover": "#F0F2F4",
+      "bg-active": "#E6E8EB",
       "bg-disabled": "#1A1F23",
       "fg": "#F8F9FA",
-      "border": "#4D5358"
+      "border": "#697177"
     },
     "tertiary": {
       "bg": "transparent",
@@ -1385,8 +1388,8 @@ export const themes = {
       "bg-hover": "transparent",
       "bg-active": "transparent",
       "bg-disabled": "transparent",
-      "fg": "#8FA6F0",
-      "fg-hover": "#ADBFF5",
+      "fg": "#A6A9FE",
+      "fg-hover": "#C7C8FE",
       "border": "transparent"
     }
   },
@@ -1422,13 +1425,13 @@ export const themes = {
     "fg-disabled": "#697177",
     "border": "#4D5358",
     "border-hover": "#697177",
-    "border-focus": "#6F8AE8",
+    "border-focus": "#8E90FE",
     "border-error": "#F87171",
     "border-success": "#4ADE80",
     "border-disabled": "#2C3338",
-    "radius": "6px",
+    "radius": "8px",
     "border-width": "1px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-size": "14px",
     "line-height": "1.5",
     "transition": "border-color 100ms cubic-bezier(0, 0, 0.2, 1), box-shadow 100ms cubic-bezier(0, 0, 0.2, 1)",
@@ -1460,9 +1463,9 @@ export const themes = {
   "radio": {
     "size": "16px",
     "border": "#697177",
-    "border-checked": "#4567DD",
+    "border-checked": "#4346FD",
     "bg": "#1A1F23",
-    "bg-checked": "#4567DD",
+    "bg-checked": "#4346FD",
     "dot": "#FFFFFF",
     "bg-disabled": "#11181C",
     "border-disabled": "#2C3338",
@@ -1475,9 +1478,9 @@ export const themes = {
     "size": "16px",
     "radius": "2px",
     "border": "#697177",
-    "border-checked": "#4567DD",
+    "border-checked": "#4346FD",
     "bg": "#1A1F23",
-    "bg-checked": "#4567DD",
+    "bg-checked": "#4346FD",
     "mark": "#FFFFFF",
     "bg-disabled": "#11181C",
     "border-disabled": "#2C3338",
@@ -1511,7 +1514,7 @@ export const themes = {
   },
   "badge": {
     "radius": "9999px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-weight": "500",
     "icon-gap": "4px",
     "padding-inline": {
@@ -1543,8 +1546,8 @@ export const themes = {
     "trigger-fg-active": "#F8F9FA",
     "trigger-fg-hover": "#F8F9FA",
     "trigger-fg-disabled": "#697177",
-    "underline-color": "#4567DD",
-    "pill-bg-active": "#4567DD",
+    "underline-color": "#4346FD",
+    "pill-bg-active": "#4346FD",
     "pill-fg-active": "#FFFFFF",
     "segmented-bg-active": "#1A1F23",
     "trigger-padding": {
@@ -1558,6 +1561,7 @@ export const themes = {
       "lg": "16px"
     },
     "trigger-radius": "6px",
+    "pill-radius": "9999px",
     "list-radius": "6px",
     "trigger-transition": "color 100ms cubic-bezier(0, 0, 0.2, 1), background-color 100ms cubic-bezier(0, 0, 0.2, 1)"
   },
@@ -1587,7 +1591,7 @@ export const themes = {
     "trigger-bg": "#1A1F23",
     "trigger-fg": "#F8F9FA",
     "trigger-border": "#4D5358",
-    "trigger-radius": "6px",
+    "trigger-radius": "8px",
     "trigger-padding": "8px 12px",
     "chip-bg": "#2C3338",
     "chip-fg": "#F8F9FA",
@@ -1603,7 +1607,7 @@ export const themes = {
       "md": "8px",
       "lg": "12px"
     },
-    "fill-brand": "#3C61DD",
+    "fill-brand": "#3137FD",
     "fill-success": "#16A34A",
     "fill-warning": "#D97706",
     "fill-danger": "#DC2626",

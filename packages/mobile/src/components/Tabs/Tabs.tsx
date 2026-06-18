@@ -37,6 +37,7 @@ export function Tabs({
   const hPad = H_PAD[size];
   const fontSize = FONT[size];
   const radius = px(t["trigger-radius"]);
+  const pillRadius = px(t["pill-radius"]);
 
   function renderTab(item: (typeof items)[number]) {
     const isActive = selected === item.value;
@@ -64,7 +65,7 @@ export function Tabs({
           {
             paddingVertical: vPad,
             paddingHorizontal: hPad,
-            borderRadius: variant === "pill" ? radius : 0,
+            borderRadius: variant === "pill" ? pillRadius : 0,
             backgroundColor:
               variant === "pill"
                 ? pressed && !isDisabled && !isActive
@@ -77,7 +78,12 @@ export function Tabs({
         <Text
           numberOfLines={1}
           style={{
-            color: variant === "pill" ? pillFg : fg,
+            color:
+              variant === "pill"
+                ? pillFg
+                : variant === "underline" && isActive
+                ? t["underline-color"]
+                : fg,
             fontSize,
             fontWeight: isActive ? "600" : "400",
             includeFontPadding: false,
@@ -89,7 +95,7 @@ export function Tabs({
           <View
             style={[
               styles.underline,
-              { backgroundColor: t["underline-color"] },
+              { backgroundColor: t["underline-color"], bottom: -vPad },
             ]}
           />
         )}

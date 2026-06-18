@@ -47,6 +47,7 @@ This solo mode intentionally lets the agent merge its own PRs. The lead-review e
 - **Editing a component / adding a variant** → read `docs/ai/component-usage.md` + `docs/ai/quality-bar.md` before touching code. Web lives in `packages/web/src/components/`, mobile in `packages/mobile/src/components/`.
 - **Generating a new screen from a prompt or Figma** → read `docs/ai/pipeline.md` + `docs/ai/component-usage.md`.
 - **Token-level change** → read `docs/ai/token-usage.md` first; edit `packages/tokens/source/` only and let `build.mjs` regenerate — never touch the consumer or the generated files.
+- **Reskinning / exploring a new visual style from a reference image** → read `docs/ai/style-extraction.md` (D18): extract the style, regenerate the `core.json` primitives, let references cascade, preview on a `style/<name>` branch.
 
 ## 4. File map (where things live)
 
@@ -89,6 +90,7 @@ Structural changes — forking/detaching a published component, breaking a compo
 - `docs/ai/pipeline.md` — design-to-dev workflow
 - `docs/ai/component-usage.md` — component selection + composition rules
 - `docs/ai/token-usage.md` — token tier rules
+- `docs/ai/style-extraction.md` — reskin the foundations from a reference image (D18)
 - `docs/ai/prompting.md` — prompt library
 - `docs/ai/quality-bar.md` — production-readiness checklist
 - `docs/ai/rfc-template.md` — RFC template for structural changes

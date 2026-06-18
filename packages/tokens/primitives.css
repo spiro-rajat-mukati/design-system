@@ -14,17 +14,17 @@
   --color-neutral-800: #2C3338;
   --color-neutral-900: #1A1F23;
   --color-neutral-950: #11181C;
-  --color-brand-50: #EEF2FE;
-  --color-brand-100: #DDE6FE;
-  --color-brand-200: #ADBFF5;
-  --color-brand-300: #8FA6F0;
-  --color-brand-400: #6F8AE8;
-  --color-brand-500: #5277e2;
-  --color-brand-600: #4567DD;
-  --color-brand-700: #3C61DD;
-  --color-brand-800: #385BCC;
-  --color-brand-900: #3451B2;
-  --color-brand-950: #243B8A;
+  --color-brand-50: #EEEFFF;
+  --color-brand-100: #E0E1FF;
+  --color-brand-200: #C7C8FE;
+  --color-brand-300: #A6A9FE;
+  --color-brand-400: #8E90FE;
+  --color-brand-500: #6164FD;
+  --color-brand-600: #4346FD;
+  --color-brand-700: #3137FD;
+  --color-brand-800: #2226D8;
+  --color-brand-900: #1B1FA6;
+  --color-brand-950: #141663;
   --color-info-50: #ECFEFF;
   --color-info-100: #CFFAFE;
   --color-info-200: #A5F3FC;
@@ -90,9 +90,9 @@
   --space-32: 128px;
 
   /* ---------- Typography — primitives ---------- */
-  --font-family-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-sans: "TT Hoves", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-family-serif: ui-serif, Georgia, "Times New Roman", serif;
-  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-family-mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
   --font-size-25: 10px;
   --font-size-50: 11px;
@@ -102,6 +102,7 @@
   --font-size-400: 18px;
   --font-size-500: 20px;
   --font-size-600: 24px;
+  --font-size-650: 28px;
   --font-size-700: 30px;
   --font-size-800: 36px;
   --font-size-900: 48px;
