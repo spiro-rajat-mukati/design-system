@@ -14,17 +14,17 @@
       "950": { "$value": "#11181C", "$type": "color" }
     },
     "brand": {
-      "50":  { "$value": "#EEF2FE", "$type": "color" },
-      "100": { "$value": "#DDE6FE", "$type": "color" },
-      "200": { "$value": "#ADBFF5", "$type": "color", "$description": "Existing token: button primary disabled bg" },
-      "300": { "$value": "#8FA6F0", "$type": "color" },
-      "400": { "$value": "#6F8AE8", "$type": "color" },
-      "500": { "$value": "#5277e2", "$type": "color" },
-      "600": { "$value": "#4567DD", "$type": "color" },
-      "700": { "$value": "#3C61DD", "$type": "color", "$description": "Existing token: brand 700, button primary bg" },
-      "800": { "$value": "#385BCC", "$type": "color", "$description": "Existing token: button primary hover" },
-      "900": { "$value": "#3451B2", "$type": "color", "$description": "Existing token: button primary active" },
-      "950": { "$value": "#243B8A", "$type": "color" }
+      "50":  { "$value": "#EEEFFF", "$type": "color" },
+      "100": { "$value": "#E0E1FF", "$type": "color" },
+      "200": { "$value": "#C7C8FE", "$type": "color" },
+      "300": { "$value": "#A6A9FE", "$type": "color" },
+      "400": { "$value": "#8E90FE", "$type": "color", "$description": "Energy accent: link-hover (lighter step)" },
+      "500": { "$value": "#6164FD", "$type": "color" },
+      "600": { "$value": "#4346FD", "$type": "color" },
+      "700": { "$value": "#3137FD", "$type": "color", "$description": "Energy accent base: links, focus ring, selection (was Kijani indigo #3C61DD)" },
+      "800": { "$value": "#2226D8", "$type": "color" },
+      "900": { "$value": "#1B1FA6", "$type": "color" },
+      "950": { "$value": "#141663", "$type": "color" }
     },
     "info": {
       "50":  { "$value": "#ECFEFF", "$type": "color" },

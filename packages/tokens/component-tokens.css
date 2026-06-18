@@ -27,18 +27,18 @@
   --button-font-size-md: var(--font-size-200);
   --button-font-size-lg: var(--font-size-300);
   --button-font-size-xl: var(--font-size-400);
-  --button-primary-bg: var(--color-action-primary-bg);
-  --button-primary-bg-hover: var(--color-action-primary-bg-hover);
-  --button-primary-bg-active: var(--color-action-primary-bg-active);
-  --button-primary-bg-disabled: var(--color-action-primary-bg-disabled);
-  --button-primary-fg: var(--color-action-primary-fg);
-  --button-primary-border: var(--color-action-primary-bg);
-  --button-secondary-bg: var(--color-action-secondary-bg);
-  --button-secondary-bg-hover: var(--color-action-secondary-bg-hover);
-  --button-secondary-bg-active: var(--color-action-secondary-bg-active);
-  --button-secondary-bg-disabled: var(--color-action-secondary-bg-disabled);
-  --button-secondary-fg: var(--color-action-secondary-fg);
-  --button-secondary-border: var(--color-border-default);
+  --button-primary-bg: var(--color-neutral-950);
+  --button-primary-bg-hover: var(--color-neutral-800);
+  --button-primary-bg-active: var(--color-neutral-700);
+  --button-primary-bg-disabled: var(--color-neutral-400);
+  --button-primary-fg: var(--color-white);
+  --button-primary-border: var(--color-neutral-950);
+  --button-secondary-bg: var(--color-surface-default);
+  --button-secondary-bg-hover: var(--color-neutral-100);
+  --button-secondary-bg-active: var(--color-neutral-200);
+  --button-secondary-bg-disabled: var(--color-surface-default);
+  --button-secondary-fg: var(--color-text-primary);
+  --button-secondary-border: var(--color-neutral-800);
   --button-tertiary-bg: var(--color-action-tertiary-bg);
   --button-tertiary-bg-hover: var(--color-action-tertiary-bg-hover);
   --button-tertiary-bg-active: var(--color-action-tertiary-bg-active);
@@ -265,6 +265,14 @@
 }
 
 [data-theme="dark"] {
+  /* button */
+  --button-primary-bg: var(--color-neutral-50);
+  --button-primary-bg-hover: var(--color-neutral-200);
+  --button-primary-bg-active: var(--color-neutral-300);
+  --button-primary-bg-disabled: var(--color-neutral-800);
+  --button-primary-fg: var(--color-neutral-950);
+  --button-primary-border: var(--color-neutral-50);
+  --button-secondary-border: var(--color-neutral-600);
   /* input */
   --input-focus-ring: 0 0 0 3px rgba(143, 166, 240, 0.30);
   --input-focus-ring-error: 0 0 0 3px rgba(248, 113, 113, 0.30);

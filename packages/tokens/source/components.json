@@ -33,20 +33,20 @@
     },
 
     "primary": {
-      "bg":          { "$value": "{color.action.primary.bg}",          "$type": "color" },
-      "bg-hover":    { "$value": "{color.action.primary.bg-hover}",    "$type": "color" },
-      "bg-active":   { "$value": "{color.action.primary.bg-active}",   "$type": "color" },
-      "bg-disabled": { "$value": "{color.action.primary.bg-disabled}", "$type": "color" },
-      "fg":          { "$value": "{color.action.primary.fg}",          "$type": "color" },
-      "border":      { "$value": "{color.action.primary.bg}",          "$type": "color" }
+      "bg":          { "$value": "{color.neutral.950}", "$type": "color", "$description": "Energy: monochrome near-black primary (was {color.action.primary.bg} indigo)" },
+      "bg-hover":    { "$value": "{color.neutral.800}", "$type": "color" },
+      "bg-active":   { "$value": "{color.neutral.700}", "$type": "color" },
+      "bg-disabled": { "$value": "{color.neutral.400}", "$type": "color" },
+      "fg":          { "$value": "{color.white}",       "$type": "color" },
+      "border":      { "$value": "{color.neutral.950}", "$type": "color" }
     },
     "secondary": {
-      "bg":          { "$value": "{color.action.secondary.bg}",          "$type": "color" },
-      "bg-hover":    { "$value": "{color.action.secondary.bg-hover}",    "$type": "color" },
-      "bg-active":   { "$value": "{color.action.secondary.bg-active}",   "$type": "color" },
-      "bg-disabled": { "$value": "{color.action.secondary.bg-disabled}", "$type": "color" },
-      "fg":          { "$value": "{color.action.secondary.fg}",          "$type": "color" },
-      "border":      { "$value": "{color.border.default}",               "$type": "color" }
+      "bg":          { "$value": "{color.surface.default}", "$type": "color", "$description": "Energy: outline secondary (transparent/surface fill, was filled neutral)" },
+      "bg-hover":    { "$value": "{color.neutral.100}",     "$type": "color" },
+      "bg-active":   { "$value": "{color.neutral.200}",     "$type": "color" },
+      "bg-disabled": { "$value": "{color.surface.default}", "$type": "color" },
+      "fg":          { "$value": "{color.text.primary}",    "$type": "color" },
+      "border":      { "$value": "{color.neutral.800}",     "$type": "color" }
     },
     "tertiary": {
       "bg":          { "$value": "{color.action.tertiary.bg}",          "$type": "color" },
