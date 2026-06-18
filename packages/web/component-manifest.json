@@ -1,6 +1,6 @@
 {
   "platform": "web",
-  "generatedAt": "2026-06-17T19:53:10.143Z",
+  "generatedAt": "2026-06-18T15:39:05.668Z",
   "components": [
     {
       "name": "Badge",
@@ -51,10 +51,10 @@
       "codeConnect": true,
       "ccMappings": {
         "figmaMapped": [
-          "hasdot",
           "size",
           "tone",
-          "variant"
+          "variant",
+          "with dot"
         ],
         "codeMapped": [
           "withdot"
