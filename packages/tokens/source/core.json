@@ -102,9 +102,9 @@
 
   "font-family": {
     "sans":  {
-      "$value": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "$value": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
       "$type": "fontFamilies",
-      "$extensions": { "design-system.figma-value": "Inter" }
+      "$extensions": { "design-system.figma-value": "TT Hoves" }
     },
     "serif": {
       "$value": "ui-serif, Georgia, \"Times New Roman\", serif",
@@ -112,9 +112,9 @@
       "$extensions": { "design-system.figma-value": "Georgia" }
     },
     "mono":  {
-      "$value": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace",
+      "$value": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace",
       "$type": "fontFamilies",
-      "$extensions": { "design-system.figma-value": "Menlo" }
+      "$extensions": { "design-system.figma-value": "DM Mono" }
     }
   },
 
@@ -127,6 +127,7 @@
     "400": { "$value": "18px", "$type": "fontSizes" },
     "500": { "$value": "20px", "$type": "fontSizes" },
     "600": { "$value": "24px", "$type": "fontSizes" },
+    "650": { "$value": "28px", "$type": "fontSizes", "$description": "Sub-heading step (heading-1 web / title-lg mobile)" },
     "700": { "$value": "30px", "$type": "fontSizes" },
     "800": { "$value": "36px", "$type": "fontSizes" },
     "900": { "$value": "48px", "$type": "fontSizes" }

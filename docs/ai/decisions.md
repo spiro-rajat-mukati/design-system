@@ -100,6 +100,13 @@ Figma stores/binds certain variable `$type`s on a **different scale or unit** th
 - ~~**CRA → Vite** for `packages/web`~~ — done (D16).
 - **P2 plugin backlog:** Styles sync, component drift via Code Connect, team / GitHub-App auth, npm publishing.
 
+### Parked — Energy reskin + owner-deferred (revisit)
+
+- **Typography: unify web roles to mobile (DEFERRED — owner decision pending).** Make `text.web.*` role names/sizes/weights match `text.mobile.*`; line-height stays per-platform (web ratio, mobile px, from the same `{line-height.*}` token). **Blocker:** buttons/fields use `text.web.label-m` (14px / medium-500) and mobile's ramp has no medium-14 role — pick one: map those labels to `subhead-md` (semibold 600), add a `body-md-medium` (14/500) role to both ramps, or `body-md-regular` (regular 400). On execution: keep web-only `code` + `overline` (no mobile equivalent); drop the unused web roles (`heading-1..6`, fluid `display-*`, `label-l/s`, `body-l` — only in the token showcase, not wired to components). Clean maps: `body-m`→`body-lg-regular`, `body-s`→`body-md-regular`, `caption`→`caption` (12→11px).
+- **Stale input focus-ring after the accent swap.** `components.json` `input.focus-ring` is hardcoded `rgba(60, 97, 221, 0.20)` (old indigo) and `components-dark.json` is `rgba(143, 166, 240, 0.30)` — neither moved with the new accent. Update to the new accent (`rgba(49, 55, 253, 0.20)` / new `brand.300`). Also feeds `radio`/`checkbox`/`tag` focus rings.
+- **Post-build component styling tweaks (apply once all components are built).** Owner's running end-of-build list: disabled-state styling, input help-text toggle. (Task #19.)
+- **Drift report follow-ups (later).** Web capability-missing parity (ProgressBar shape/circular, Tabs orientation/fullWidth, Textarea resize, Select searchable/matchWidth, MultiSelect selectAll/chipCount, Tag selected; mobile Tabs/Tag disabled, mobile ProgressBar indeterminate); web coverage (build Figma pages for Field/Input/Popover).
+
 ---
 
 _Append entries as `D#` / `L#` with a date when decisions or lessons land. Supersede rather than delete._

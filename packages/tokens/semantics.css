@@ -89,7 +89,7 @@
   --text-web-display-s-size: clamp(24px, 2.5vw + 12px, 30px);
   --text-web-display-s-line: var(--line-height-tight);
   --text-web-display-s-weight: var(--font-weight-semibold);
-  --text-web-heading-1-size: var(--font-size-700);
+  --text-web-heading-1-size: var(--font-size-650);
   --text-web-heading-1-line: var(--line-height-snug);
   --text-web-heading-1-weight: var(--font-weight-semibold);
   --text-web-heading-2-size: var(--font-size-600);

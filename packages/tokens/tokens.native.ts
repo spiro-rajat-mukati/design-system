@@ -201,9 +201,9 @@ export const themes = {
     "32": "128px"
   },
   "font-family": {
-    "sans": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "sans": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "serif": "ui-serif, Georgia, \"Times New Roman\", serif",
-    "mono": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+    "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
   },
   "font-size": {
     "25": "10px",
@@ -214,6 +214,7 @@ export const themes = {
     "400": "18px",
     "500": "20px",
     "600": "24px",
+    "650": "28px",
     "700": "30px",
     "800": "36px",
     "900": "48px"
@@ -345,8 +346,8 @@ export const themes = {
         "weight": "600"
       },
       "heading-1": {
-        "size": "30px",
-        "line": "38",
+        "size": "28px",
+        "line": "35",
         "weight": "600"
       },
       "heading-2": {
@@ -413,7 +414,7 @@ export const themes = {
         "size": "14px",
         "line": "21",
         "weight": "400",
-        "family": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+        "family": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
       },
       "overline": {
         "size": "11px",
@@ -429,8 +430,8 @@ export const themes = {
         "weight": "600"
       },
       "title-lg": {
-        "size": "30px",
-        "line": "38",
+        "size": "28px",
+        "line": "35",
         "weight": "600"
       },
       "title-md": {
@@ -506,9 +507,9 @@ export const themes = {
     }
   },
   "button": {
-    "radius": "6px",
+    "radius": "9999px",
     "border-width": "1px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-weight": "500",
     "letter-spacing": "0",
     "icon-gap": "8px",
@@ -622,9 +623,9 @@ export const themes = {
     "border-error": "#DC2626",
     "border-success": "#16A34A",
     "border-disabled": "#E6E8EB",
-    "radius": "6px",
+    "radius": "8px",
     "border-width": "1px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-size": "14px",
     "line-height": "1.5",
     "transition": "border-color 100ms cubic-bezier(0, 0, 0.2, 1), box-shadow 100ms cubic-bezier(0, 0, 0.2, 1)",
@@ -707,7 +708,7 @@ export const themes = {
   },
   "badge": {
     "radius": "9999px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-weight": "500",
     "icon-gap": "4px",
     "padding-inline": {
@@ -754,6 +755,7 @@ export const themes = {
       "lg": "16px"
     },
     "trigger-radius": "6px",
+    "pill-radius": "9999px",
     "list-radius": "6px",
     "trigger-transition": "color 100ms cubic-bezier(0, 0, 0.2, 1), background-color 100ms cubic-bezier(0, 0, 0.2, 1)"
   },
@@ -783,7 +785,7 @@ export const themes = {
     "trigger-bg": "#FFFFFF",
     "trigger-fg": "#11181C",
     "trigger-border": "#D7DBDF",
-    "trigger-radius": "6px",
+    "trigger-radius": "8px",
     "trigger-padding": "8px 12px",
     "chip-bg": "#F0F2F4",
     "chip-fg": "#11181C",
@@ -1005,9 +1007,9 @@ export const themes = {
     "32": "128px"
   },
   "font-family": {
-    "sans": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "sans": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "serif": "ui-serif, Georgia, \"Times New Roman\", serif",
-    "mono": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+    "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
   },
   "font-size": {
     "25": "10px",
@@ -1018,6 +1020,7 @@ export const themes = {
     "400": "18px",
     "500": "20px",
     "600": "24px",
+    "650": "28px",
     "700": "30px",
     "800": "36px",
     "900": "48px"
@@ -1149,8 +1152,8 @@ export const themes = {
         "weight": "600"
       },
       "heading-1": {
-        "size": "30px",
-        "line": "38",
+        "size": "28px",
+        "line": "35",
         "weight": "600"
       },
       "heading-2": {
@@ -1217,7 +1220,7 @@ export const themes = {
         "size": "14px",
         "line": "21",
         "weight": "400",
-        "family": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+        "family": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
       },
       "overline": {
         "size": "11px",
@@ -1233,8 +1236,8 @@ export const themes = {
         "weight": "600"
       },
       "title-lg": {
-        "size": "30px",
-        "line": "38",
+        "size": "28px",
+        "line": "35",
         "weight": "600"
       },
       "title-md": {
@@ -1310,9 +1313,9 @@ export const themes = {
     }
   },
   "button": {
-    "radius": "6px",
+    "radius": "9999px",
     "border-width": "1px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-weight": "500",
     "letter-spacing": "0",
     "icon-gap": "8px",
@@ -1426,9 +1429,9 @@ export const themes = {
     "border-error": "#F87171",
     "border-success": "#4ADE80",
     "border-disabled": "#2C3338",
-    "radius": "6px",
+    "radius": "8px",
     "border-width": "1px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-size": "14px",
     "line-height": "1.5",
     "transition": "border-color 100ms cubic-bezier(0, 0, 0.2, 1), box-shadow 100ms cubic-bezier(0, 0, 0.2, 1)",
@@ -1511,7 +1514,7 @@ export const themes = {
   },
   "badge": {
     "radius": "9999px",
-    "font-family": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "font-family": "\"TT Hoves\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
     "font-weight": "500",
     "icon-gap": "4px",
     "padding-inline": {
@@ -1558,6 +1561,7 @@ export const themes = {
       "lg": "16px"
     },
     "trigger-radius": "6px",
+    "pill-radius": "9999px",
     "list-radius": "6px",
     "trigger-transition": "color 100ms cubic-bezier(0, 0, 0.2, 1), background-color 100ms cubic-bezier(0, 0, 0.2, 1)"
   },
@@ -1587,7 +1591,7 @@ export const themes = {
     "trigger-bg": "#1A1F23",
     "trigger-fg": "#F8F9FA",
     "trigger-border": "#4D5358",
-    "trigger-radius": "6px",
+    "trigger-radius": "8px",
     "trigger-padding": "8px 12px",
     "chip-bg": "#2C3338",
     "chip-fg": "#F8F9FA",

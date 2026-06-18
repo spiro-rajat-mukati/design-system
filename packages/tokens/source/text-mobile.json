@@ -7,7 +7,7 @@
         "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
       },
       "title-lg": {
-        "size":   { "$value": "{font-size.700}",        "$type": "fontSizes" },
+        "size":   { "$value": "{font-size.650}",        "$type": "fontSizes", "$description": "Sub-heading = 28px (was 30/font-size.700)" },
         "line":   { "$value": "{line-height.snug}",     "$type": "lineHeights" },
         "weight": { "$value": "{font-weight.semibold}", "$type": "fontWeights" }
       },

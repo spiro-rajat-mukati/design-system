@@ -3,7 +3,7 @@
 
 :root {
   /* ---------- button ---------- */
-  --button-radius: var(--radius-md);
+  --button-radius: var(--radius-full);
   --button-border-width: var(--border-width-1);
   --button-font-family: var(--font-family-sans);
   --button-font-weight: var(--text-web-label-m-weight);
@@ -91,7 +91,7 @@
   --input-border-error: var(--color-border-error);
   --input-border-success: var(--color-border-success);
   --input-border-disabled: var(--color-border-disabled);
-  --input-radius: var(--radius-md);
+  --input-radius: var(--radius-lg);
   --input-border-width: var(--border-width-1);
   --input-font-family: var(--font-family-sans);
   --input-font-size: var(--text-web-body-s-size);
@@ -209,6 +209,7 @@
   --tabs-trigger-font-md: var(--font-size-200);
   --tabs-trigger-font-lg: var(--font-size-300);
   --tabs-trigger-radius: var(--radius-md);
+  --tabs-pill-radius: var(--radius-full);
   --tabs-list-radius: var(--radius-md);
   --tabs-trigger-transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
 

@@ -1,6 +1,6 @@
 {
   "button": {
-    "radius":         { "$value": "{radius.md}",            "$type": "borderRadius" },
+    "radius":         { "$value": "{radius.full}",          "$type": "borderRadius", "$description": "Pill buttons (fully rounded)" },
     "border-width":   { "$value": "{border-width.1}",       "$type": "borderWidth" },
     "font-family":    { "$value": "{font-family.sans}",     "$type": "fontFamilies" },
     "font-weight":    { "$value": "{text.web.label-m.weight}",  "$type": "fontWeights" },
@@ -114,7 +114,7 @@
     "border-error":    { "$value": "{color.border.error}",      "$type": "color" },
     "border-success":  { "$value": "{color.border.success}",    "$type": "color" },
     "border-disabled": { "$value": "{color.border.disabled}",   "$type": "color" },
-    "radius":          { "$value": "{radius.md}",               "$type": "borderRadius" },
+    "radius":          { "$value": "{radius.lg}",               "$type": "borderRadius", "$description": "Input box radius = 8px (radius.lg); all input sizes + select-trigger inherit via {input.radius}" },
     "border-width":    { "$value": "{border-width.1}",          "$type": "borderWidth" },
     "font-family":     { "$value": "{font-family.sans}",        "$type": "fontFamilies" },
     "font-size":       { "$value": "{text.web.body-s.size}",        "$type": "fontSizes" },
@@ -257,6 +257,7 @@
       "lg": { "$value": "{font-size.300}", "$type": "fontSizes" }
     },
     "trigger-radius":     { "$value": "{radius.md}", "$type": "borderRadius" },
+    "pill-radius":        { "$value": "{radius.full}", "$type": "borderRadius", "$description": "Pill tab selected = fully rounded" },
     "list-radius":        { "$value": "{radius.md}", "$type": "borderRadius" },
     "trigger-transition": { "$value": "color {duration.fast} {ease.out}, background-color {duration.fast} {ease.out}", "$type": "other" }
   },

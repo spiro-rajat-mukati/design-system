@@ -1641,22 +1641,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "dark-web": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "light-ios": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "dark-ios": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "light-android": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         },
         "dark-android": {
-          "alias": "radius/md"
+          "alias": "radius/full"
         }
       }
     },
@@ -6225,22 +6225,22 @@
       "type": "STRING",
       "values": {
         "light-web": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "dark-web": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "light-ios": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "dark-ios": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "light-android": {
-          "value": "Menlo"
+          "value": "DM Mono"
         },
         "dark-android": {
-          "value": "Menlo"
+          "value": "DM Mono"
         }
       }
     },
@@ -6249,10 +6249,10 @@
       "type": "STRING",
       "values": {
         "light-web": {
-          "value": "Inter"
+          "value": "TT Hoves"
         },
         "dark-web": {
-          "value": "Inter"
+          "value": "TT Hoves"
         },
         "light-ios": {
           "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", sans-serif"
@@ -6481,6 +6481,30 @@
         },
         "dark-android": {
           "value": 24
+        }
+      }
+    },
+    {
+      "name": "font-size/650",
+      "type": "FLOAT",
+      "values": {
+        "light-web": {
+          "value": 28
+        },
+        "dark-web": {
+          "value": 28
+        },
+        "light-ios": {
+          "value": 28
+        },
+        "dark-ios": {
+          "value": 28
+        },
+        "light-android": {
+          "value": 28
+        },
+        "dark-android": {
+          "value": 28
         }
       }
     },
@@ -7209,22 +7233,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "dark-web": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "light-ios": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "dark-ios": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "light-android": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         },
         "dark-android": {
-          "alias": "radius/md"
+          "alias": "radius/lg"
         }
       }
     },
@@ -9341,6 +9365,30 @@
       }
     },
     {
+      "name": "tabs/pill-radius",
+      "type": "FLOAT",
+      "values": {
+        "light-web": {
+          "alias": "radius/full"
+        },
+        "dark-web": {
+          "alias": "radius/full"
+        },
+        "light-ios": {
+          "alias": "radius/full"
+        },
+        "dark-ios": {
+          "alias": "radius/full"
+        },
+        "light-android": {
+          "alias": "radius/full"
+        },
+        "dark-android": {
+          "alias": "radius/full"
+        }
+      }
+    },
+    {
       "name": "tabs/segmented-bg-active",
       "type": "COLOR",
       "values": {
@@ -10521,22 +10569,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 38
+          "value": 35
         },
         "dark-web": {
-          "value": 38
+          "value": 35
         },
         "light-ios": {
-          "value": 38
+          "value": 35
         },
         "dark-ios": {
-          "value": 38
+          "value": 35
         },
         "light-android": {
-          "value": 38
+          "value": 35
         },
         "dark-android": {
-          "value": 38
+          "value": 35
         }
       }
     },
@@ -10545,22 +10593,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-web": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "light-ios": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-ios": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "light-android": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-android": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         }
       }
     },
@@ -11409,22 +11457,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "value": 38
+          "value": 35
         },
         "dark-web": {
-          "value": 38
+          "value": 35
         },
         "light-ios": {
-          "value": 38
+          "value": 35
         },
         "dark-ios": {
-          "value": 38
+          "value": 35
         },
         "light-android": {
-          "value": 38
+          "value": 35
         },
         "dark-android": {
-          "value": 38
+          "value": 35
         }
       }
     },
@@ -11433,22 +11481,22 @@
       "type": "FLOAT",
       "values": {
         "light-web": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-web": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "light-ios": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-ios": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "light-android": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         },
         "dark-android": {
-          "alias": "font-size/700"
+          "alias": "font-size/650"
         }
       }
     },
