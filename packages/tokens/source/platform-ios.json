@@ -3,7 +3,7 @@
 
   "font-family": {
     "sans": {
-      "$value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", sans-serif",
+      "$value": "TT Hoves, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", sans-serif",
       "$type": "fontFamilies"
     }
   }
