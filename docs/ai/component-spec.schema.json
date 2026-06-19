@@ -29,7 +29,8 @@
       "properties": {
         "fileKey": { "type": "string" },
         "nodeId": { "type": "string" },
-        "lastSyncedAt": { "type": "string", "format": "date-time" }
+        "lastSyncedAt": { "type": "string", "format": "date-time" },
+        "specFrameNodeId": { "type": "string", "description": "node id of the designer-facing spec/usage frame in Figma (organisms & templates)" }
       }
     },
     "props": {
@@ -223,6 +224,7 @@
         "tests": { "type": "boolean" },
         "a11yAxe": { "type": "boolean", "description": "axe-core zero violations" },
         "lightDarkRtl": { "type": "boolean" },
+        "figmaSpecFrame": { "type": "boolean", "description": "designer-facing spec/usage frame published in Figma beside the component (required for organisms & templates)" },
         "codeConnect": { "type": "boolean", "description": ".figma.tsx published" },
         "driftRegistered": { "type": "boolean", "description": "present in component-manifest.json" },
         "designSignoff": { "type": "boolean", "description": "visual parity vs Figma confirmed" },

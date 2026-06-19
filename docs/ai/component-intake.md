@@ -25,6 +25,7 @@ A committed `<Name>.spec.json` validating against `component-spec.schema.json`, 
 9. **Gates** — design sign-off (visual parity), eng review (`quality-bar.md`), axe-core zero violations, Chromatic snapshot, bundle budget.
 10. **Code Connect publish + drift register** — so Dev Mode shows the real call and the drift report covers it from day one.
 11. **Set the update model** — `regenerate-shell` vs `hand-maintain` + drift (generation is bootstrap-once; re-running over hand-written code clobbers it).
+12. **Publish the designer spec frame in Figma** *(organisms & templates)* — a visual, non-technical usage frame beside the component: purpose, anatomy (which parts are this component vs. its container), options in plain language, states, do/don't, handoff. It's how designers use the component correctly and evolve it for new cases. Record its node id as `figma.specFrameNodeId`. Required on **create and update** — keep it in sync with the component (D20).
 
 ## Tiering — which sections are required
 
@@ -41,6 +42,7 @@ A committed `<Name>.spec.json` validating against `component-spec.schema.json`, 
 | Tokens / theming | **yes** | yes | yes | yes | yes |
 | Validation | inputs only | inputs only | if forms | if forms | — |
 | Performance | — | — | lists/heavy | lists/heavy | yes |
+| **Designer spec frame (Figma)** | — | — | **yes** | **yes** | **yes** |
 
 Don't ask data-model/loading questions of a `Badge`. Don't skip a11y on anything.
 
@@ -100,7 +102,7 @@ Each item notes **[auto]** (pull from the Figma node) or **[ask]** (must be answ
 
 ## Gates / Definition of Done → `definitionOfDone`
 
-Ships only when all true: Storybook story · behaviour unit tests · **axe-core zero violations** · light/dark/RTL pass · Code Connect `.figma.tsx` published · registered in `component-manifest.json` (drift covers it) · design sign-off (visual parity) · eng review (`quality-bar.md`).
+Ships only when all true: Storybook story · behaviour unit tests · **axe-core zero violations** · light/dark/RTL pass · Code Connect `.figma.tsx` published · registered in `component-manifest.json` (drift covers it) · design sign-off (visual parity) · eng review (`quality-bar.md`) · **designer spec frame published in Figma** (organisms & templates).
 
 ---
 

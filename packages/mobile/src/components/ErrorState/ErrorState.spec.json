@@ -10,7 +10,8 @@
   },
   "figma": {
     "fileKey": "VQ49OXLtAbwlBBFABLEjrN",
-    "nodeId": "169:846"
+    "nodeId": "169:846",
+    "specFrameNodeId": "182:252"
   },
   "props": [
     {
@@ -133,6 +134,7 @@
     "tests": true,
     "a11yAxe": false,
     "lightDarkRtl": true,
+    "figmaSpecFrame": true,
     "codeConnect": false,
     "driftRegistered": true,
     "designSignoff": false,
