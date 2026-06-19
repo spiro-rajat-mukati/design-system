@@ -34,6 +34,7 @@ import {
   RadioGroup,
   type ThemeName,
 } from "../src/index";
+import { DemoScreens } from "./screens/DemoScreens";
 
 // ─── Section wrapper ────────────────────────────────────────────────────────
 
@@ -133,7 +134,7 @@ function BottomSheetDemo() {
   );
 }
 
-function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
+function Showcase({ onToggleTheme, onOpenDemos }: { onToggleTheme: () => void; onOpenDemos: () => void }) {
   const { theme, themeName } = useTheme();
   const bg = theme.color.surface.default;
   const fg = theme.color.text.primary;
@@ -151,16 +152,26 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
       {/* Theme toggle bar */}
       <View style={[styles.themeBar, { backgroundColor: theme.color.surface.raised, borderBottomColor: theme.color.border.subtle }]}>
         <Text style={[styles.appTitle, { color: fg }]}>Kijani Mobile</Text>
-        <Pressable
-          onPress={onToggleTheme}
-          style={[styles.toggleBtn, { backgroundColor: theme.color.action.secondary.bg }]}
-          accessibilityRole="button"
-          accessibilityLabel={`Switch to ${themeName === "light" ? "dark" : "light"} mode`}
-        >
-          <Text style={{ color: theme.color.action.secondary.fg, fontSize: 13 }}>
-            {themeName === "light" ? "🌙 Dark" : "☀️ Light"}
-          </Text>
-        </Pressable>
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <Pressable
+            onPress={onOpenDemos}
+            style={[styles.toggleBtn, { backgroundColor: theme.color.action.secondary.bg }]}
+            accessibilityRole="button"
+            accessibilityLabel="Open demo screens"
+          >
+            <Text style={{ color: theme.color.action.secondary.fg, fontSize: 13 }}>Screens →</Text>
+          </Pressable>
+          <Pressable
+            onPress={onToggleTheme}
+            style={[styles.toggleBtn, { backgroundColor: theme.color.action.secondary.bg }]}
+            accessibilityRole="button"
+            accessibilityLabel={`Switch to ${themeName === "light" ? "dark" : "light"} mode`}
+          >
+            <Text style={{ color: theme.color.action.secondary.fg, fontSize: 13 }}>
+              {themeName === "light" ? "🌙 Dark" : "☀️ Light"}
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={[styles.scroll, { backgroundColor: bg }]}>
@@ -574,10 +585,18 @@ function Showcase({ onToggleTheme }: { onToggleTheme: () => void }) {
 
 export default function App() {
   const [theme, setTheme] = useState<ThemeName>("light");
+  const [view, setView] = useState<"components" | "demos">("components");
   return (
     <ThemeProvider forcedTheme={theme}>
       <ToastProvider>
-        <Showcase onToggleTheme={() => setTheme(t => t === "light" ? "dark" : "light")} />
+        {view === "components" ? (
+          <Showcase
+            onToggleTheme={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
+            onOpenDemos={() => setView("demos")}
+          />
+        ) : (
+          <DemoScreens onClose={() => setView("components")} />
+        )}
       </ToastProvider>
     </ThemeProvider>
   );
