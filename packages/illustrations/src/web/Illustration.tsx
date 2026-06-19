@@ -4,13 +4,15 @@
 import * as React from 'react';
 import { Coin } from './Coin';
 import { Battery } from './Battery';
+import { Error } from './Error';
 import type { IllustrationMeta } from '../../manifest';
 
-type IllustrationName = 'coin' | 'battery';
+type IllustrationName = 'coin' | 'battery' | 'error';
 
 const REGISTRY: Record<string, React.ComponentType<{ width?: number | string; alt?: string; className?: string; style?: React.CSSProperties }>> = {
   'coin': Coin,
   'battery': Battery,
+  'error': Error,
 };
 
 export interface IllustrationProps {

@@ -8,6 +8,7 @@ export type IllustrationMeta =
 export const manifest: Readonly<Record<string, IllustrationMeta>> = {
   'coin': { type: 'svg',    width: 240, height: 180 },
   'battery': { type: 'raster', width: 188, height: 98, src: '../../raster/battery.webp', src2x: '../../raster/battery@2x.webp' },
+  'error': { type: 'raster', width: 54, height: 54, src: '../../raster/error.webp', src2x: '../../raster/error@2x.webp' },
 } as const;
 
 export type IllustrationName = keyof typeof manifest;
