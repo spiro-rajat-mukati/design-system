@@ -5,5 +5,7 @@ export { Coin } from './Coin';
 export type { CoinProps } from './Coin';
 export { Battery } from './Battery';
 export type { BatteryProps } from './Battery';
+export { Error } from './Error';
+export type { ErrorProps } from './Error';
 export { Illustration } from './Illustration';
 export type { IllustrationProps } from './Illustration';

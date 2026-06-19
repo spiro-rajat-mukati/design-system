@@ -4,12 +4,14 @@
 import * as React from 'react';
 import { Coin } from './Coin';
 import { Battery } from './Battery';
+import { Error } from './Error';
 
-type IllustrationName = 'coin' | 'battery';
+type IllustrationName = 'coin' | 'battery' | 'error';
 
 const REGISTRY: Record<string, React.ComponentType<{ width?: number; accessibilityLabel?: string }>> = {
   'coin': Coin,
   'battery': Battery,
+  'error': Error,
 };
 
 export interface IllustrationProps {
