@@ -3,7 +3,7 @@
 
   "font-family": {
     "sans": {
-      "$value": "Roboto, \"Noto Sans\", sans-serif",
+      "$value": "TT Hoves, Roboto, \"Noto Sans\", sans-serif",
       "$type": "fontFamilies"
     }
   }
