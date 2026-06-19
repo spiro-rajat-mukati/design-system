@@ -48,6 +48,7 @@ This solo mode intentionally lets the agent merge its own PRs. The lead-review e
 - **Generating a new screen from a prompt or Figma** → read `docs/ai/pipeline.md` + `docs/ai/component-usage.md`.
 - **Token-level change** → read `docs/ai/token-usage.md` first; edit `packages/tokens/source/` only and let `build.mjs` regenerate — never touch the consumer or the generated files.
 - **Reskinning / exploring a new visual style from a reference image** → read `docs/ai/style-extraction.md` (D18): extract the style, regenerate the `core.json` primitives, let references cascade, preview on a `style/<name>` branch.
+- **Generating a component from a Figma component into dev-ready code** → run the intake gate in `docs/ai/component-intake.md` (D19), capture a `<Name>.spec.json` (`docs/ai/component-spec.schema.json`), then generate + review. Assisted bootstrap, not 1:1 codegen.
 
 ## 4. File map (where things live)
 
@@ -91,6 +92,8 @@ Structural changes — forking/detaching a published component, breaking a compo
 - `docs/ai/component-usage.md` — component selection + composition rules
 - `docs/ai/token-usage.md` — token tier rules
 - `docs/ai/style-extraction.md` — reskin the foundations from a reference image (D18)
+- `docs/ai/component-intake.md` — Figma → dev-ready component intake gate / checklist (D19)
+- `docs/ai/component-spec.schema.json` — machine-readable component contract (feeds codegen/stories/tests/Code Connect/drift)
 - `docs/ai/prompting.md` — prompt library
 - `docs/ai/quality-bar.md` — production-readiness checklist
 - `docs/ai/rfc-template.md` — RFC template for structural changes

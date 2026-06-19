@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kijani.spiro/component-spec.schema.json",
+  "title": "Kijani component spec",
+  "description": "Machine-readable contract captured at intake for a component being generated from Figma into dev-ready code. It makes Figma's blind spots (data, state, loading, edge cases, a11y, behavior) explicit, and is the single source that drives codegen, Storybook stories, test stubs, Code Connect (.figma.tsx), and the drift manifest. One file per component: <Name>.spec.json, colocated with the component. See component-intake.md for the human-facing checklist and workflow.",
+  "type": "object",
+  "required": ["meta", "figma", "props", "states", "a11y", "updateModel", "definitionOfDone"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["name", "tier", "platforms", "domain", "location", "owner", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "description": "PascalCase, e.g. BatteryCard" },
+        "tier": { "enum": ["atom", "molecule", "organism-generic", "pattern", "template"], "description": "pattern = product-level (domain-aware) organism" },
+        "platforms": { "type": "array", "items": { "enum": ["web", "mobile"] }, "minItems": 1 },
+        "domain": { "enum": ["generic", "product"], "description": "generic -> @kijani; product -> spiro-app/src/patterns" },
+        "location": { "type": "string", "description": "package + path, e.g. '@kijani/web : components/Field' or 'spiro-app : src/patterns/BatteryCard'" },
+        "owner": { "type": "string" },
+        "status": { "enum": ["draft", "in-review", "ready", "deprecated"] },
+        "replaces": { "type": "string", "description": "component this supersedes + migration note, if any" }
+      }
+    },
+    "figma": {
+      "type": "object",
+      "required": ["fileKey", "nodeId"],
+      "additionalProperties": false,
+      "properties": {
+        "fileKey": { "type": "string" },
+        "nodeId": { "type": "string" },
+        "lastSyncedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "props": {
+      "type": "array",
+      "description": "The dev API. Derived from the DATA MODEL, not the Figma variant matrix. Keep continuous values continuous (level:number), never pre-bucketed. Mark derived values so they are computed in one place, not passed in.",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string", "description": "TS type: number | string | BatteryStatus | ReactNode | ..." },
+          "required": { "type": "boolean", "default": false },
+          "default": {},
+          "enum": { "type": "array", "items": { "type": "string" } },
+          "derived": { "type": "boolean", "description": "computed inside the component (e.g. level -> colour), not set by the consumer" },
+          "fromFigmaVariant": { "type": "string", "description": "Figma variant/property this maps from, if any" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "states": {
+      "type": "object",
+      "required": ["set", "controlModel"],
+      "additionalProperties": false,
+      "properties": {
+        "set": { "type": "array", "items": { "enum": ["default", "hover", "focus", "active", "disabled", "loading", "error", "success", "empty", "selected", "expanded", "read-only"] } },
+        "controlModel": { "enum": ["controlled", "uncontrolled", "both"] },
+        "defaultState": { "type": "string" },
+        "transitions": { "type": "string", "description": "what triggers each change" }
+      }
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "accepts": { "type": "string", "description": "allowed content, e.g. 'any control', 'ReactNode', 'icon'" },
+          "default": { "type": "string" }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "signature"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "description": "onX naming" },
+          "signature": { "type": "string", "description": "e.g. (value: string) => void" },
+          "debounceMs": { "type": "number" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "loading": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "strategy": { "enum": ["skeleton", "spinner", "none"] },
+        "placement": { "type": "string" },
+        "error": { "type": "string", "description": "error UI + retry behavior" },
+        "empty": { "type": "string", "description": "empty-state UI" },
+        "pagination": { "enum": ["none", "paged", "infinite", "lazy"] }
+      }
+    },
+    "edgeCases": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "longText": { "enum": ["truncate", "wrap", "clamp-lines"] },
+        "overflow": { "type": "string" },
+        "nullData": { "type": "string", "description": "behavior when a field is missing/undefined" },
+        "emptyList": { "type": "string" },
+        "maxNumber": { "type": "string", "description": "e.g. show 99+" },
+        "i18n": { "type": "boolean" },
+        "rtl": { "type": "boolean" },
+        "pluralization": { "type": "boolean" }
+      }
+    },
+    "a11y": {
+      "type": "object",
+      "required": ["element", "keyboard"],
+      "additionalProperties": false,
+      "properties": {
+        "element": { "type": "string", "description": "semantic element/role, e.g. 'button', '[role=tab]'" },
+        "aria": { "type": "array", "items": { "type": "string" } },
+        "keyboard": { "type": "array", "items": { "type": "string" }, "description": "key -> action, e.g. 'Enter: activate'" },
+        "focusManagement": { "type": "string", "description": "trap / restore / roving tabindex / none" },
+        "srAnnouncements": { "type": "string", "description": "live-region announcements" },
+        "reducedMotion": { "type": "boolean" }
+      }
+    },
+    "responsive": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sizing": { "enum": ["fluid", "fixed", "fill"] },
+        "breakpoints": { "type": "string" },
+        "touchTargetMinPx": { "type": "number", "default": 44 },
+        "layoutShift": { "type": "string", "description": "mobile <-> desktop layout changes" }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allBound": { "type": "boolean", "description": "every Figma value bound to a variable (drift-lint clean)" },
+        "theming": { "type": "array", "items": { "enum": ["light", "dark", "ios", "android"] } },
+        "motionTokens": { "type": "boolean" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "inputs/forms only",
+      "additionalProperties": false,
+      "properties": {
+        "rules": { "type": "string" },
+        "errorCopy": { "type": "string" },
+        "mask": { "type": "string" },
+        "formIntegration": { "type": "string" }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "memoize": { "type": "boolean" },
+        "virtualizeList": { "type": "boolean" },
+        "imageOptimization": { "type": "boolean" },
+        "bundleBudgetKb": { "type": "number" }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "polymorphicAs": { "type": "boolean", "description": "renders as button/a/etc via `as` prop" },
+        "compoundParts": { "type": "array", "items": { "type": "string" }, "description": "e.g. Card.Header, Card.Body" }
+      }
+    },
+    "codeConnect": {
+      "type": "object",
+      "description": "Figma prop -> code prop mapping for the .figma.tsx bridge (D5/D15). Visual-only Figma axes are omitted.",
+      "additionalProperties": false,
+      "properties": {
+        "mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["figmaProp", "codeProp"],
+            "additionalProperties": false,
+            "properties": {
+              "figmaProp": { "type": "string" },
+              "codeProp": { "type": "string" },
+              "transform": { "type": "string", "description": "enum map / boolean / instance / omit" }
+            }
+          }
+        }
+      }
+    },
+    "tests": {
+      "type": "array",
+      "description": "behaviors to unit-test (behavior, not snapshots)",
+      "items": { "type": "string" }
+    },
+    "ops": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "analytics": { "type": "string", "description": "telemetry hooks/events" },
+        "errorBoundary": { "type": "boolean" },
+        "security": { "type": "string", "description": "sanitization if it renders user-supplied content" },
+        "i18nKeys": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "updateModel": {
+      "enum": ["regenerate-shell", "hand-maintain"],
+      "description": "what happens when the Figma changes AFTER build: regenerate only the presentational shell, or hand-patch and rely on drift detection (D16). Generation is bootstrap-once, not a live binding."
+    },
+    "definitionOfDone": {
+      "type": "object",
+      "required": ["storybook", "tests", "a11yAxe", "codeConnect", "driftRegistered", "designSignoff", "engReview"],
+      "additionalProperties": false,
+      "properties": {
+        "storybook": { "type": "boolean" },
+        "tests": { "type": "boolean" },
+        "a11yAxe": { "type": "boolean", "description": "axe-core zero violations" },
+        "lightDarkRtl": { "type": "boolean" },
+        "codeConnect": { "type": "boolean", "description": ".figma.tsx published" },
+        "driftRegistered": { "type": "boolean", "description": "present in component-manifest.json" },
+        "designSignoff": { "type": "boolean", "description": "visual parity vs Figma confirmed" },
+        "engReview": { "type": "boolean", "description": "meets quality-bar.md" }
+      }
+    }
+  }
+}
