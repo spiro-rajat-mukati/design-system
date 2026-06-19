@@ -3,6 +3,8 @@
 > Reference guide for building **patterns** (domain-aware composites like a "Battery card") and **templates** (full flows/screens) on top of the Kijani primitives. The worked example is the **Battery Image + Battery Details** card reused across the Bike and Station flows.
 >
 > Guiding rule (agreed): **dev-optimal structure wins over design structure.** Figma can carry extra enumerated states/toggles as a convenience; code stays driven by data + a small config, and **Code Connect bridges the two.**
+>
+> Building one of these **from a Figma component**? Run the intake gate first — `component-intake.md` (D19) — and capture a `<Name>.spec.json` before generating.
 
 ---
 
