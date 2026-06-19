@@ -94,3 +94,6 @@ export type { BottomSheetProps } from "./components/BottomSheet";
 
 export { ErrorState } from "./components/ErrorState";
 export type { ErrorStateProps, ErrorStateAction } from "./components/ErrorState";
+
+export { WarningState } from "./components/WarningState";
+export type { WarningStateProps, WarningStateAction } from "./components/WarningState";

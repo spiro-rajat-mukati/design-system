@@ -1,0 +1,111 @@
+{
+  "meta": {
+    "name": "WarningState",
+    "tier": "organism-generic",
+    "platforms": ["mobile"],
+    "domain": "generic",
+    "location": "@kijani/mobile : src/components/WarningState",
+    "owner": "rajat",
+    "status": "draft"
+  },
+  "figma": {
+    "fileKey": "VQ49OXLtAbwlBBFABLEjrN",
+    "nodeId": "178:369",
+    "specFrameNodeId": "190:252"
+  },
+  "props": [
+    { "name": "title", "type": "string", "required": true, "description": "Headline. Rendered as an accessibility header (text/mobile/title-sm)." },
+    { "name": "description", "type": "string", "description": "Supporting copy. Rendered in color/text/warning per the warning tone." },
+    { "name": "steps", "type": "string[]", "fromFigmaVariant": "helpTips", "description": "Optional ordered 'what to do next' steps. Presence shows a divider + numbered list (replaces the Figma helpTips boolean)." },
+    { "name": "stepsTitle", "type": "string", "default": "What to do next?", "description": "Heading above the steps list." },
+    { "name": "illustration", "type": "ReactNode", "description": "Visual above the text (slot). undefined → built-in themed warning badge; null → hidden; otherwise the caller's node." },
+    { "name": "primaryAction", "type": "WarningStateAction", "description": "Filled primary button (e.g. Go Back & Review). Supports a loading spinner." },
+    { "name": "secondaryAction", "type": "WarningStateAction", "description": "Outline secondary button (e.g. Continue). Rendered ABOVE the primary action (consistent with ErrorState)." },
+    { "name": "accessibilityLabel", "type": "string" },
+    { "name": "testID", "type": "string" },
+    { "name": "style", "type": "StyleProp<ViewStyle>" }
+  ],
+  "states": {
+    "set": ["default", "loading"],
+    "controlModel": "uncontrolled",
+    "defaultState": "default",
+    "transitions": "primaryAction.loading / secondaryAction.loading toggle the per-button spinner. Caller-driven; no internal async state."
+  },
+  "slots": [
+    { "name": "illustration", "accepts": "ReactNode", "default": "DefaultWarningIllustration (themed warning badge)" }
+  ],
+  "events": [
+    { "name": "primaryAction.onPress", "signature": "() => void" },
+    { "name": "secondaryAction.onPress", "signature": "() => void" }
+  ],
+  "loading": {
+    "strategy": "spinner",
+    "placement": "on the primary/secondary action button (Button loading state)",
+    "error": "Caller toggles action.loading; WarningState runs no async.",
+    "pagination": "none"
+  },
+  "edgeCases": {
+    "longText": "wrap",
+    "nullData": "description, steps, illustration and both actions are optional; omitted parts are not rendered. steps: undefined/empty → no list.",
+    "i18n": true,
+    "rtl": true
+  },
+  "a11y": {
+    "element": "View group; title is accessibilityRole=header; actions are role=button via the Button primitive",
+    "aria": [
+      "title: accessibilityRole=header",
+      "container: accessibilityLiveRegion=polite",
+      "default illustration + step number badges: importantForAccessibility=no-hide-descendants"
+    ],
+    "keyboard": ["Touch only; VoiceOver/TalkBack read the header, message, steps, then the buttons in order"],
+    "focusManagement": "none — the host BottomSheet owns modal focus",
+    "srAnnouncements": "Container is a polite live region, so the warning is announced when it appears.",
+    "reducedMotion": true
+  },
+  "responsive": {
+    "sizing": "fill",
+    "touchTargetMinPx": 44,
+    "layoutShift": "none; mobile-only; container-agnostic (BottomSheet / full-screen / inline)"
+  },
+  "tokens": {
+    "allBound": true,
+    "theming": ["light", "dark"],
+    "motionTokens": false
+  },
+  "codeConnect": {
+    "mappings": [
+      { "figmaProp": "helpTips", "codeProp": "steps", "transform": "boolean → string[] (presence) or undefined" },
+      { "figmaProp": "Warning Headline", "codeProp": "title", "transform": "text → example string" },
+      { "figmaProp": "body", "codeProp": "description", "transform": "text → example string" },
+      { "figmaProp": "Button (primary)", "codeProp": "primaryAction", "transform": "nested Button instance → primaryAction" },
+      { "figmaProp": "Button (secondary)", "codeProp": "secondaryAction", "transform": "nested Button instance → secondaryAction" }
+    ]
+  },
+  "tests": [
+    "renders title + description",
+    "title has header role",
+    "renders steps + default title when provided",
+    "no steps section when omitted",
+    "honours custom steps title",
+    "primaryAction.onPress fires on press",
+    "secondaryAction.onPress fires on press",
+    "primary does not fire while loading",
+    "custom illustration slot renders",
+    "renders in dark theme"
+  ],
+  "ops": {
+    "security": "title/description/steps are app-supplied strings rendered via <Text> (RN escapes content; no markup injection)."
+  },
+  "updateModel": "hand-maintain",
+  "definitionOfDone": {
+    "storybook": false,
+    "tests": true,
+    "a11yAxe": false,
+    "lightDarkRtl": true,
+    "figmaSpecFrame": true,
+    "codeConnect": false,
+    "driftRegistered": true,
+    "designSignoff": false,
+    "engReview": false
+  }
+}

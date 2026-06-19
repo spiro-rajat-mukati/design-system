@@ -14,6 +14,7 @@ import {
   ProgressBar,
   BottomSheet,
   ErrorState,
+  WarningState,
 } from "../../src/index";
 
 /**
@@ -135,6 +136,42 @@ function ErrorSheetScreen() {
   );
 }
 
+function WarningSheetScreen() {
+  const { theme } = useTheme();
+  const [open, setOpen] = useState(false);
+  return (
+    <ScrollView contentContainerStyle={s.body}>
+      <Text style={[s.h1, { color: theme.color.text.primary }]}>Warning sheet</Text>
+      <Text style={[s.sub, { color: theme.color.text.secondary }]}>
+        WarningState with a “what to do next” steps list, inside a BottomSheet.
+      </Text>
+      <View style={{ height: 20 }} />
+      <Button fullWidth onPress={() => setOpen(true)}>
+        Show warning sheet
+      </Button>
+
+      <BottomSheet
+        visible={open}
+        onClose={() => setOpen(false)}
+        showCloseButton
+        snapPoints={["80%"]}
+      >
+        <WarningState
+          title="Warning Headline"
+          description="You can mark this battery as faulty only if it is mapped to your station"
+          steps={[
+            "Continue with the faulty battery mapping without this battery",
+            "After submitting the faulty battery list, scan this battery again & re-map it to your station first",
+            "After successful re-mapping, mark this battery as faulty again",
+          ]}
+          primaryAction={{ label: "Go Back & Review", onPress: () => setOpen(false) }}
+          secondaryAction={{ label: "Continue", onPress: () => setOpen(false) }}
+        />
+      </BottomSheet>
+    </ScrollView>
+  );
+}
+
 export function DemoScreens({ onClose }: { onClose: () => void }) {
   const { theme } = useTheme();
   const [screen, setScreen] = useState("account");
@@ -158,6 +195,7 @@ export function DemoScreens({ onClose }: { onClose: () => void }) {
             { value: "account", label: "Account" },
             { value: "settings", label: "Settings" },
             { value: "error", label: "Error" },
+            { value: "warning", label: "Warning" },
           ]}
           value={screen}
           onChange={setScreen}
@@ -169,8 +207,10 @@ export function DemoScreens({ onClose }: { onClose: () => void }) {
         <AccountScreen />
       ) : screen === "settings" ? (
         <SettingsScreen />
-      ) : (
+      ) : screen === "error" ? (
         <ErrorSheetScreen />
+      ) : (
+        <WarningSheetScreen />
       )}
     </SafeAreaWrapper>
   );
