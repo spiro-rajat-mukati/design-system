@@ -6255,16 +6255,16 @@
           "value": "TT Hoves"
         },
         "light-ios": {
-          "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", sans-serif"
+          "value": "TT Hoves, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", sans-serif"
         },
         "dark-ios": {
-          "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", sans-serif"
+          "value": "TT Hoves, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"SF Pro Display\", sans-serif"
         },
         "light-android": {
-          "value": "Roboto, \"Noto Sans\", sans-serif"
+          "value": "TT Hoves, Roboto, \"Noto Sans\", sans-serif"
         },
         "dark-android": {
-          "value": "Roboto, \"Noto Sans\", sans-serif"
+          "value": "TT Hoves, Roboto, \"Noto Sans\", sans-serif"
         }
       }
     },
