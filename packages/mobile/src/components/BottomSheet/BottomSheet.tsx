@@ -31,6 +31,7 @@ export function BottomSheet({
   title,
   children,
   showHandle = true,
+  showCloseButton = false,
   closeOnBackdrop = true,
   closeOnSwipeDown = true,
   style,
@@ -213,6 +214,19 @@ export function BottomSheet({
           </View>
         )}
 
+        {showCloseButton && (
+          <Pressable
+            onPress={animateClose}
+            accessibilityRole="button"
+            accessibilityLabel="Close"
+            hitSlop={8}
+            testID={testID ? `${testID}-close` : undefined}
+            style={[styles.closeButton, { right: px(theme.space["4"]) }]}
+          >
+            <Text style={{ fontSize: 18, lineHeight: 20, color: t.text.secondary }}>✕</Text>
+          </Pressable>
+        )}
+
         {title != null && (
           <Text
             style={[
@@ -257,6 +271,15 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 8,
+    zIndex: 2,
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     lineHeight: 28,

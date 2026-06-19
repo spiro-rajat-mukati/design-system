@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, View, StyleSheet } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import { useTheme } from "../../ThemeContext";
 import type { SafeAreaWrapperProps, SafeAreaEdge, SafeAreaSurface } from "./SafeAreaWrapper.types";
 
