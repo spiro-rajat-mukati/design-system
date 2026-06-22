@@ -54,8 +54,11 @@ A Figma node URL for a design file (`/design/{fileKey}/...?node-id={id}`).
 9. **Verify.** `cd packages/{platform} && npx tsc --noEmit && npx jest {Name}`, then
    `node scripts/build-manifest.mjs && node scripts/check-manifest.mjs`. Fix until green.
 
-10. **Designer spec frame (D20).** Load `figma-use`, then build the spec frame beside the
-    component via `use_figma` (anatomy / options / states / do-don't / handoff). Record
+10. **Designer spec frame (D20) — MANDATORY, never skip.** As soon as the dev component is
+    created and verified, build its spec frame: load `figma-use`, then via `use_figma`
+    create the frame beside the component in its source Figma file (anatomy / options /
+    states / do-don't / handoff). This runs for EVERY component the generator produces —
+    organisms, patterns, templates — including product patterns and shakedowns. Record
     `figma.specFrameNodeId` + `definitionOfDone.figmaSpecFrame` in the spec.
 
 11. **Demo.** Add the component to `packages/mobile/demo/screens/DemoScreens.tsx`.
@@ -67,4 +70,4 @@ A Figma node URL for a design file (`/design/{fileKey}/...?node-id={id}`).
 - Generation is an **assisted bootstrap** (D19): the scaffolder + Figma give the shell;
   you design the API + behaviour. Never claim push-button parity.
 - Tokens only — no hardcoded colours/spacing/radius/type (golden rule #1).
-- Spec frame is required for organisms & templates (D20), on create *and* update.
+- Spec frame is **mandatory** for every generated component (organisms, patterns, templates), on create *and* update (D20) — build it as soon as the component is created/verified; never skip it.
