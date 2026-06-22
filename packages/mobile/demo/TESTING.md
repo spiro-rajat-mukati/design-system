@@ -36,20 +36,27 @@ the content, and dismiss — complementing the jest/RNTL unit tests.
 Maestro targets an installed app by **appId**. `app.json` sets it to
 `com.kijani.mobiledemo` (iOS `bundleIdentifier` / Android `package`).
 
-**Recommended — dev build (stable appId):**
-
-```bash
-npx expo run:ios            # or: npx expo run:android  (builds & installs com.kijani.mobiledemo)
-npm run e2e                 # maestro test .maestro  (runs all three flows)
-# single flow:
-maestro test .maestro/02-error-sheet.yaml
-```
-
-**Expo Go (quick, less reliable):** open the project in Expo Go, then override the appId:
+**Quickest — Expo Go (no native build, no CocoaPods, no sudo):** open the project in
+Expo Go (`npm start`, press `i` or scan the QR), then override the appId:
 
 ```bash
 maestro test -e APP_ID=host.exp.Exponent .maestro
+# single flow:
+maestro test -e APP_ID=host.exp.Exponent .maestro/02-error-sheet.yaml
 ```
+
+**Dev build with the stable appId — build in the cloud (no local Xcode/CocoaPods/sudo):**
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest build --profile development   # → install link for com.kijani.mobiledemo
+npm run e2e                                       # maestro test .maestro
+```
+
+**Local native build instead** (only if you want it) needs Xcode + CocoaPods:
+`npx expo run:ios`. On a locked-down Mac, install CocoaPods without admin via
+`gem install --user-install cocoapods` (add `~/.gem/ruby/<version>/bin` to PATH) or
+`brew install cocoapods` — but you don't need this for the flows above.
 
 Flows use visible text selectors (e.g. "Show error sheet", "What to do next?"), so they
 stay readable; keep those labels stable in `demo/screens/DemoScreens.tsx` or update the
