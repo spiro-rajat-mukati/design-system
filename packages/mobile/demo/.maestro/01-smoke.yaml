@@ -1,0 +1,11 @@
+# Smoke — the app launches and the composed "Screens" view is reachable.
+# appId matches app.json (ios.bundleIdentifier / android.package). For Expo Go,
+# override with: maestro test -e APP_ID=host.exp.Exponent (see TESTING.md).
+appId: com.kijani.mobiledemo
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Screens"
+- tapOn: "Screens"
+- assertVisible: "Demo screens"
+- assertVisible: "Account"

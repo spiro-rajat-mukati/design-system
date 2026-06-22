@@ -10,15 +10,19 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kijani.mobiledemo"
     },
     "android": {
+      "package": "com.kijani.mobiledemo",
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       }
     },
+    "scheme": "kijanidemo",
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "output": "static"
     }
   }
 }
