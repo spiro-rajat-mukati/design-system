@@ -97,3 +97,6 @@ export type { ErrorStateProps, ErrorStateAction } from "./components/ErrorState"
 
 export { WarningState } from "./components/WarningState";
 export type { WarningStateProps, WarningStateAction } from "./components/WarningState";
+
+export { BatteryCard } from "./components/BatteryCard";
+export type { BatteryCardProps, BatteryContext, BatteryCardStatus } from "./components/BatteryCard";

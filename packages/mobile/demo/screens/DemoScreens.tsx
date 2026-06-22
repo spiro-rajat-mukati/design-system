@@ -15,6 +15,7 @@ import {
   BottomSheet,
   ErrorState,
   WarningState,
+  BatteryCard,
 } from "../../src/index";
 
 /**
@@ -172,6 +173,24 @@ function WarningSheetScreen() {
   );
 }
 
+function BatteryDemoScreen() {
+  const { theme } = useTheme();
+  return (
+    <ScrollView contentContainerStyle={s.body}>
+      <Text style={[s.h1, { color: theme.color.text.primary }]}>Battery card</Text>
+      <Text style={[s.sub, { color: theme.color.text.secondary }]}>
+        Generated via the kijani-component-generator shakedown — closest Kijani primitives, not exact product art.
+      </Text>
+      <View style={{ height: 16 }} />
+      <BatteryCard name="U7B1LBNL36300660" level={7} context="bike" status="error" />
+      <View style={{ height: 16 }} />
+      <BatteryCard name="U7B1LBNL36300660" level={64} context="station" status="in-progress" />
+      <View style={{ height: 16 }} />
+      <BatteryCard name="U7B1LBNL36300660" level="unknown" context="bike" onRemap={() => {}} />
+    </ScrollView>
+  );
+}
+
 export function DemoScreens({ onClose }: { onClose: () => void }) {
   const { theme } = useTheme();
   const [screen, setScreen] = useState("account");
@@ -196,6 +215,7 @@ export function DemoScreens({ onClose }: { onClose: () => void }) {
             { value: "settings", label: "Settings" },
             { value: "error", label: "Error" },
             { value: "warning", label: "Warning" },
+            { value: "battery", label: "Battery" },
           ]}
           value={screen}
           onChange={setScreen}
@@ -209,8 +229,10 @@ export function DemoScreens({ onClose }: { onClose: () => void }) {
         <SettingsScreen />
       ) : screen === "error" ? (
         <ErrorSheetScreen />
-      ) : (
+      ) : screen === "warning" ? (
         <WarningSheetScreen />
+      ) : (
+        <BatteryDemoScreen />
       )}
     </SafeAreaWrapper>
   );

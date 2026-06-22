@@ -1,0 +1,73 @@
+{
+  "meta": {
+    "name": "BatteryCard",
+    "tier": "pattern",
+    "platforms": ["mobile"],
+    "domain": "product",
+    "location": "@kijani/mobile : src/components/BatteryCard",
+    "owner": "rajat",
+    "status": "draft"
+  },
+  "figma": { "fileKey": "dQRT3wlyyiNh2WjjXPejWK", "nodeId": "40002084:16516" },
+  "props": [
+    { "name": "name", "type": "string", "required": true, "description": "Battery serial / display name, e.g. U7B1LBNL36300660." },
+    { "name": "level", "type": "number | \"unknown\"", "required": true, "description": "0-100 charge → derived tone; 'unknown' → SoC-unknown state with a re-map link." },
+    { "name": "context", "type": "BatteryContext", "required": true, "enum": ["bike", "station"], "fromFigmaVariant": "Remap To", "description": "Set by the flow; drives the Bike/Station indicator + the default caption." },
+    { "name": "caption", "type": "string", "description": "Subheading below the image; defaults to 'Re-Map Battery to {Bike|Station}'." },
+    { "name": "status", "type": "BatteryCardStatus", "enum": ["default", "in-progress", "warning", "error"], "default": "default", "description": "Flow state; tints the background pattern (grey/blue/yellow/red)." },
+    { "name": "illustration", "type": "ReactNode", "description": "Battery image slot; default themed placeholder (real default: @kijani/illustrations Battery)." },
+    { "name": "onRemap", "type": "() => void", "description": "Fired by the re-map link, only in the 'unknown' level state." },
+    { "name": "remapLabel", "type": "string", "default": "Re-map battery", "description": "Label for the re-map link." },
+    { "name": "testID", "type": "string" },
+    { "name": "style", "type": "StyleProp<ViewStyle>" }
+  ],
+  "states": {
+    "set": ["default", "loading", "error"],
+    "controlModel": "uncontrolled",
+    "defaultState": "default",
+    "transitions": "status drives the background tint (default→grey, in-progress→info/blue, warning→amber, error→red); level number→derived charge tone, 'unknown'→re-map link."
+  },
+  "slots": [
+    { "name": "illustration", "accepts": "ReactNode", "default": "themed placeholder (real: @kijani/illustrations Battery)" }
+  ],
+  "events": [
+    { "name": "onRemap", "signature": "() => void", "description": "re-map link tapped (unknown level state)" }
+  ],
+  "edgeCases": {
+    "longText": "wrap",
+    "nullData": "caption derives from context when omitted; illustration falls back to a placeholder; onRemap optional (link is static if absent).",
+    "maxNumber": "level clamped 0-100",
+    "rtl": true
+  },
+  "a11y": {
+    "element": "View group; battery level is a Badge with text; the re-map link is role=button",
+    "aria": ["re-map link: accessibilityRole=button + accessibilityLabel", "decorative illustration + indicator hidden from SR where appropriate"],
+    "keyboard": ["Touch only; the re-map link is the sole focusable control"],
+    "focusManagement": "none",
+    "reducedMotion": true
+  },
+  "responsive": { "sizing": "fill", "touchTargetMinPx": 44, "layoutShift": "none; mobile-only" },
+  "tokens": { "allBound": true, "theming": ["light", "dark"], "motionTokens": false },
+  "codeConnect": {
+    "mappings": [
+      { "figmaProp": "Remap To", "codeProp": "context", "transform": "enum: Bike→bike, Station→station" },
+      { "figmaProp": "Battery Name", "codeProp": "name", "transform": "text → string" },
+      { "figmaProp": "Battery Level", "codeProp": "level", "transform": "continuous number or 'unknown'" }
+    ]
+  },
+  "tests": [
+    "renders name + derived caption from context",
+    "overrides caption when provided",
+    "renders battery level percent with derived tone",
+    "shows re-map link in unknown state and fires onRemap",
+    "no re-map link when level is a number",
+    "applies a status background tint",
+    "renders in dark theme"
+  ],
+  "ops": { "security": "name/caption are app strings rendered via <Text>; no markup injection." },
+  "updateModel": "hand-maintain",
+  "definitionOfDone": {
+    "storybook": false, "tests": true, "a11yAxe": false, "lightDarkRtl": true,
+    "codeConnect": false, "driftRegistered": true, "designSignoff": false, "engReview": false
+  }
+}

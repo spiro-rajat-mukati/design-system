@@ -1,6 +1,6 @@
 {
   "platform": "mobile",
-  "generatedAt": "2026-06-19T19:22:54.779Z",
+  "generatedAt": "2026-06-22T23:05:00.632Z",
   "components": [
     {
       "name": "ActionSheet",
@@ -95,6 +95,65 @@
           "children",
           "leadingicon",
           "withdot"
+        ]
+      }
+    },
+    {
+      "name": "BatteryCard",
+      "source": "packages/mobile/src/components/BatteryCard/BatteryCard.types.ts",
+      "platform": "mobile",
+      "props": {
+        "name": {
+          "kind": "other"
+        },
+        "level": {
+          "kind": "union",
+          "options": [
+            "unknown"
+          ]
+        },
+        "context": {
+          "kind": "union",
+          "options": [
+            "bike",
+            "station"
+          ]
+        },
+        "caption": {
+          "kind": "other"
+        },
+        "status": {
+          "kind": "union",
+          "options": [
+            "default",
+            "in-progress",
+            "warning",
+            "error"
+          ]
+        },
+        "illustration": {
+          "kind": "node"
+        },
+        "onRemap": {
+          "kind": "other"
+        },
+        "remapLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        },
+        "style": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "remap to"
+        ],
+        "codeMapped": [
+          "context"
         ]
       }
     },
