@@ -12,10 +12,10 @@
  *   - <Name>.spec.json       (copied into the component dir if not already there)
  * Then: appends the library export to src/index.ts and regenerates the manifest.
  *
- * Deterministic only — no AI, zero dependencies. Part of the `new-organism` flow.
+ * Deterministic only — no AI, zero dependencies. Part of the Kijani Component Generator flow.
  *
  * Usage:
- *   node tools/component-gen/scaffold.mjs --spec <path/to/Name.spec.json> [flags]
+ *   node tools/kijani-component-generator/scaffold.mjs --spec <path/to/Name.spec.json> [flags]
  * Flags:
  *   --force        overwrite existing .tsx/.types even if present (default: keep)
  *   --no-index     don't append the export to src/index.ts

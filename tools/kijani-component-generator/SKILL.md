@@ -1,12 +1,12 @@
 ---
-name: new-organism
-description: Convert a Figma organism/component into a dev-ready @kijani component. Interviews you for the gaps Figma can't show, writes <Name>.spec.json, runs the deterministic scaffolder, builds the Figma designer spec frame, verifies, and commits — pausing at approve-gates. Use when turning a Figma node into a coded component, building an organism, reconciling a Figma component into code, or when the user says "new organism", "build this Figma component", or pastes a Figma component URL to implement.
+name: kijani-component-generator
+description: Convert a Figma organism/component into a dev-ready @kijani component. Interviews you for the gaps Figma can't show, writes <Name>.spec.json, runs the deterministic scaffolder, builds the Figma designer spec frame, verifies, and commits — pausing at approve-gates. Use when turning a Figma node into a coded component, building an organism, reconciling a Figma component into code, or when the user says "Kijani component generator", "generate a component", "build this Figma component", "new organism", or pastes a Figma component URL to implement.
 ---
 
-# new-organism — Figma → dev-ready @kijani component
+# Kijani Component Generator — Figma → dev-ready @kijani component
 
 Orchestrates the D19 intake gate + D20 spec frame. The **deterministic** work is done by
-the scaffolder (`tools/component-gen/scaffold.mjs`); you (the agent) do only the judgment
+the scaffolder (`tools/kijani-component-generator/scaffold.mjs`); you (the agent) do only the judgment
 bits and stop at the three approve-gates. The DesignSync plugin is NOT involved in
 generation — it only does drift + Code Connect (D5).
 
@@ -40,7 +40,7 @@ A Figma node URL for a design file (`/design/<fileKey>/...?node-id=<id>`).
    redundant props. Confirm the prop list with the user.
 
 7. **Scaffold (deterministic).**
-   `node tools/component-gen/scaffold.mjs --spec <path-to-spec.json>`
+   `node tools/kijani-component-generator/scaffold.mjs --spec <path-to-spec.json>`
    Emits types, a compiling component shell, the barrel, a Code Connect stub, and a test
    file (smoke test + `it.todo` per `spec.tests`); appends the library export; regenerates
    the manifest. Respects `updateModel` — won't clobber hand-maintained files without

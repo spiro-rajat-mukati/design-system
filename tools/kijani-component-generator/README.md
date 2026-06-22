@@ -1,4 +1,4 @@
-# component-gen — the organism → dev-ready flow
+# Kijani Component Generator — the organism → dev-ready flow
 
 Automates the mechanical half of turning a Figma organism into a `@kijani` component.
 
@@ -6,7 +6,7 @@ Automates the mechanical half of turning a Figma organism into a `@kijani` compo
   it emits the types, a compiling component shell, the barrel, a Code Connect stub, and a
   test file; appends the library export; and regenerates the manifest. It never writes the
   component *body* or the prop API — those are judgment calls (D19).
-- **`SKILL.md`** — the `new-organism` orchestration skill. It drives the full flow:
+- **`SKILL.md`** — the `kijani-component-generator` orchestration skill. It drives the full flow:
   read Figma → classify → dedup (gate) → interview the gaps → write the spec → API review
   (gate) → run the scaffolder → implement body + tests → verify → spec frame (D20) →
   demo → commit (gate). Install it via Settings → Capabilities (or bundle it in a plugin);
@@ -15,7 +15,7 @@ Automates the mechanical half of turning a Figma organism into a `@kijani` compo
 ## Quick use (scaffolder only)
 
 ```bash
-node tools/component-gen/scaffold.mjs --spec packages/mobile/src/components/Foo/Foo.spec.json
+node tools/kijani-component-generator/scaffold.mjs --spec packages/mobile/src/components/Foo/Foo.spec.json
 # flags: --force (overwrite hand-maintained files) · --no-index · --no-manifest
 ```
 
