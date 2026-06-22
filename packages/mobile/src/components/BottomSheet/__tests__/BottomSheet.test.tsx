@@ -130,4 +130,27 @@ describe("BottomSheet", () => {
     );
     expect(getByTestId("bs-handle-area")).toBeTruthy();
   });
+
+  it("renders a close button and calls onClose when showCloseButton", () => {
+    const onClose = jest.fn();
+    const { getByLabelText } = wrap(
+      <BottomSheet {...baseProps} onClose={onClose} showCloseButton testID="bs">
+        {null}
+      </BottomSheet>,
+    );
+    fireEvent.press(getByLabelText("Close"));
+    act(() => {
+      jest.runAllTimers();
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not render a close button by default", () => {
+    const { queryByLabelText } = wrap(
+      <BottomSheet {...baseProps} testID="bs">
+        {null}
+      </BottomSheet>,
+    );
+    expect(queryByLabelText("Close")).toBeNull();
+  });
 });

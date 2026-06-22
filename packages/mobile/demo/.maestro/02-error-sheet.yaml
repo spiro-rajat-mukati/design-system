@@ -1,0 +1,13 @@
+# Error sheet — open the ErrorState organism in a BottomSheet, see the actions,
+# and dismiss it via the secondary action.
+appId: com.kijani.mobiledemo
+---
+- launchApp:
+    clearState: true
+- tapOn: "Screens"
+- tapOn: "Error"
+- tapOn: "Show error sheet"
+- assertVisible: "Try Again"
+- assertVisible: "Go Back"
+- tapOn: "Go Back"
+- assertNotVisible: "Try Again"

@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "name": "ErrorState",
+    "tier": "organism-generic",
+    "platforms": ["mobile"],
+    "domain": "generic",
+    "location": "@kijani/mobile : src/components/ErrorState",
+    "owner": "rajat",
+    "status": "draft"
+  },
+  "figma": {
+    "fileKey": "VQ49OXLtAbwlBBFABLEjrN",
+    "nodeId": "169:846",
+    "specFrameNodeId": "182:252"
+  },
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Headline. Rendered as an accessibility header (text/mobile/title-sm)."
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "Supporting copy. Rendered in color/text/danger per the design decision."
+    },
+    {
+      "name": "illustration",
+      "type": "ReactNode",
+      "description": "Visual above the text (slot). undefined → built-in themed danger badge; null → hidden; otherwise the caller's node."
+    },
+    {
+      "name": "primaryAction",
+      "type": "ErrorStateAction",
+      "description": "Filled primary button (e.g. Try Again). Supports a loading spinner."
+    },
+    {
+      "name": "secondaryAction",
+      "type": "ErrorStateAction",
+      "fromFigmaVariant": "secondaryAction",
+      "description": "Outline secondary button (e.g. Go Back). Rendered ABOVE the primary action to mirror the Figma."
+    },
+    { "name": "accessibilityLabel", "type": "string" },
+    { "name": "testID", "type": "string" },
+    { "name": "style", "type": "StyleProp<ViewStyle>" }
+  ],
+  "states": {
+    "set": ["default", "loading"],
+    "controlModel": "uncontrolled",
+    "defaultState": "default",
+    "transitions": "primaryAction.loading / secondaryAction.loading toggle the per-button spinner. Caller-driven; the component holds no internal async state."
+  },
+  "slots": [
+    {
+      "name": "illustration",
+      "accepts": "ReactNode",
+      "default": "DefaultErrorIllustration (themed danger badge)"
+    }
+  ],
+  "events": [
+    { "name": "primaryAction.onPress", "signature": "() => void" },
+    { "name": "secondaryAction.onPress", "signature": "() => void" }
+  ],
+  "loading": {
+    "strategy": "spinner",
+    "placement": "on the primary/secondary action button (Button loading state)",
+    "error": "Caller toggles action.loading during the retry; ErrorState runs no async.",
+    "pagination": "none"
+  },
+  "edgeCases": {
+    "longText": "wrap",
+    "nullData": "description, illustration and both actions are optional; omitted parts are not rendered (illustration undefined→default, null→hidden).",
+    "i18n": true,
+    "rtl": true
+  },
+  "a11y": {
+    "element": "View group; title is accessibilityRole=header; actions are role=button via the Button primitive",
+    "aria": [
+      "title: accessibilityRole=header",
+      "container: accessibilityLiveRegion=polite",
+      "default illustration: importantForAccessibility=no-hide-descendants"
+    ],
+    "keyboard": ["Touch only; VoiceOver/TalkBack read the header then the buttons in order"],
+    "focusManagement": "none — the host BottomSheet owns modal focus (accessibilityViewIsModal)",
+    "srAnnouncements": "Container is a polite live region, so the error is announced when it appears.",
+    "reducedMotion": true
+  },
+  "responsive": {
+    "sizing": "fill",
+    "touchTargetMinPx": 44,
+    "layoutShift": "none; mobile-only; container-agnostic (BottomSheet / full-screen / inline)"
+  },
+  "tokens": {
+    "allBound": true,
+    "theming": ["light", "dark"],
+    "motionTokens": false
+  },
+  "codeConnect": {
+    "mappings": [
+      {
+        "figmaProp": "secondaryAction",
+        "codeProp": "secondaryAction",
+        "transform": "boolean → secondaryAction object or undefined"
+      },
+      {
+        "figmaProp": "Error Headline",
+        "codeProp": "title",
+        "transform": "text → example string"
+      },
+      {
+        "figmaProp": "body",
+        "codeProp": "description",
+        "transform": "text → example string"
+      }
+    ]
+  },
+  "tests": [
+    "renders title + description",
+    "title has header role",
+    "primaryAction.onPress fires on press",
+    "secondaryAction.onPress fires on press",
+    "no secondary action when omitted",
+    "primary does not fire while loading",
+    "custom illustration slot renders",
+    "renders in dark theme"
+  ],
+  "ops": {
+    "security": "title/description are app-supplied strings rendered via <Text> (RN escapes content; no markup injection)."
+  },
+  "updateModel": "hand-maintain",
+  "definitionOfDone": {
+    "storybook": false,
+    "tests": true,
+    "a11yAxe": false,
+    "lightDarkRtl": true,
+    "figmaSpecFrame": true,
+    "codeConnect": false,
+    "driftRegistered": true,
+    "designSignoff": false,
+    "engReview": false
+  }
+}

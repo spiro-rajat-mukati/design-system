@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useTheme } from "../../ThemeContext";
 import { px } from "../../utils/tokens";
-import type { TabsProps, TabsVariant } from "./Tabs.types";
+import type { TabsProps } from "./Tabs.types";
 
 const V_PAD: Record<"sm" | "md" | "lg", number> = { sm: 8, md: 12, lg: 12 };
 const H_PAD: Record<"sm" | "md" | "lg", number> = { sm: 12, md: 16, lg: 20 };
@@ -36,7 +36,6 @@ export function Tabs({
   const vPad = V_PAD[size];
   const hPad = H_PAD[size];
   const fontSize = FONT[size];
-  const radius = px(t["trigger-radius"]);
   const pillRadius = px(t["pill-radius"]);
 
   function renderTab(item: (typeof items)[number]) {

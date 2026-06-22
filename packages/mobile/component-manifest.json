@@ -1,6 +1,6 @@
 {
   "platform": "mobile",
-  "generatedAt": "2026-06-18T15:39:05.719Z",
+  "generatedAt": "2026-06-19T19:22:54.779Z",
   "components": [
     {
       "name": "ActionSheet",
@@ -122,6 +122,9 @@
           "kind": "node"
         },
         "showHandle": {
+          "kind": "boolean"
+        },
+        "showCloseButton": {
           "kind": "boolean"
         },
         "closeOnBackdrop": {
@@ -264,6 +267,44 @@
           "checked",
           "indeterminate"
         ]
+      }
+    },
+    {
+      "name": "ErrorState",
+      "source": "packages/mobile/src/components/ErrorState/ErrorState.types.ts",
+      "platform": "mobile",
+      "props": {
+        "title": {
+          "kind": "other"
+        },
+        "description": {
+          "kind": "other"
+        },
+        "illustration": {
+          "kind": "node"
+        },
+        "primaryAction": {
+          "kind": "other"
+        },
+        "secondaryAction": {
+          "kind": "other"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        },
+        "style": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "secondaryaction"
+        ],
+        "codeMapped": []
       }
     },
     {
@@ -952,6 +993,50 @@
           "message",
           "title",
           "tone"
+        ],
+        "codeMapped": []
+      }
+    },
+    {
+      "name": "WarningState",
+      "source": "packages/mobile/src/components/WarningState/WarningState.types.ts",
+      "platform": "mobile",
+      "props": {
+        "title": {
+          "kind": "other"
+        },
+        "description": {
+          "kind": "other"
+        },
+        "steps": {
+          "kind": "other"
+        },
+        "stepsTitle": {
+          "kind": "other"
+        },
+        "illustration": {
+          "kind": "node"
+        },
+        "primaryAction": {
+          "kind": "other"
+        },
+        "secondaryAction": {
+          "kind": "other"
+        },
+        "accessibilityLabel": {
+          "kind": "other"
+        },
+        "testID": {
+          "kind": "other"
+        },
+        "style": {
+          "kind": "other"
+        }
+      },
+      "codeConnect": true,
+      "ccMappings": {
+        "figmaMapped": [
+          "helptips"
         ],
         "codeMapped": []
       }

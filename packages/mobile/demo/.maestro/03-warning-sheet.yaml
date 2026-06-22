@@ -1,0 +1,14 @@
+# Warning sheet — open the WarningState organism, verify the "what to do next"
+# steps list + both actions render, then proceed via the secondary action.
+appId: com.kijani.mobiledemo
+---
+- launchApp:
+    clearState: true
+- tapOn: "Screens"
+- tapOn: "Warning"
+- tapOn: "Show warning sheet"
+- assertVisible: "What to do next?"
+- assertVisible: "Go Back & Review"
+- assertVisible: "Continue"
+- tapOn: "Continue"
+- assertNotVisible: "What to do next?"

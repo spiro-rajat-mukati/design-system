@@ -17,7 +17,7 @@ figma.connect(
       title: figma.string("Title"),
       message: figma.string("Message"),
     },
-    example: ({ tone, title, message }) => (
+    example: () => (
       <ToastProvider>{null}</ToastProvider>
     ),
   }

@@ -91,3 +91,9 @@ export type { ListItemProps, ListItemVariant } from "./components/ListItem";
 
 export { BottomSheet } from "./components/BottomSheet";
 export type { BottomSheetProps } from "./components/BottomSheet";
+
+export { ErrorState } from "./components/ErrorState";
+export type { ErrorStateProps, ErrorStateAction } from "./components/ErrorState";
+
+export { WarningState } from "./components/WarningState";
+export type { WarningStateProps, WarningStateAction } from "./components/WarningState";

@@ -48,7 +48,7 @@ This solo mode intentionally lets the agent merge its own PRs. The lead-review e
 - **Generating a new screen from a prompt or Figma** → read `docs/ai/pipeline.md` + `docs/ai/component-usage.md`.
 - **Token-level change** → read `docs/ai/token-usage.md` first; edit `packages/tokens/source/` only and let `build.mjs` regenerate — never touch the consumer or the generated files.
 - **Reskinning / exploring a new visual style from a reference image** → read `docs/ai/style-extraction.md` (D18): extract the style, regenerate the `core.json` primitives, let references cascade, preview on a `style/<name>` branch.
-- **Generating a component from a Figma component into dev-ready code** → run the intake gate in `docs/ai/component-intake.md` (D19), capture a `<Name>.spec.json` (`docs/ai/component-spec.schema.json`), then generate + review. Assisted bootstrap, not 1:1 codegen.
+- **Generating a component from a Figma component into dev-ready code** → run the intake gate in `docs/ai/component-intake.md` (D19), capture a `<Name>.spec.json` (`docs/ai/component-spec.schema.json`), then generate + review. Assisted bootstrap, not 1:1 codegen. For **organisms and templates**, also publish a designer-facing **spec frame** in Figma beside the component (visual, non-technical: anatomy, options, states, do/don't, handoff) — required on create and update (D20). The whole flow is automated by the **`kijani-component-generator`** skill + the deterministic scaffolder in `tools/kijani-component-generator/` (D21).
 
 ## 4. File map (where things live)
 
@@ -62,6 +62,7 @@ This solo mode intentionally lets the agent merge its own PRs. The lead-review e
 | `figma-plugin/` | DesignSync plugin — two-way Figma↔GitHub token sync |
 | `site/` | Showcase + docs site (static HTML, no build) |
 | `docs/ai/` | Deep-dive guides for AI usage |
+| `tools/kijani-component-generator/` | Organism→component automation: deterministic scaffolder + the `kijani-component-generator` skill (D21) |
 | `.storybook/` | Storybook config |
 | `.github/workflows/` | CI — token validate/build + Chromatic |
 
@@ -106,4 +107,4 @@ Structural changes — forking/detaching a published component, breaking a compo
 
 ---
 
-_Last reviewed: 2026-06-14 · Owned by: Rajat (solo; design + eng leads once the team grows) · RFC template: `docs/ai/rfc-template.md`_
+_Last reviewed: 2026-06-20 · Owned by: Rajat (solo; design + eng leads once the team grows) · RFC template: `docs/ai/rfc-template.md`_
