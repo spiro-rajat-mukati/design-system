@@ -1,6 +1,6 @@
 ---
 name: kijani-component-generator
-description: Convert a Figma organism/component into a dev-ready @kijani component. Interviews you for the gaps Figma can't show, writes <Name>.spec.json, runs the deterministic scaffolder, builds the Figma designer spec frame, verifies, and commits — pausing at approve-gates. Use when turning a Figma node into a coded component, building an organism, reconciling a Figma component into code, or when the user says "Kijani component generator", "generate a component", "build this Figma component", "new organism", or pastes a Figma component URL to implement.
+description: Convert a Figma organism/component into a dev-ready @kijani component. Interviews you for the gaps Figma can't show, writes {Name}.spec.json, runs the deterministic scaffolder, builds the Figma designer spec frame, verifies, and commits — pausing at approve-gates. Use when turning a Figma node into a coded component, building an organism, reconciling a Figma component into code, or when the user says "Kijani component generator", "generate a component", "build this Figma component", "new organism", or pastes a Figma component URL to implement.
 ---
 
 # Kijani Component Generator — Figma → dev-ready @kijani component
@@ -11,7 +11,7 @@ bits and stop at the three approve-gates. The DesignSync plugin is NOT involved 
 generation — it only does drift + Code Connect (D5).
 
 ## Input
-A Figma node URL for a design file (`/design/<fileKey>/...?node-id=<id>`).
+A Figma node URL for a design file (`/design/{fileKey}/...?node-id={id}`).
 
 ## Steps
 
@@ -32,7 +32,7 @@ A Figma node URL for a design file (`/design/<fileKey>/...?node-id=<id>`).
    then ask the user ONLY the unknowns (behaviour, control model, states, loading, edge
    cases, a11y, tone, slots) via AskUserQuestion.
 
-5. **Write the spec.** Assemble `<Name>.spec.json` (must validate against the schema).
+5. **Write the spec.** Assemble `{Name}.spec.json` (must validate against the schema).
    This is the single source of truth for the rest of the flow.
 
 6. **Design the API — APPROVE-GATE 2.** Props mirror the *data model*, not the Figma
@@ -40,18 +40,18 @@ A Figma node URL for a design file (`/design/<fileKey>/...?node-id=<id>`).
    redundant props. Confirm the prop list with the user.
 
 7. **Scaffold (deterministic).**
-   `node tools/kijani-component-generator/scaffold.mjs --spec <path-to-spec.json>`
+   `node tools/kijani-component-generator/scaffold.mjs --spec {path-to-spec.json}`
    Emits types, a compiling component shell, the barrel, a Code Connect stub, and a test
    file (smoke test + `it.todo` per `spec.tests`); appends the library export; regenerates
    the manifest. Respects `updateModel` — won't clobber hand-maintained files without
    `--force`.
 
-8. **Implement the body.** Fill `<Name>.tsx` from the Figma node + spec: real behaviour,
+8. **Implement the body.** Fill `{Name}.tsx` from the Figma node + spec: real behaviour,
    states, loading, accessibility (roles, focus, live region), tokens only (no hardcoded
    values), light + dark. Replace each `it.todo` with a real test. Map props in
-   `<Name>.figma.tsx`.
+   `{Name}.figma.tsx`.
 
-9. **Verify.** `cd packages/<platform> && npx tsc --noEmit && npx jest <Name>`, then
+9. **Verify.** `cd packages/{platform} && npx tsc --noEmit && npx jest {Name}`, then
    `node scripts/build-manifest.mjs && node scripts/check-manifest.mjs`. Fix until green.
 
 10. **Designer spec frame (D20).** Load `figma-use`, then build the spec frame beside the
