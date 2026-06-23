@@ -22,7 +22,7 @@
     "scheme": "kijanidemo",
     "web": {
       "bundler": "metro",
-      "output": "static"
+      "output": "single"
     }
   }
 }
